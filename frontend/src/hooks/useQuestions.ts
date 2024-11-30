@@ -1,7 +1,33 @@
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../App';
-import { Question } from '../types/question';
 import { Market, MarketsClient } from '../utils/MarketsClient';
+
+// Define Article type
+interface Article {
+  id: string;
+  author: string;
+  title: string;
+  published_date: string;
+  isKeyEvent: boolean;
+  description: string;
+  main_image_url: string;
+  content: any[]; // You might want to define a more specific type for content
+}
+
+// Define Question type
+interface Question {
+  id: string;
+  question: string;
+  category?: string;
+  totalPredictions: number;
+  data: Array<{
+    date: string;
+    probability: number;
+  }>;
+  articles: Article[];
+  isUserQuestion?: boolean;
+  isFollowing?: boolean;
+}
 
 const INITIAL_QUESTIONS: Question[] = [
   {
@@ -17,28 +43,44 @@ const INITIAL_QUESTIONS: Question[] = [
     ],
     articles: [
       {
+        id: 'a',
+        author: 'Mas',
         title: "Google DeepMind Achieves Major Breakthrough in AGI Research",
-        url: "#",
-        date: 'Feb',
-        isKeyEvent: true
+        published_date: 'Feb',
+        isKeyEvent: true,
+        content: [],
+        description: 'Lorem Ipsum',
+        main_image_url: '',
       },
       {
+        id: 'b',
+        author: 'Shoehas',
         title: "Leading AI Researchers Debate Intelligence Metrics",
-        url: "#",
-        date: 'Feb',
-        isKeyEvent: false
+        published_date: 'Feb',
+        isKeyEvent: false,
+        description: 'Lorem Ipsum',
+        main_image_url: '',
+        content: [],
       },
       {
+        id: 'c',
+        author: 'George',
         title: "New Neural Architecture Shows Human-Level Reasoning",
-        url: "#",
-        date: 'Mar',
-        isKeyEvent: true
+        published_date: 'Mar',
+        isKeyEvent: true,
+        description: 'Lorem Ipsum',
+        main_image_url: '',
+        content: [],
       },
       {
+        id: 'd',
+        author: 'Jeremy',
         title: "Ethics Board Releases AI Safety Guidelines",
-        url: "#",
-        date: 'Apr',
-        isKeyEvent: false
+        published_date: 'Apr',
+        isKeyEvent: false,
+        description: 'Lorem Ipsum',
+        main_image_url: '',
+        content: [],
       }
     ]
   },
@@ -55,22 +97,34 @@ const INITIAL_QUESTIONS: Question[] = [
     ],
     articles: [
       {
+        id: 'a',
+        author: 'Mas',
         title: "SpaceX Starship Completes Orbital Test Flight",
-        url: "#",
-        date: 'Feb',
-        isKeyEvent: true
+        published_date: 'Feb',
+        isKeyEvent: true,
+        content: [],
+        description: 'Lorem Ipsum',
+        main_image_url: '',
       },
       {
+        id: 'b',
+        author: 'Shoehas',
         title: "Mars Mission Timeline Updated",
-        url: "#",
-        date: 'Mar',
-        isKeyEvent: false
+        published_date: 'Mar',
+        isKeyEvent: true,
+        content: [],
+        description: 'Lorem Ipsum',
+        main_image_url: '',
       },
       {
+        id: 'c',
+        author: 'John',
         title: "Revolutionary Propulsion System Test Successful",
-        url: "#",
-        date: 'Mar',
-        isKeyEvent: true
+        published_date: 'Mar',
+        isKeyEvent: true,
+        content: [],
+        description: 'Lorem Ipsum',
+        main_image_url: '',
       }
     ]
   },
@@ -87,22 +141,34 @@ const INITIAL_QUESTIONS: Question[] = [
     ],
     articles: [
       {
+        id: '1',
+        author: 'Anonymous',
         title: "Record Breaking Temperatures in Pacific Region",
-        url: "#",
-        date: 'Feb',
-        isKeyEvent: true
+        published_date: 'Feb',
+        isKeyEvent: true,
+        description: 'Lorem Ipsum',
+        main_image_url: '',
+        content: [],
       },
       {
+        id: '2',
+        author: 'Anonymous',
         title: "New Climate Model Predictions Released",
-        url: "#",
-        date: 'Mar',
-        isKeyEvent: true
+        published_date: 'Mar',
+        isKeyEvent: true,
+        description: 'Lorem Ipsum',
+        main_image_url: '',
+        content: [],
       },
       {
+        id: '3',
+        author: 'Anonymous',
         title: "Global Climate Summit Announces New Measures",
-        url: "#",
-        date: 'Apr',
-        isKeyEvent: false
+        published_date: 'Apr',
+        isKeyEvent: false,
+        description: 'Lorem Ipsum',
+        main_image_url: '',
+        content: [],
       }
     ]
   },
@@ -120,24 +186,33 @@ const INITIAL_QUESTIONS: Question[] = [
     articles: [
       {
         id: '1',
+        author: 'Anonymous',
         title: "Apple Supplier Leaks AR Component Production",
-        url: "#",
-        date: 'Feb',
-        isKeyEvent: true
+        published_date: 'Feb',
+        isKeyEvent: true,
+        description: 'Lorem Ipsum',
+        main_image_url: '',
+        content: [],
       },
       {
         id: '2',
+        author: 'Anonymous',
         title: "Patent Filing Reveals New AR Interface",
-        url: "#",
-        date: 'Mar',
-        isKeyEvent: true
+        published_date: 'Mar',
+        isKeyEvent: true,
+        description: 'Lorem Ipsum',
+        main_image_url: '',
+        content: [],
       },
       {
         id: '3',
+        author: 'Anonymous',
         title: "Industry Analysts Predict Q4 Launch",
-        url: "#",
-        date: 'Apr',
-        isKeyEvent: false
+        published_date: 'Apr',
+        isKeyEvent: false,
+        description: 'Lorem Ipsum',
+        main_image_url: '',
+        content: [],
       }
     ]
   }
@@ -175,8 +250,8 @@ const questionsFromMarkets = async (markets: Market[]) => {
     });
   }
 
-  return questions
-}
+  return questions;
+};
 
 export const useQuestions: () => UseQuestions = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -256,4 +331,3 @@ export const useQuestions: () => UseQuestions = () => {
     getQuestionsByCategory
   };
 };
-

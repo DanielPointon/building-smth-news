@@ -4,8 +4,19 @@ import { ProbabilityGraph } from '../components/graph/ProbabilityGraph';
 import { TradingButtons } from '../components/trading/TradingButtons';
 import { ArticleList } from '../components/articles/ArticleList';
 import { useQuestions } from '../hooks/useQuestions';
-import { Article, Event } from '../types/question';
+import { Article } from '../types/question';
 import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
+
+// Define Event type if not already defined in types/question.ts
+interface Event {
+  date: string;
+  title: string;
+}
+
+// Type guard to ensure article has required fields
+function isValidArticle(article: Article): article is Article & { published_date: string } {
+  return article.isKeyEvent === true && typeof article.published_date === 'string';
+}
 
 const QuestionPage = () => {
   const { id } = useParams();
@@ -23,10 +34,10 @@ const QuestionPage = () => {
   const currentProbability = question.data[question.data.length - 1].probability;
 
   const validEvents: Event[] = question.articles
-    .filter((a): a is Article & { date: string } => a.isKeyEvent && typeof a.date === 'string')
-    .map(a => ({
-      date: a.date,
-      title: a.title
+    .filter(isValidArticle)
+    .map(article => ({
+      date: article.published_date,
+      title: article.title
     }));
 
   return (

@@ -7,7 +7,7 @@ import { ArticleList } from '../articles/ArticleList';
 import { QuestionCardProps, Article } from '../../types/question';
 
 const isValidEvent = (article: Article): article is (Article & { date: string }) => {
-  return article.isKeyEvent && typeof article.date === 'string';
+  return !!article.isKeyEvent && article.isKeyEvent && typeof article.published_date === 'string';
 };
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({

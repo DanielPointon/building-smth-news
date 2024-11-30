@@ -8,7 +8,7 @@ interface ArticleLinkProps {
 
 export const ArticleLink: React.FC<ArticleLinkProps> = ({ article }) => (
   <a
-    href={article.url}
+    href={`/article/${article.id}`}
     target="_blank"
     rel="noopener noreferrer"
     className={`flex items-center justify-between p-4 transition-all duration-300 rounded-lg shadow-md ${

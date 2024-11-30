@@ -2,23 +2,6 @@
 import { useState, useEffect, Fragment } from "react";
 import { useParams } from "react-router-dom";
 
-export type Article = any;
-
-// interface Article {
-//   id: string;
-//   title: string;
-//   published_date: string;
-//   author: string;
-//   content: Array<{
-//     type: "text" | "image";
-//     content?: string;
-//     image_url?: string;
-//     description?: string;
-//   }>;
-//   main_image_url: string;
-//   description: string;
-// }
-
 export const ArticlePage: React.FC = () => {
   const { id } = useParams();
   const [article, setArticle] = useState<Article | null>(null);
