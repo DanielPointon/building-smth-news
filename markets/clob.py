@@ -163,8 +163,6 @@ class Clob:
                 self._add_order(order, self.asks)
 
     def on_order_fill(self, order: Order, price: int, fill: int):
-        self.trades.append(Trade(datetime.now(), price, fill))
-
         # TODO:
         print(
             f"Order {order.id} ({order.side}): filled {fill} @ {price} (limit={order.price})"
@@ -199,6 +197,7 @@ class Clob:
             order.quantity -= size
             counter.quantity -= size
 
+            self.trades.append(Trade(datetime.now(), price, size))
             self.on_order_fill(order, order.price, size)
             self.on_order_fill(counter, order.price, size)
 

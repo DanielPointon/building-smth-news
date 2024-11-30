@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Question } from '../types/question';
+import { Market, MarketsClient } from '../utils/MarketsClient';
 
 const INITIAL_QUESTIONS: Question[] = [
   {
@@ -147,10 +148,47 @@ interface UseQuestions {
   getQuestionsByCategory: (category: Question['category']) => Question[];
 }
 
+const questionsFromMarkets = async (markets: Market[]) => {
+  let client = new MarketsClient();
+
+  let questions: Question[] = [];
+
+  for (const m of markets) {
+    let trades = await client.getTrades(m.id);
+
+    let data = trades.trades.map(t => ({
+      date: t.time,
+      probability: t.price
+    }));
+
+    questions.push({
+      id: m.id,
+      question: m.name,
+      category: 'AI',
+      totalPredictions: data.length,
+      data: data,
+      articles: []
+    });
+  }
+
+  return questions
+}
+
 export const useQuestions = (): UseQuestions => {
   const [questions, setQuestions] = useState<Question[]>(INITIAL_QUESTIONS);
   const [userQuestions, setUserQuestions] = useState<Question[]>([]);
   const [followedQuestions, setFollowedQuestions] = useState<Question[]>([]);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      const client = new MarketsClient();
+      const markets = await client.getMarkets();
+      const questions = await questionsFromMarkets(markets.markets);
+      setQuestions(_prev => questions);
+    };
+
+    fetchQuestions();
+  }, []);
 
   const addQuestion = (questionData: { question: string; initialProbability: number }) => {
     const newQuestion: Question = {
@@ -174,15 +212,15 @@ export const useQuestions = (): UseQuestions => {
     if (!question) return;
 
     const updatedQuestion = { ...question, isFollowing: !question.isFollowing };
-    
-    setQuestions(prev => 
+
+    setQuestions(prev =>
       prev.map(q => q.id === questionId ? updatedQuestion : q)
     );
 
     if (updatedQuestion.isFollowing) {
       setFollowedQuestions(prev => [...prev, updatedQuestion]);
     } else {
-      setFollowedQuestions(prev => 
+      setFollowedQuestions(prev =>
         prev.filter(q => q.id !== questionId)
       );
     }

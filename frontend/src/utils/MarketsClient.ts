@@ -1,55 +1,70 @@
-type Uuid = string;
+export type Uuid = string;
 
-interface User {
+export interface Model {
   id: Uuid;
-  created_at: string; // iso date string
+  created_at: string; // ISO date string
 }
 
-interface Market {
-  id: Uuid;
-  created_at: string;
+export interface User extends Model {}
+
+export interface Market extends Model {
   name: string;
   description: string;
 }
 
-interface MarketCreateInfo {
+export interface MarketCreateInfo {
   name: string;
   description: string;
 }
 
-type OrderSide = "bid" | "ask";
+export type OrderSide = "bid" | "ask";
 
-interface Order {
-  id: Uuid;
-  created_at: string;
+export interface OrderCreateInfo {
   user_id: Uuid;
   side: OrderSide;
   price: number;
   quantity: number;
 }
 
-interface OrderCreateInfo {
-  user_id: Uuid;
-  side: OrderSide;
+export interface MarketList {
+  markets: Market[];
+}
+
+export interface MarketTrade {
+  time: string; // ISO date string
   price: number;
   quantity: number;
 }
 
-interface MarketClobOrder {
+export interface MarketTrades {
+  market_id: Uuid;
+  trades: MarketTrade[];
+}
+
+export interface MarketClobOrder {
   price: number;
   quantity: number;
 }
 
-interface MarketClob {
+export interface MarketClob {
+  midpoint: number | null;
   bids: MarketClobOrder[];
   asks: MarketClobOrder[];
 }
 
-export class ApiClient {
+export interface Order extends Model {
+  user_id: Uuid;
+  side: OrderSide;
+  price: number;
+  quantity: number;
+}
+
+export class MarketsClient {
   private readonly baseURL: string;
 
-  constructor(baseURL: string) {
-    this.baseURL = baseURL;
+  constructor() {
+    // FIXME: env
+    this.baseURL = "http://localhost:8000";
   }
 
   private async request<T>(
@@ -86,6 +101,14 @@ export class ApiClient {
   // markets
   async createMarket(info: MarketCreateInfo): Promise<Market> {
     return this.request<Market>("/markets/", "POST", info);
+  }
+
+  async getMarkets(): Promise<MarketList> {
+    return this.request<MarketList>("/markets", "GET");
+  }
+
+  async getTrades(marketId: Uuid): Promise<MarketTrades> {
+    return this.request<MarketTrades>(`/markets/${marketId}/trades`, "GET");
   }
 
   async getMarket(marketId: Uuid): Promise<Market> {
