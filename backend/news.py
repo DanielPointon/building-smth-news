@@ -6,6 +6,9 @@ import json
 from pathlib import Path
 from openai import Client
 import uuid
+from fastapi.responses import JSONResponse
+from typing import Optional
+import openai
 
 app = FastAPI()
 router = APIRouter()
@@ -23,61 +26,49 @@ app.add_middleware(
 )
 
 # DB_PATH = Path("database.json")
-DB_PATH = Path("../scraper/out/ft_articles.json")
+DB_PATH = Path("database.json")
 
-if DB_PATH.exists():
-    with open(DB_PATH, "r") as db_file:
-        print(db_file)
-        database = {}
-        database["articles"] = json.load(db_file)
-else:
-    database = {"articles": [], "questions": []}
-    # database = {}
+with open(DB_PATH, "r") as db_file:
+    print(db_file)
+    database = json.load(db_file)
+
 
 # print(database)
 
 def save_database():
+    def pydantic_to_serializable(obj):
+        """Helper function to handle Pydantic models."""
+        if isinstance(obj, BaseModel):
+            return obj.model_dump()  # Convert Pydantic models to dictionaries
+        elif isinstance(obj, (list, tuple)):
+            return [pydantic_to_serializable(item) for item in obj]
+        elif isinstance(obj, dict):
+            return {key: pydantic_to_serializable(value) for key, value in obj.items()}
+        return obj  # Return the object as-is if not Pydantic
+
     with open(DB_PATH, "w") as db_file:
-        json.dump(database, db_file, indent=4)
+        json.dump(pydantic_to_serializable(database), db_file, indent=4)
+
 
 
 class ImageContent(BaseModel):
     image_url: str
     image_caption: str
-
-
-class ArticleContent(BaseModel):
-    type: str
-    content: str | None = None
-    image_url: str | None = None
-    description: str | None = None
-
-class Article(BaseModel):
-    title: str
-    description: str
-    author: str
-    published_date: str
-    content: List[ArticleContent]
-    url: str
-
-@router.get("/articles/{article_id}")
-async def get_article(article_id: str):
-    """
-    Fetch a specific article by ID from the database.
-    """
-    article = next(
-        (article for article in database["articles"] 
-         if str(article["id"]) == article_id),
-        None
-    )
     
-    if not article:
-        raise HTTPException(
-            status_code=404,
-            detail="Article not found"
-        )
+class TextContent(BaseModel):
+    text: str
     
-    return article
+class ArticleMetadataRequest(BaseModel):
+    article_id: int
+
+class ClusterRequest(BaseModel):
+    question_id: int
+
+class ArticleContent(RootModel[Union[TextContent, ImageContent]]):
+    """
+    Article content can be either a string (text) or an image with caption.
+    """
+    pass
 
 
 class QuestionInput(BaseModel):
@@ -86,7 +77,7 @@ class QuestionInput(BaseModel):
     metadata: dict
 
 class ArticleInput(BaseModel):
-    id: int
+    id: Union[int, None]
     title: str
     description: str
     author: str
@@ -96,6 +87,23 @@ class ArticleInput(BaseModel):
     metadata: dict  # Includes fields like countries and other dynamic metadata
     questions: List[QuestionInput]
 
+class Event(BaseModel):
+    event_title: str
+    event_date: Optional[str]  # "YYYY-MM-DD" or None
+    article_id: int
+
+class ExtractedEvents(BaseModel):
+    question_id: int
+    events: List[Event]
+    
+class Cluster(BaseModel):
+    cluster_topic: str
+    article_ids: List[int]
+
+class ClusteredSubtopics(BaseModel):
+    question_id: int
+    clusters: List[Cluster]
+
 
 @router.post("/articles/create")
 async def create_article(article: ArticleInput):
@@ -103,6 +111,7 @@ async def create_article(article: ArticleInput):
     Create a new article with detailed question data and metadata. If a question already exists
     (based on text and metadata), link the article to the existing question.
     """
+    print("Creating article...")
     article.id = uuid.uuid4().int
 
     # Add the article to the database
@@ -147,15 +156,16 @@ async def create_article(article: ArticleInput):
     # Save the database
     save_database()
 
-    return {"message": "Article and associated questions created/linked successfully."}
+    return {"article_id": article.id, "message": "Article and associated questions created/linked successfully."}
 
 
 @router.post("/articles/metadata")
-async def get_article_metadata(article_id: int):
+async def get_article_metadata(article_metadata: ArticleMetadataRequest):
     """
     Generate metadata for an article using GPT-4o.
     Metadata includes a list of countries and other dynamic attributes.
     """
+    article_id = article_metadata.article_id
     article = next((article for article in database["articles"] if article["id"] == article_id), None)
     if not article:
         raise HTTPException(status_code=404, detail="Article not found.")
@@ -167,7 +177,7 @@ async def get_article_metadata(article_id: int):
     {flattened_content}
 
     Extract metadata including:
-    - "countries": A list of country codes relevant to the article (e.g., ["US", "FR"]).
+    - "countries": A list of country codes relevant to the article (e.g., ["US", "FR"]). Leave this empty if no countries are mentioned.
     - Other relevant metadata that could be useful for classification (i.e. fields like "tags", "topics", "concepts", "events" etc).
 
     Provide the result in JSON format:
@@ -185,7 +195,7 @@ async def get_article_metadata(article_id: int):
     )
     metadata = response_metadata.choices[0].message.content
 
-    article["metadata"] = metadata
+    article["metadata"] = json.loads(metadata)
     save_database()
 
     return {"article_id": article_id, "metadata": metadata}
@@ -287,7 +297,7 @@ async def generate_questions_for_article(article: dict):
         )
     return linked_questions
 
-@router.post("/questions/{question_id}/events")
+@router.post("/questions/{question_id}/events", response_model=ExtractedEvents)
 async def get_events_for_question(question_id: int):
     """
     Extract relevant events for a given question ID from all related articles.
@@ -315,53 +325,50 @@ async def get_events_for_question(question_id: int):
         for article in related_articles
     ]
 
-    # Build GPT prompt
-    prompt_events = f"""
-    The following are contents of articles related to a specific prediction market question:
+    # Define the structured model for the OpenAI API
+    class EventExtractionRequest(BaseModel):
+        question: str
+        articles: List[dict]
 
-    Question: {question["text"]}
+    event_extraction_request = EventExtractionRequest(
+        question=question["text"],
+        articles=article_contents
+    )
 
-    Articles:
-    {json.dumps(article_contents, indent=2)}
-
-    Based on these articles, extract a list of relevant events specific to the question.
-    Each event should include:
-    - "event_title": The title of the event.
-    - "event_date": The date of the event, if available. Leave blank if not mentioned. Do NOT make this up.
-    - "article_id": The ID of the article from which the event is derived. If there are multiple articles with the same event, choose the one with the most relevant context.
-
-    Output the result as a JSON array:
-    [
-        {{
-            "event_title": "Event title goes here",
-            "event_date": "YYYY-MM-DD or blank if no date",
-            "article_id": 123
-        }}
-    ]
-    """
     try:
-        response_events = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": prompt_events}],
-            response_format={"type": "json_object"},
-            max_tokens=1000,
-            temperature=0.7,
+        # Use structured data mode with OpenAI API
+        completion = client.beta.chat.completions.parse(
+            model="gpt-4o-2024-08-06",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an AI that extracts events from articles related to specific questions. "
+                               "Each event should include an event title, an optional event date, and the article ID from which it was derived.",
+                },
+                {
+                    "role": "user",
+                    "content": event_extraction_request.json(),
+                },
+            ],
+            tools=[openai.pydantic_function_tool(ExtractedEvents)],
         )
-        events = response_events.choices[0].message.content
 
-        # Ensure the response is JSON-parseable
-        parsed_events = json.loads(events)
-        return {"question_id": question_id, "events": parsed_events}
+        # Parse the structured response
+        parsed_arguments = completion.choices[0].message.tool_calls[0].function.parsed_arguments
+        return parsed_arguments
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error extracting events: {str(e)}")
+        # return empty events list
+        print(f"Error generating events: {str(e)}")
+        return ExtractedEvents(question_id=question_id, events=[])
 
-@router.post("/get_clusters_for_question")
-async def get_clusters_for_question(question_id: int):
+@router.post("/get_clusters_for_question", response_model=ClusteredSubtopics)
+async def get_clusters_for_question(cluster_request: ClusterRequest):
     """
     Generate clusters of sub-topics for a given question based on related articles.
     Each cluster contains a sub-topic and a list of related articles.
     """
+    question_id = cluster_request.question_id
     # Fetch the question by ID
     question = next((q for q in database["questions"] if q["id"] == question_id), None)
     if not question:
@@ -376,42 +383,37 @@ async def get_clusters_for_question(question_id: int):
     if not related_articles:
         raise HTTPException(status_code=404, detail="No related articles found for the given question.")
 
-    # Build GPT prompt
-    prompt_clusters = f"""a
-    The following are contents of articles related to a specific prediction market question:
+    # Define the structured model for the OpenAI API
+    class ClusterRequest(BaseModel):
+        question: str
+        articles: List[dict]
 
-    Question: {question["text"]}
+    cluster_request = ClusterRequest(
+        question=question["text"],
+        articles=related_articles
+    )
 
-    Articles:
-    {json.dumps(related_articles, indent=2)}
-
-    Based on these articles, generate clusters of sub-topics relevant to the question.
-    Each cluster should have:
-    - "cluster_topic": A short title for the sub-topic.
-    - "article_ids": A list of article IDs related to this sub-topic.
-
-    Output the result as a JSON array:
-    [
-        {{
-            "cluster_topic": "Sub-topic title",
-            "article_ids": [123, 456]
-        }}
-    ]
-    """
     try:
-        # Call GPT-4o API
-        response_clusters = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt_clusters}],
-            response_format={"type": "json_object"},
-            max_tokens=1000,
-            temperature=0.7,
+        # Use structured data mode with OpenAI API
+        completion = client.beta.chat.completions.parse(
+            model="gpt-4o-2024-08-06",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an AI that clusters sub-topics from articles related to specific questions. "
+                               "Each cluster should include a topic title and the IDs of related articles.",
+                },
+                {
+                    "role": "user",
+                    "content": cluster_request.json(),
+                },
+            ],
+            tools=[openai.pydantic_function_tool(ClusteredSubtopics)],
         )
-        clusters = response_clusters.choices[0].message.content
 
-        # Parse the response to ensure valid JSON
-        parsed_clusters = json.loads(clusters)
-        return {"question_id": question_id, "clusters": parsed_clusters}
+        # Parse the structured response
+        parsed_arguments = completion.choices[0].message.tool_calls[0].function.parsed_arguments
+        return parsed_arguments
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating clusters: {str(e)}")
