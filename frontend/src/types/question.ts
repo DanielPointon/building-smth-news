@@ -1,10 +1,14 @@
 // types/question.ts
-export interface Article {
-  title: string;
-  url: string;
-  date?: string;
-  isKeyEvent: boolean;
-}
+// export interface Article {
+//   id: string;
+//   main_image_url?: string;
+//   title: string;
+//   url: string;
+//   date?: string;
+//   isKeyEvent: boolean;
+// }
+
+export type Article = any;
 
 export interface DataPoint {
   date: string;

@@ -2,24 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CalendarDays, User, ExternalLink } from 'lucide-react';
 import { Card, CardContent } from 'components/ui/card';
-
-interface Article {
-  id: string;
-  title: string;
-  description: string;
-  author: string;
-  published_date: string;
-  main_image_url?: string;
-  content: Array<{
-    type: string;
-    content?: string;
-    image_url?: string;
-    description?: string;
-  }>;
-}
+import React from 'react';
+import { Article } from 'types/question';
 
 const ArticlesPage = () => {
-  const [articles, setArticles] = React.useState([]);
+  const [articles, setArticles] = React.useState<Article[]>([]);
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
 

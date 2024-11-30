@@ -119,18 +119,21 @@ const INITIAL_QUESTIONS: Question[] = [
     ],
     articles: [
       {
+        id: '1',
         title: "Apple Supplier Leaks AR Component Production",
         url: "#",
         date: 'Feb',
         isKeyEvent: true
       },
       {
+        id: '2',
         title: "Patent Filing Reveals New AR Interface",
         url: "#",
         date: 'Mar',
         isKeyEvent: true
       },
       {
+        id: '3',
         title: "Industry Analysts Predict Q4 Launch",
         url: "#",
         date: 'Apr',
