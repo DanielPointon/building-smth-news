@@ -13,7 +13,7 @@ const ArticlesPage = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await fetch('http://localhost:8000/articles');
+        const response = await fetch('http://localhost:8005/articles');
         if (!response.ok) throw new Error('Failed to fetch articles');
         const data = await response.json();
         setArticles(data);
