@@ -159,6 +159,26 @@ async def create_article(article: ArticleInput):
     return {"article_id": article.id, "message": "Article and associated questions created/linked successfully."}
 
 
+@router.get("/articles/{article_id}")
+async def get_article(article_id: str):
+    """
+    Article content can be either a string (text) or an image with caption.
+    Fetch a specific article by ID from the database.
+    """
+    article = next(
+        (article for article in database["articles"] 
+         if str(article["id"]) == article_id),
+        None
+    )
+    
+    if not article:
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found"
+        )
+    
+    return article
+
 @router.post("/articles/metadata")
 async def get_article_metadata(article_metadata: ArticleMetadataRequest):
     """
@@ -228,7 +248,6 @@ def flatten_article_content(content: List[Union[str, dict]]) -> str:
     return "\n".join(flattened_content)
 
 
-# GPT Integration: Generate and link questions
 async def generate_questions_for_article(article: dict):
     """
     Generate prediction market-style questions for an article using GPT
