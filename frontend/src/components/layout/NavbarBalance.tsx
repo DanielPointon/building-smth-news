@@ -1,3 +1,5 @@
+import { Balance } from "types/balance";
+
 export const NavbarBalance: React.FC<Balance> = ({ currency, amount, icon: Icon }) => {
   const colorClass = currency === 'PRC' ? 'text-yellow-500' : 'text-green-500';
   

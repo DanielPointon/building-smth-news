@@ -55,7 +55,7 @@ const QuestionPage = () => {
         </CardHeader>
         
         <CardContent className="mt-6">
-          <div className="bg-[rgb(28,32,41)] p-4 rounded-lg shadow-md mb-6">
+          <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm mb-6">
             <ProbabilityGraph 
               data={question.data}
               events={validEvents}
