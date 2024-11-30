@@ -95,9 +95,9 @@ const GlobeVisualization = () => {
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
         backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
         polygonsData={countries}
-        polygonCapColor={() => 'rgba(0, 0, 100, 0.6)'}
-        polygonSideColor={() => 'rgba(0, 0, 0, 1)'}
-        polygonStrokeColor={() => 'rgba(173, 216, 230, 0.05)'}
+        polygonCapColor={() => 'rgba(0, 0, 0, 0.6)'}
+        polygonStrokeColor={() => `#${Math.round(Math.random() * Math.pow(2, 24)).toString(16).padStart(6, '0')}`}
+        polygonSideColor={() => 'rgba(0, 0, 0, 0.05)'}
         polygonLabel={(d: any) => `
           <div class="bg-gray-900 p-2 rounded-lg shadow-lg">
             <div class="font-bold text-purple-400">${d.properties.ADMIN} (${d.properties.ISO_A2})</div>
