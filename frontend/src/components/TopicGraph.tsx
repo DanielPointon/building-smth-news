@@ -99,7 +99,8 @@ export const TopicGraph: React.FC<TopicGraphProps> = ({ clusters, onClusterSelec
           labelWeight: 'normal',
           renderEdgeLabels: false,
           defaultDrawNodeLabel: drawLabel,
-          defaultDrawNodeHover: drawHover
+          defaultDrawNodeHover: drawHover,
+        //   allowInvalidContainer: true,
         }}
       >
         <LoadGraph clusters={clusters} />
