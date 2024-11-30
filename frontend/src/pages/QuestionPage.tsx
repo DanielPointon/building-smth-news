@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ProbabilityGraph } from '../components/graph/ProbabilityGraph';
 import { TradingButtons } from '../components/trading/TradingButtons';
@@ -73,7 +72,7 @@ const QuestionPage = () => {
             />
           </div>
 
-          <TradingButtons probability={currentProbability} />
+          <TradingButtons marketId={question.id} probability={currentProbability} />
 
           <div className="mt-8">
             <h3 className="text-xl font-georgia text-[rgb(38,42,51)] mb-4">Related Articles</h3>

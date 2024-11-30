@@ -18,6 +18,7 @@ export const MyQuestionsPage: React.FC = () => {
             id={q.id}
             key={q.id}
             question={q.question}
+            probability={q.probability}
             data={q.data}
             articles={q.articles}
           />

@@ -13,14 +13,17 @@ const isValidEvent = (article: Article): article is (Article & { date: string })
 export const QuestionCard: React.FC<QuestionCardProps> = ({
   id,
   question,
+  probability,
   data,
   articles
 }) => {
   const navigate = useNavigate();
   const [showAllNews, setShowAllNews] = useState<boolean>(false);
-  const currentProbability = data[data.length - 1].probability;
-  const previousProbability = data[data.length - 2]?.probability;
-  const trending = currentProbability > previousProbability;
+  const currentProbability = probability ?? 0.5;
+  // const previousProbability = data[data.length - 2]?.probability;
+  // const trending = currentProbability > previousProbability;
+  // TODO:
+  const trending = false;
 
   const events = articles
     .filter(isValidEvent)
@@ -66,7 +69,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             events={events}
           />
         </div>
-        <TradingButtons probability={currentProbability} />
+        <TradingButtons marketId={id} probability={currentProbability} />
         <div className="mt-6 space-y-2">
           <ArticleList 
             articles={articles} 

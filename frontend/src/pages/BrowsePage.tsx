@@ -46,6 +46,7 @@ export const BrowsePage: React.FC = () => {
               key={q.id}
               id={q.id}
               question={q.question}
+              probability={q.probability}
               data={q.data}
               articles={q.articles}
             />

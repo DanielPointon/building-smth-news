@@ -29,6 +29,7 @@ export interface Event {
 export interface Question {
   id: string;
   question: string;
+  probability: number | null;
   data: DataPoint[];
   articles: Article[];
   totalPredictions?: number;
@@ -40,6 +41,7 @@ export interface Question {
 export interface QuestionCardProps {
   id: string;
   question: string;
+  probability: number | null;
   data: DataPoint[];
   articles: Article[];
 }

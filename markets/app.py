@@ -68,7 +68,6 @@ async def create_user() -> User:
 
 @app.get("/users/{id}/trades")
 async def users_get_trades(id: Uuid) -> UserTrades:
-    print(id)
     trades: list[MarketTrade] = []
 
     for c in CLOBS.store.values():
@@ -94,6 +93,7 @@ async def users_get_trades(id: Uuid) -> UserTrades:
                     )
                 )
 
+    trades.sort(key=lambda k: k.time, reverse=True)
     return UserTrades(user_id=id, trades=trades)
 
 
@@ -136,6 +136,8 @@ async def markets_create_order(id: Uuid, info: OrderCreateInfo) -> Order:
     )
     clob.insert_order(order)
 
+    print(clob)
+
     return order
 
 
@@ -161,7 +163,9 @@ async def markets_get_trades(id: Uuid) -> MarketTrades:
         for t in clob.trades
     ]
 
-    return MarketTrades(market_id=id, trades=trades)
+    trades.sort(key=lambda k: k.time, reverse=True)
+
+    return MarketTrades(market_id=id, midpoint=clob.midpoint(), trades=trades)
 
 
 @markets.get("/{id}/clob")
@@ -190,8 +194,5 @@ async def markets_get_clob(id: Uuid) -> MarketClob:
 
         ask = ask.succ
 
-    midpoint = None
-    if bids and asks:
-        midpoint = (bids[0].price + asks[0].price) / 2
-
+    midpoint = clob.midpoint()
     return MarketClob(midpoint=midpoint, bids=bids, asks=asks)

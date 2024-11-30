@@ -4,12 +4,12 @@ import { TradingModal } from './TradingModal';
 import { TradeConfirmation } from './TradeConfirmation';
 import { TradingButtonsProps } from 'types/trades';
 
-export const TradingButtons: React.FC<TradingButtonsProps> = ({ probability }) => {
+export const TradingButtons: React.FC<TradingButtonsProps> = ({ probability, marketId }) => {
   const [showModal, setShowModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [tradeType, setTradeType] = useState<'buy' | 'sell' | null>(null);
 
-  const handleTradeComplete = (type: 'buy' | 'sell', amount: string) => {
+  const handleTradeComplete = (type: 'buy' | 'sell', amount: number) => {
     setTradeType(type);
     setShowConfirm(true);
     setTimeout(() => setShowConfirm(false), 2000);
@@ -31,6 +31,7 @@ export const TradingButtons: React.FC<TradingButtonsProps> = ({ probability }) =
         onClose={() => setShowModal(false)}
         probability={probability}
         onTrade={handleTradeComplete}
+        marketId={marketId}
       />
       {showConfirm && tradeType && (
         <TradeConfirmation type={tradeType} probability={probability} />

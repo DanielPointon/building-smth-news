@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { Dispatch, SetStateAction, createContext, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -18,9 +18,12 @@ import QuestionPage from "pages/QuestionPage";
 import ArticlesPage from "./pages/ArticlesPage";
 
 export const UserContext = createContext("");
+export const ApiContentContext = createContext<[number, Dispatch<SetStateAction<number>>]>(null as unknown as [number, Dispatch<SetStateAction<number>>]);
 
 const MainContent: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
+  const reloadState = useState(0);
+
   const location = useLocation();
 
   const getActiveTab = () => {
@@ -29,29 +32,31 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[rgb(255,241,229)]">
-      <Navbar
-        onHistoryClick={() => setShowHistory(true)}
-        className="shadow-xl"
-      />
-      <TransactionHistory
-        isOpen={showHistory}
-        onClose={() => setShowHistory(false)}
-      />
+    <ApiContentContext.Provider value={reloadState}>
+      <div className="min-h-screen bg-[rgb(255,241,229)]">
+        <Navbar
+          onHistoryClick={() => setShowHistory(true)}
+          className="shadow-xl"
+        />
+        <TransactionHistory
+          isOpen={showHistory}
+          onClose={() => setShowHistory(false)}
+        />
 
-      <div className="max-w-6xl mx-auto px-6 pt-8">
-        <Routes>
-          <Route path="/" element={<Navigate to="/browse" replace />} />
-          <Route path="/browse" element={<BrowsePage />} />
-          <Route path="/my-questions" element={<MyQuestionsPage />} />
-          <Route path="/following" element={<FollowingPage />} />
-          <Route path="/global" element={<GlobalPage />} />
-          <Route path="/article/:id" element={<ArticlePage />} />
-          <Route path="/question/:id" element={<QuestionPage />} />
-          <Route path="/articles" element={<ArticlesPage />} />
-        </Routes>
+        <div className="max-w-6xl mx-auto px-6 pt-8">
+          <Routes>
+            <Route path="/" element={<Navigate to="/browse" replace />} />
+            <Route path="/browse" element={<BrowsePage />} />
+            <Route path="/my-questions" element={<MyQuestionsPage />} />
+            <Route path="/following" element={<FollowingPage />} />
+            <Route path="/global" element={<GlobalPage />} />
+            <Route path="/article/:id" element={<ArticlePage />} />
+            <Route path="/question/:id" element={<QuestionPage />} />
+            <Route path="/articles" element={<ArticlesPage />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </ApiContentContext.Provider >
   );
 };
 

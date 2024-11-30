@@ -8,14 +8,16 @@ export interface Transaction {
 }
 
 export interface TradingButtonsProps {
+  marketId: string;
   probability: number;
 }
 
 export interface TradingModalProps {
+  marketId: string;
   isOpen: boolean;
   onClose: () => void;
   probability: number;
-  onTrade: (type: 'buy' | 'sell', amount: string) => void;
+  onTrade: (type: 'buy' | 'sell', amount: number) => void;
 }
 
 export interface TradeConfirmationProps {

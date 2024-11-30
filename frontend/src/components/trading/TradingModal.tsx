@@ -1,25 +1,49 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { DollarSign } from 'lucide-react';
 import { TradingModalProps } from 'types/trades';
+import { MarketsClient } from 'utils/MarketsClient';
+import { ApiContentContext, UserContext } from 'App';
 
 export const TradingModal: React.FC<TradingModalProps> = ({
   isOpen,
   onClose,
   probability,
+  marketId,
   onTrade
 }) => {
-  const [amount, setAmount] = useState<string>('');
+  const [amount, setAmount] = useState<number>(1);
   const [processing, setProcessing] = useState(false);
+  const [_reloadKey, setReloadKey] = useContext(ApiContentContext);
+
+  const userId = useContext(UserContext);
 
   if (!isOpen) return null;
 
   const handleTrade = (type: 'buy' | 'sell') => {
     setProcessing(true);
-    setTimeout(() => {
+
+    // market order
+    let price;
+    if (type == "buy") {
+      price = 100;
+    } else {
+      price = 0;
+    }
+
+    const client = new MarketsClient();
+    client.createOrder(marketId, {
+      user_id: userId,
+      side: type == "buy" ? "bid" : "ask",
+      price: price,
+      quantity: amount
+    }).then(() => {
+      setReloadKey(k => k + 1);
+
       onTrade(type, amount);
       setProcessing(false);
       onClose();
-    }, 1000);
+      console.log("refreshed")
+    });
   };
 
   return (
@@ -32,7 +56,7 @@ export const TradingModal: React.FC<TradingModalProps> = ({
             <input
               type="number"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => setAmount(parseInt(e.target.value))}
               className="w-full bg-transparent border-none text-lg text-[rgb(38,42,51)] focus:outline-none font-georgia placeholder-gray-500"
               placeholder="0"
               min="0"

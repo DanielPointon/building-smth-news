@@ -179,6 +179,12 @@ class Clob:
         self.bids.clean_orders()
         self.asks.clean_orders()
 
+    def midpoint(self) -> float | None:
+        if self.bids.first and self.asks.first:
+            return (self.bids.first.price + self.asks.first.price) / 2
+
+        return None
+
     def _process_order(self, order: Order):
         match order.side:
             case "bid":
@@ -213,10 +219,10 @@ class Clob:
                     sell_user = order.user_id
 
             self.trades.append(
-                Trade(buy_user, sell_user, datetime.now(), order.price, size)
+                Trade(buy_user, sell_user, datetime.now(), counter.price, size)
             )
-            self.on_order_fill(order, order.price, size)
-            self.on_order_fill(counter, order.price, size)
+            self.on_order_fill(order, counter.price, size)
+            self.on_order_fill(counter, counter.price, size)
 
             if counter.quantity == 0:
                 _ = self.delete_order(counter.id)

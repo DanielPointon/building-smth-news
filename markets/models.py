@@ -51,6 +51,7 @@ class MarketTrade(BaseModel):
 
 class MarketTrades(BaseModel):
     market_id: Uuid
+    midpoint: float | None
     trades: list[MarketTrade]
 
 

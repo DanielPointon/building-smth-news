@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { UserContext } from '../App';
+import { ApiContentContext, UserContext } from '../App';
 import { Question } from '../types/question';
 import { Market, MarketsClient } from '../utils/MarketsClient';
 import { Transaction } from 'types/trades';
@@ -8,8 +8,17 @@ interface UseTransactions {
   transactions: Transaction[];
 }
 
+export const useReload = () => {
+  const context = useContext(ApiContentContext);
+
+  if (!context) {
+    throw new Error("useReload must be used within a ReloadProvider");
+  }
+};
+
 export const useTransactions: () => UseTransactions = () => {
   const userId = useContext(UserContext);
+  const [reloadKey, _setReloadKey] = useContext(ApiContentContext);
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
@@ -39,7 +48,7 @@ export const useTransactions: () => UseTransactions = () => {
     };
 
     fetchTransactions();
-  }, []);
+  }, [reloadKey]);
 
   return {
     transactions

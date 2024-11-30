@@ -1,6 +1,6 @@
 import requests
 
-uid = "foo"
+uid = "root"
 
 m = requests.post(
     "http://localhost:8000/markets", json={"name": "foo", "description": "bar"}

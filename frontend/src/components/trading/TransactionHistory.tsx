@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronRight, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { Transaction, TransactionHistoryProps } from 'types/trades';
-import { useTransactions } from 'hooks/useTransactions';
+import { useTransactions } from '../../hooks/useTransactions';
 
 const SAMPLE_TRANSACTIONS: Transaction[] = [
   {

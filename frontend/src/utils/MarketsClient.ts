@@ -40,6 +40,7 @@ export interface MarketTrade {
 
 export interface MarketTrades {
   market_id: Uuid;
+  midpoint: number | null;
   trades: MarketTrade[];
 }
 
@@ -88,6 +89,10 @@ export class MarketsClient {
     });
 
     if (!response.ok) {
+      try {
+        console.log(await response.json())
+      } catch {}
+
       throw new Error(
         `HTTP error ${response.status}: ${response.statusText}`
       );
