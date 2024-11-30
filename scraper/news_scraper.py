@@ -201,11 +201,16 @@ class FTScraper:
 if __name__ == "__main__":
     scraper = FTScraper()
 
-    articles = scraper.get_articles()
+    sections_to_scrape = ["world", "world-uk", "companies", "technology", "markets", "climate-capital", "opinion", "lex"]
+    articles = [article for section in sections_to_scrape for article in scraper.get_articles(section)]
+
+    # print(articles)
 
     article_contents = [
         scraper.get_article_content_with_img(article["url"]) for article in articles
     ]
+    
+    # print(article_contents)
 
     out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out")
 
