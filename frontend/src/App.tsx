@@ -7,6 +7,7 @@ import { MyQuestionsPage } from './pages/MyQuestionsPage';
 import { FollowingPage } from './pages/Following';
 import { NavigationTabs } from './components/layout/NavigationTabs';
 import { COLORS } from './constants/color';
+import GlobalPage from 'pages/GlobalPage';
 
 const MainContent: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
@@ -28,16 +29,18 @@ const MainContent: React.FC = () => {
         onClose={() => setShowHistory(false)}
       />
 
-      <div className="max-w-4xl mx-auto p-6 pt-20">
-        <NavigationTabs activeTab={getActiveTab()} />
+      {/* <div className="max-w-4xl mx-auto p-6 pt-20"> */}
+        {/* <NavigationTabs activeTab={getActiveTab()} /> */}
 
         <Routes>
           <Route path="/" element={<Navigate to="/browse" replace />} />
           <Route path="/browse" element={<BrowsePage />} />
           <Route path="/my-questions" element={<MyQuestionsPage />} />
           <Route path="/following" element={<FollowingPage />} />
+          <Route path="/global" element={<GlobalPage />} />
+
         </Routes>
-      </div>
+      {/* </div> */}
     </div>
   );
 };
