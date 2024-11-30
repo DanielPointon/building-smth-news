@@ -1,4 +1,5 @@
 import React from 'react';
+import { COLORS } from '../../constants/color';
 
 interface CardProps {
   children: React.ReactNode;
@@ -6,31 +7,31 @@ interface CardProps {
 }
 
 export const Card: React.FC<CardProps> = ({ children, className = '' }) => (
-  <div className={`bg-gray-900 border border-gray-800 rounded-lg shadow-xl ${className}`}>
+  <div className={`bg-white border border-gray-200 rounded-lg shadow-lg ${className}`}>
     {children}
   </div>
 );
 
 export const CardHeader: React.FC<CardProps> = ({ children, className = '' }) => (
-  <div className={`p-4 ${className}`}>
+  <div className={`p-4 border-b border-gray-200 ${className}`}>
     {children}
   </div>
 );
 
 export const CardTitle: React.FC<CardProps> = ({ children, className = '' }) => (
-  <h3 className={`text-lg font-semibold text-gray-100 ${className}`}>
+  <h3 className={`text-lg font-semibold text-gray-800 ${className}`}>
     {children}
   </h3>
 );
 
 export const CardContent: React.FC<CardProps> = ({ children, className = '' }) => (
-  <div className={`p-4 pt-0 ${className}`}>
+  <div className={`p-4 ${className}`}>
     {children}
   </div>
 );
 
 export const CardFooter: React.FC<CardProps> = ({ children, className = '' }) => (
-  <div className={`p-4 pt-0 ${className}`}>
+  <div className={`p-4 border-t border-gray-200 ${className}`}>
     {children}
   </div>
 );

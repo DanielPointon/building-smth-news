@@ -24,26 +24,26 @@ export const TradingModal: React.FC<TradingModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-gray-900 rounded-xl p-6 w-96 border border-gray-800">
-        <h3 className="text-lg font-bold mb-4 text-gray-100">Confirm Trade</h3>
+      <div className="bg-white rounded-xl p-6 w-96 border border-gray-200">
+        <h3 className="text-lg font-bold mb-4 text-gray-800">Confirm Trade</h3>
         <div className="space-y-4">
-          <div className="bg-gray-800 p-3 rounded-lg">
-            <label className="text-sm text-gray-400">Amount of shares</label>
+          <div className="bg-gray-100 p-3 rounded-lg">
+            <label className="text-sm text-gray-500">Amount of shares</label>
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full bg-transparent border-none text-lg text-gray-100 focus:outline-none"
+              className="w-full bg-transparent border-none text-lg text-gray-800 focus:outline-none"
               placeholder="0"
               min="0"
             />
           </div>
-          <div className="text-sm text-gray-400">
-            Current probability: <span className="text-purple-400">{probability}%</span>
+          <div className="text-sm text-gray-500">
+            Current probability: <span className="text-purple-500">{probability}%</span>
           </div>
           {processing ? (
-            <div className="flex items-center justify-center h-10 bg-gray-800 rounded-lg">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-400"></div>
+            <div className="flex items-center justify-center h-10 bg-gray-100 rounded-lg">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
             </div>
           ) : (
             <div className="flex gap-3">
@@ -63,7 +63,7 @@ export const TradingModal: React.FC<TradingModalProps> = ({
           )}
           <button
             onClick={onClose}
-            className="w-full text-gray-400 hover:text-gray-300 text-sm"
+            className="w-full text-gray-500 hover:text-gray-700 text-sm"
           >
             Cancel
           </button>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExternalLink, Newspaper, Sparkles } from 'lucide-react';
 import { Article } from '../../types/question';
+import { COLORS } from '../../constants/color';
 
 interface ArticleLinkProps {
   article: Article;
@@ -13,21 +14,21 @@ export const ArticleLink: React.FC<ArticleLinkProps> = ({ article }) => (
     rel="noopener noreferrer"
     className={`flex items-center justify-between p-3 rounded-lg transition-all duration-300 ${
       article.isKeyEvent 
-        ? 'bg-gradient-to-r from-purple-900/50 to-blue-900/50 border border-purple-500/30' 
-        : 'bg-gray-800/50 hover:bg-gray-700/50'
+        ? 'bg-gradient-to-r from-COLORS.graph.events[0]/50 to-COLORS.graph.events[1]/50 border border-COLORS.graph.events[0]/30' 
+        : 'bg-COLORS.background.card/50 hover:bg-COLORS.background.card/70'
     } group backdrop-blur-sm`}
   >
     <div className="flex items-center gap-3">
       {article.isKeyEvent ? (
-        <Sparkles size={16} className="text-purple-400" />
+        <Sparkles size={16} className="text-COLORS.graph.events[0]" />
       ) : (
-        <Newspaper size={16} className="text-gray-400" />
+        <Newspaper size={16} className="text-COLORS.text.muted" />
       )}
-      <span className="text-sm text-gray-300">{article.title}</span>
+      <span className="text-sm text-COLORS.text.secondary">{article.title}</span>
     </div>
     <ExternalLink 
       size={16} 
-      className="text-gray-400 group-hover:text-purple-400 transition-colors" 
+      className={`text-COLORS.text.muted group-hover:text-COLORS.graph.events[0] transition-colors`} 
     />
   </a>
 );

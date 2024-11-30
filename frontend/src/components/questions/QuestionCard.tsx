@@ -5,6 +5,7 @@ import { TradingButtons } from '../trading/TradingButtons';
 import { ArticleList } from '../articles/ArticleList';
 import { QuestionCardProps, Article } from '../../types/question';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from 'components/ui/card';
+import { COLORS } from '../../constants/color';
 
 const isValidEvent = (article: Article): article is (Article & { date: string }) => {
   return article.isKeyEvent && typeof article.date === 'string';
@@ -28,18 +29,18 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     }));
 
   return (
-    <Card className="bg-gray-900 border-gray-800 shadow-xl">
+    <Card className="bg-white border border-gray-200 shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-semibold text-gray-100">
+        <CardTitle className="text-lg font-semibold text-gray-800">
           <div className="flex items-center gap-2">
             {question}
-            {trending && <Sparkles size={16} className="text-purple-400" />}
+            {trending && <Sparkles size={16} className="text-purple-500" />}
           </div>
         </CardTitle>
         <div className="flex items-center gap-2">
           <span 
             className={`text-2xl font-bold ${
-              trending ? 'text-green-400' : 'text-red-400'
+              trending ? 'text-green-500' : 'text-red-500'
             }`}
           >
             {currentProbability}%
@@ -47,7 +48,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           <TrendingUp 
             size={20} 
             className={`${
-              trending ? 'text-green-400 rotate-0' : 'text-red-400 rotate-180'
+              trending ? 'text-green-500 rotate-0' : 'text-red-500 rotate-180'
             }`}
           />
         </div>
@@ -71,7 +72,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         <CardFooter>
           <button
             onClick={() => setShowAllNews(prev => !prev)}
-            className="flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors mt-2 group"
+            className="flex items-center gap-2 text-sm text-purple-500 hover:text-purple-600 transition-colors mt-2 group"
           >
             {showAllNews ? 'Show less' : 'Explore more'}
             <ChevronRight 

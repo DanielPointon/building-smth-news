@@ -1,43 +1,42 @@
 export const COLORS = {
     primary: {
-        purple: '#8B5CF6',
-        blue: '#3B82F6',
+        purple: '#6D5BD0',
+        blue: '#4B71C6',
     },
     status: {
-        green: '#10B981',
+        green: '#22C55E',
         red: '#EF4444',
         yellow: '#F59E0B',
     },
     graph: {
-        events: ['#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
+        events: ['#6D5BD0', '#4B71C6', '#22C55E', '#F59E0B', '#EF4444'],
         line: {
-            start: '#8B5CF6',
-            end: '#3B82F6',
+            start: '#6D5BD0',
+            end: '#4B71C6',
         },
         background: {
-            start: 'rgba(139, 92, 246, 0.15)',
-            end: 'rgba(59, 130, 246, 0.05)',
+            start: 'rgba(109, 91, 208, 0.1)',
+            end: 'rgba(75, 113, 198, 0.05)',
         },
     },
     background: {
-        dark: '#111827',
-        card: '#1F2937',
-        input: '#374151',
+        dark: '#F9FAFB',
+        card: '#FFFFFF',
+        input: '#E5E7EB',
     },
     text: {
-        primary: '#F9FAFB',
-        secondary: '#9CA3AF',
-        muted: '#6B7280',
+        primary: '#111827',
+        secondary: '#6B7280',
+        muted: '#9CA3AF',
     },
 } as const;
 
 export type ColorKey = keyof typeof COLORS;
 
-// constants/colors.ts
 export const EVENT_COLORS = [
-    '#8B5CF6', // Purple
-    '#3B82F6', // Blue
-    '#10B981', // Green
+    '#6D5BD0', // Purple
+    '#4B71C6', // Blue
+    '#22C55E', // Green
     '#F59E0B', // Yellow
     '#EF4444'  // Red
 ] as const;
