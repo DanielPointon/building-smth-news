@@ -41,8 +41,6 @@ const questionsFromMarkets = async (markets: Market[]): Promise<Question[]> => {
                 probability: Math.round(t.price)
             }))
 
-            console.log(`last: ${data[data.length - 1].probability}`)
-
             // Only add markets that have trade data
             if (data.length > 0) {
                 questions.push({

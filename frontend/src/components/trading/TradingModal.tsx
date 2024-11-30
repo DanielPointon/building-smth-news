@@ -75,13 +75,13 @@ export const TradingModal: React.FC<TradingModalProps> = ({
                 onClick={() => handleTrade('buy')}
                 className="flex-1 py-3 px-4 bg-[rgb(13,118,128)] hover:bg-[rgb(11,98,108)] text-white transition-colors font-georgia rounded-xl"
               >
-                Buy
+                Higher
               </button>
               <button
                 onClick={() => handleTrade('sell')}
                 className="flex-1 py-3 px-4 bg-[rgb(13,118,128)] hover:bg-[rgb(11,98,108)] text-white transition-colors font-georgia rounded-xl"
               >
-                Sell
+                Lower
               </button>
             </div>
           )}
