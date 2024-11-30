@@ -1,5 +1,3 @@
-// /frontend/src/components/questions/QuestionCard.tsx
-
 import React, { useState } from 'react';
 import { TrendingUp, Sparkles, ChevronRight } from 'lucide-react';
 import { ProbabilityGraph } from '../graph/ProbabilityGraph';
@@ -51,7 +49,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       </div>
       
       <div className="py-6">
-        <div className="bg-[rgb(28,32,41)] p-4 mb-6 rounded-lg shadow-md">
+        <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
           <ProbabilityGraph 
             data={data}
             events={events}
