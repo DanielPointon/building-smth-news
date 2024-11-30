@@ -20,7 +20,6 @@ export const BrowsePage: React.FC = () => {
         </p>
       </div>
       <div className="space-y-6">
-<<<<<<< HEAD
         <div className="space-y-6">
           {questions.map((q) => (
             <QuestionCard
@@ -28,19 +27,6 @@ export const BrowsePage: React.FC = () => {
               key={q.id}
               question={q.question}
               data={q.data}
-||||||| parent of 7bb3636 (rm trailing whitespace)
-        {questions.map((q) => (
-          <QuestionCard 
-            key={q.id}
-            question={q.question}
-            data={q.data}
-=======
-        {questions.map((q) => (
-          <QuestionCard
-            key={q.id}
-            question={q.question}
-            data={q.data}
->>>>>>> 7bb3636 (rm trailing whitespace)
             articles={q.articles}
             />
           ))}

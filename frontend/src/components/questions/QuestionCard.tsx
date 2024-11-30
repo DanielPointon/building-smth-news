@@ -49,41 +49,27 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           }`}>
             {currentProbability}%
           </span>
-          <TrendingUp
-            size={20}
+          <TrendingUp 
+            size={20} 
             className={`${
               trending ? 'text-[rgb(13,118,128)] rotate-0' : 'text-red-600 rotate-180'
             }`}
           />
         </div>
       </div>
-<<<<<<< HEAD
       
       {/* Rest of the component remains the same */}
-||||||| parent of 7bb3636 (rm trailing whitespace)
-      
-=======
-
->>>>>>> 7bb3636 (rm trailing whitespace)
       <div className="py-6">
-<<<<<<< HEAD
       <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
         <ProbabilityGraph 
-||||||| parent of 7bb3636 (rm trailing whitespace)
-        <div className="bg-[rgb(28,32,41)] p-4 mb-6 rounded-lg shadow-md">
-          <ProbabilityGraph 
-=======
-        <div className="bg-[rgb(28,32,41)] p-4 mb-6 rounded-lg shadow-md">
-          <ProbabilityGraph
->>>>>>> 7bb3636 (rm trailing whitespace)
             data={data}
             events={events}
           />
         </div>
         <TradingButtons probability={currentProbability} />
         <div className="mt-6 space-y-2">
-          <ArticleList
-            articles={articles}
+          <ArticleList 
+            articles={articles} 
             showAll={showAllNews}
           />
         </div>
@@ -96,8 +82,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             className="flex items-center gap-2 text-sm text-[rgb(13,118,128)] hover:text-[rgb(11,98,108)] transition-colors group"
           >
             {showAllNews ? 'Show less' : 'Explore more'}
-            <ChevronRight
-              size={16}
+            <ChevronRight 
+              size={16} 
               className={`transition-transform duration-300 group-hover:translate-x-1 ${
                 showAllNews ? 'rotate-90' : ''
               }`}

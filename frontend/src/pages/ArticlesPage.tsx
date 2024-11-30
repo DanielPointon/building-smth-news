@@ -1,14 +1,29 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CalendarDays, User, ExternalLink } from 'lucide-react';
 import { Card, CardContent } from 'components/ui/card';
 
+interface Article {
+  id: string;
+  title: string;
+  published_date: string;
+  author: string;
+  content: Array<{
+    type: "text" | "image";
+    content?: string;
+    image_url?: string;
+    description?: string;
+  }>;
+  main_image_url: string;
+  description: string;
+}
+
 const ArticlesPage = () => {
-  const [articles, setArticles] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [articles, setArticles] = useState([] as Article[]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchArticles = async () => {
       try {
         const response = await fetch('http://localhost:8000/articles');
@@ -45,7 +60,7 @@ const ArticlesPage = () => {
           <Card 
             key={article.id}
             className="bg-[rgb(255,241,229)] hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-            onClick={() => handleArticleClick(article.id)}
+            // onClick={() => handleArticleClick(article.id)}
           >
             <CardContent className="p-6">
               <div className="flex justify-between items-start gap-4">
