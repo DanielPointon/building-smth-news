@@ -8,6 +8,49 @@ import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
 import { useState } from 'react';
 import TopicGraph from 'components/TopicGraph';
 
+const mockArticles: any[] = [
+  {
+    id: '1',
+    title: 'The Impact of Economic Disruptions on Local Communities',
+    url: '#'
+  },
+  {
+    id: '2',
+    title: 'Analyzing the Ripple Effects of a Changing Global Economy',
+    url: '#'
+  },
+  {
+    id: '3',
+    title: 'Strategies for Mitigating the Economic Fallout from Unpredictable Events',
+    url: '#'
+  },
+  {
+    id: '4',
+    title: 'The Promise and Peril of Emerging Technologies',
+    url: '#'
+  },
+  {
+    id: '5',
+    title: 'Overcoming Barriers to Widespread Technological Adoption',
+    url: '#'
+  },
+  {
+    id: '6',
+    title: 'The Social Implications of Disruptive Innovation',
+    url: '#'
+  },
+  {
+    id: '7',
+    title: 'Navigating the Ethical Challenges of Technological Progress',
+    url: '#'
+  },
+  {
+    id: '8',
+    title: 'The Human Element: Ensuring Socially Responsible Technological Development',
+    url: '#'
+  }
+];
+
 // Mock clusters data - replace with actual API data
 const mockClusters = [
   {
@@ -84,6 +127,7 @@ const QuestionPage = () => {
           <div className="mt-8 mb-8">
             <h3 className="text-xl font-georgia text-[rgb(38,42,51)] mb-4">Topic Network</h3>
             <TopicGraph 
+              articles={mockArticles}
               clusters={mockClusters}
               onClusterSelect={handleClusterSelect}
             />

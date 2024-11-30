@@ -2,20 +2,96 @@
     "articles": {
         "39772345963899444759394251382399135389": {
             "id": 39772345963899444759394251382399135389,
-            "title": "Test Article",
-            "description": "A test article for verification.",
-            "author": "John Doe",
-            "published_date": "2024-11-30",
+            "topic": "Technology",
+            "title": "Hizbollah chief vows to implement ceasefire with Israel in group’s heartland",
+            "description": "In first speech since truce took effect, militant group’s leader says he will work with Lebanon’s army ",
+            "author": "Richard Salame",
+            "published_date": "2024-11-29T18:29:38.513Z",
+            "main_image_url": "https://www.ft.com/__origami/service/image/v2/images/raw/https%3A%2F%2Fd1e00ek4ebabms.cloudfront.net%2Fproduction%2Fcc0493ab-5263-4284-b8b5-9703c213bf58.jpg?source=next-article&fit=scale-down&quality=highest&width=700&dpr=1",
             "content": [
                 {
-                    "text": "This is a simple text content."
+                    "type": "text",
+                    "content": "Hizbollah’s leader Naim Qassem has publicly endorsed a commitment in his group’s ceasefire with Israel to move Lebanon’s armed forces into the country’s south, an area considered the militant group’s heartland."
                 },
                 {
-                    "image_url": "http://example.com/image.jpg",
-                    "image_caption": "An illustrative image caption."
+                    "type": "text",
+                    "content": "In his first speech since the US-brokered ceasefire took effect on Wednesday, Qassem affirmed Hizbollah’s commitment to the deal, maintaining it was not a “new agreement” but one implementing the existing UN resolution dating to the end of the 2006 war."
+                },
+                {
+                    "type": "text",
+                    "content": "“This agreement confirms the withdrawal of the Israeli army from all the places it occupied, and the deployment of the Lebanese army . . . south of the Litani River,” Qassem said, adding Hizbollah and the national army would co-ordinate at a “high level” to implement the truce’s terms."
+                },
+                {
+                    "type": "text",
+                    "content": "Hizbollah has repeatedly claimed victory following the ceasefire, although much of southern Lebanon lies in ruins after a grinding battle of attrition. The group’s weapons and infrastructure have been badly damaged and many of its leadership assassinated."
+                },
+                {
+                    "type": "text",
+                    "content": "Qassem said: “We are facing a great victory that surpasses the victory that occurred in July 2006 [after the last full-scale war between Israel and Hizbollah] due to the length of time, the ferocity of the battle, the great sacrifices and also the hordes of hostility with all the American and western support.”"
+                },
+                {
+                    "type": "text",
+                    "content": "Hizbollah began firing into Israel following Hamas’s October 7 2023 attack on the Jewish state. That resulted in near-daily cross-border shelling that erupted into full-blown war two months ago."
+                },
+                {
+                    "type": "text",
+                    "content": "Nearly 4,000 people were killed, including almost 1,000 women and children, according to Lebanon’s health ministry, and more than 1mn displaced — the vast majority of those in the past two months. About 140 Israelis have been killed in the fighting, and 60,000 residents of northern Israel evacuated."
+                },
+                {
+                    "type": "image",
+                    "image_url": "https://www.ft.com/__origami/service/image/v2/images/raw/https%3A%2F%2Fd1e00ek4ebabms.cloudfront.net%2Fproduction%2F6232fbaf-3a88-46f7-8369-81c45ff0f7fa.jpg?source=next-article&fit=scale-down&quality=highest&width=700&dpr=1",
+                    "description": "People return to their villages as they pass a destroyed building in Tyre, south Lebanon © Hussein Malla/AP"
+                },
+                {
+                    "type": "text",
+                    "content": "Many of Lebanon’s displaced began moving back to the south as soon as the ceasefire took effect. But Israel’s military has warned Lebanese residents not to go to some 60 villages and their surrounding areas, saying anyone who does so “puts themselves in danger”."
+                },
+                {
+                    "type": "text",
+                    "content": "Israel’s military said its air force struck a Hizbollah “mobile missile platform” it detected moving on Friday. “The IDF is deployed in southern Lebanon and is operating to remove threats . . . that constitute a violation of the ceasefire agreement,” it said on X."
+                },
+                {
+                    "type": "text",
+                    "content": "It was the third aerial strike in two days, following an air strike in the Sidon district north of the Litani River on what the Israeli military claimed was a Hizbollah weapons storage facility, and a reported drone strike on Taybeh."
+                },
+                {
+                    "type": "text",
+                    "content": "The IDF declined to comment on these incidents."
+                },
+                {
+                    "type": "text",
+                    "content": "The Lebanese army on Thursday said it had protested “several” Israeli strikes on Lebanese territory. The UN’s peacekeeping force has recorded Israeli fire on other border villages such as Ayta el-Chaab and Yaroun, while Israeli drones and warplanes have continued overflights of southern Lebanon."
+                },
+                {
+                    "type": "text",
+                    "content": "The US and Israel have affirmed Israel’s right to “enforce” the ceasefire, with Israeli Prime Minister Benjamin Netanyahu saying the Jewish state maintains “full freedom of military action”."
+                },
+                {
+                    "type": "text",
+                    "content": "Israeli officials have said they will take aggressive steps to prevent Hizbollah re-establishing its presence near the border."
+                },
+                {
+                    "type": "text",
+                    "content": "Lebanon’s army has deployed across southern its country since Wednesday, setting up checkpoints and monitoring residents’ return."
+                },
+                {
+                    "type": "text",
+                    "content": "But Hizbollah’s non-military officials and social welfare workers have also returned to parts of southern Lebanon and were directing some relief operations, demonstrating how difficult it will be to expel the group from areas where it has roots and where it enjoys strong support."
+                },
+                {
+                    "type": "text",
+                    "content": "The border village of Khiam, which was the site of an intense battle between Israeli forces and Hizbollah fighters before the truce, has become a flashpoint since the ceasefire. Lebanon’s NNA reported Israel opened fire several times on the village, including on mourners attending a funeral on Friday."
+                },
+                {
+                    "type": "text",
+                    "content": "Four Israeli tanks entered the western neighbourhood of Khiam, NNA reported. Israel’s military said it had been “operating to distance suspects in the area of [Khiam] in southern Lebanon”, adding “no suspects have been apprehended”."
+                },
+                {
+                    "type": "text",
+                    "content": "Additional reporting by James Shotter in Jerusalem"
                 }
             ],
-            "topic": "Technology",
+            "url": "https://www.ft.com/content/4b1dee4b-9ded-4861-b802-467b57a6ce93",
             "metadata": {
                 "countries": [],
                 "tags": [
