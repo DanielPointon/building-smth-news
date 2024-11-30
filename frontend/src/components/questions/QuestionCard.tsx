@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Sparkles, ChevronRight } from 'lucide-react';
 import { ProbabilityGraph } from '../graph/ProbabilityGraph';
 import { TradingButtons } from '../trading/TradingButtons';
@@ -10,10 +11,12 @@ const isValidEvent = (article: Article): article is (Article & { date: string })
 };
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({
+  id,
   question,
   data,
   articles
 }) => {
+  const navigate = useNavigate();
   const [showAllNews, setShowAllNews] = useState<boolean>(false);
   const currentProbability = data[data.length - 1].probability;
   const previousProbability = data[data.length - 2]?.probability;
@@ -26,9 +29,16 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       title: article.title
     }));
 
+  const handleQuestionClick = () => {
+    navigate(`/question/${id}`);
+  };
+
   return (
     <div className="bg-[rgb(255,241,229)] p-6 mb-6 shadow-lg rounded-lg border border-gray-200">
-      <div className="flex flex-row items-center justify-between pb-4 border-b border-gray-300">
+      <div 
+        className="flex flex-row items-center justify-between pb-4 border-b border-gray-300 cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={handleQuestionClick}
+      >
         <div className="text-xl font-georgia text-[rgb(38,42,51)] flex items-center gap-2">
           {question}
           {trending && <Sparkles size={16} className="text-[rgb(13,118,128)]" />}
@@ -48,8 +58,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         </div>
       </div>
       
+      {/* Rest of the component remains the same */}
       <div className="py-6">
-        <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
+        <div className="bg-[rgb(28,32,41)] p-4 mb-6 rounded-lg shadow-md">
           <ProbabilityGraph 
             data={data}
             events={events}

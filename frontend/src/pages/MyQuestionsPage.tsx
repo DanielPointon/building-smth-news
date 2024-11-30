@@ -15,6 +15,7 @@ export const MyQuestionsPage: React.FC = () => {
       ) : (
         userQuestions.map((q) => (
           <QuestionCard 
+            id={q.id}
             key={q.id}
             question={q.question}
             data={q.data}

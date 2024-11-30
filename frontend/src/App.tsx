@@ -14,6 +14,7 @@ import { FollowingPage } from "./pages/Following";
 import { NavigationTabs } from "./components/layout/NavigationTabs";
 import GlobalPage from "pages/GlobalPage";
 import { ArticlePage } from "pages/ArticlePage";
+import QuestionPage from "pages/QuestionPage";
 
 const MainContent: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
@@ -52,6 +53,7 @@ const MainContent: React.FC = () => {
           <Route path="/following" element={<FollowingPage />} />
           <Route path="/global" element={<GlobalPage />} />
           <Route path="/article/:id" element={<ArticlePage />} />
+          <Route path="/question/:id" element={<QuestionPage />} />
         </Routes>
       </div>
     </div>

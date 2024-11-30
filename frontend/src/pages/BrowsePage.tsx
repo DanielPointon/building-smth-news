@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { AddQuestionForm } from '../components/questions/AddQuestionForm';
-import { QuestionCard } from '../components/questions/QuestionCard';
 import { useQuestions } from '../hooks/useQuestions';
 import { Alert, AlertDescription } from 'components/ui/alert';
+import { QuestionCard } from 'components/questions/QuestionCard';
 
 export const BrowsePage: React.FC = () => {
   const { questions, addQuestion } = useQuestions();
@@ -14,6 +14,7 @@ export const BrowsePage: React.FC = () => {
       <div className="space-y-6">
         {questions.map((q) => (
           <QuestionCard 
+            id={`PLACEHOLDER-FIX`}
             key={q.id}
             question={q.question}
             data={q.data}

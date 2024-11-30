@@ -15,6 +15,7 @@ export const FollowingPage: React.FC = () => {
       ) : (
         followedQuestions.map((q) => (
           <QuestionCard 
+            id={q.id}
             key={q.id}
             question={q.question}
             data={q.data}
