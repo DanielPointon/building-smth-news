@@ -203,33 +203,22 @@ class FTScraper:
 if __name__ == "__main__":
     scraper = FTScraper()
 
-    # sections_to_scrape = ["world", "world-uk", "companies", "technology", "markets", "climate-capital", "opinion", "lex"]
-    sections_to_scrape = ["world"]
+    sections_to_scrape = ["world", "world-uk", "companies", "technology", "markets", "climate-capital", "opinion", "lex"]
+    # sections_to_scrape = ["world"]
     articles = [article for section in sections_to_scrape for article in scraper.get_articles(section)]
 
     # print(articles)
 
-<<<<<<< HEAD
-    # article_contents = [
-    #     scraper.get_article_content_with_img(article["url"]) for article in articles
-    # ]
+    article_contents = [
+        scraper.get_article_content_with_img(article["url"]) for article in articles
+    ]
 
-    article_contents = []
-    for i, article in enumerate(articles):
-        content = scraper.get_article_content_with_img(article["url"])
-        if content:  # Only append if content was successfully retrieved
-            content["id"] = i
-            article_contents.append(content)
-||||||| parent of 7bb3636 (rm trailing whitespace)
-    article_contents = [
-        scraper.get_article_content_with_img(article["url"]) for article in articles
-    ]
-    
-=======
-    article_contents = [
-        scraper.get_article_content_with_img(article["url"]) for article in articles
-    ]
->>>>>>> 7bb3636 (rm trailing whitespace)
+    # article_contents = []
+    # for i, article in enumerate(articles):
+    #     content = scraper.get_article_content_with_img(article["url"])
+    #     if content:  # Only append if content was successfully retrieved
+    #         content["id"] = i
+    #         article_contents.append(content)
 
     # print(article_contents)
 
