@@ -44,6 +44,9 @@ const generateQuestions = (countryName: string): Question[] => {
       };
     });
 
+    // Calculate the current probability from the latest data point
+    const currentProbability = data[data.length - 1].probability;
+
     // Generate mock articles
     const articles: Article[] = [
       {
@@ -76,7 +79,8 @@ const generateQuestions = (countryName: string): Question[] => {
       totalPredictions: Math.floor(Math.random() * 10000) + 1000,
       category: q.category as Question['category'],
       isFollowing: false,
-      isUserQuestion: false
+      isUserQuestion: false,
+      probability: currentProbability // Added probability property
     };
   });
 };

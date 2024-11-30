@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import { ApiContentContext, UserContext } from '../App'
-import { Market, MarketsClient } from '../utils/MarketsClient'
+import { MarketsClient } from '../utils/MarketsClient'
 import { Question } from 'types/question'
+import { mockQuestions } from 'MockQuestions'
 
-// Update the interface to include loading and error
 interface UseQuestions {
     questions: Question[]
     userQuestions: Question[]
@@ -13,40 +13,6 @@ interface UseQuestions {
     getQuestionsByCategory: (category: Question['category']) => Question[]
     loading: boolean
     error: string | null
-}
-
-const questionsFromMarkets = async (markets: Market[]): Promise<Question[]> => {
-    const client = new MarketsClient()
-    const questions: Question[] = []
-
-    for (const m of markets) {
-        try {
-            const trades = await client.getTrades(m.id)
-
-            // Format trades into the data points expected by the UI
-            const data = trades.trades.map(t => ({
-                date: new Date(t.time).toLocaleDateString('en-US', { month: 'short' }),
-                probability: Math.round(t.price)
-            }))
-
-            // Only add markets that have trade data
-            if (data.length > 0) {
-                questions.push({
-                    id: m.id,
-                    probability: trades.midpoint,
-                    question: m.name,
-                    category: 'AI', // You might want to get this from market metadata
-                    totalPredictions: data.length,
-                    data: data,
-                    articles: [], // You might want to fetch related articles if available
-                })
-            }
-        } catch (error) {
-            console.error(`Error fetching trades for market ${m.id}:`, error)
-        }
-    }
-
-    return questions
 }
 
 export const useQuestions = (): UseQuestions => {
@@ -63,20 +29,16 @@ export const useQuestions = (): UseQuestions => {
         const fetchQuestions = async () => {
             try {
                 setLoading(true)
-                const client = new MarketsClient()
-                const marketsResponse = await client.getMarkets(userId)
-
-                if (!marketsResponse.markets) {
-                    throw new Error('No markets data received')
-                }
-
-                const fetchedQuestions = await questionsFromMarkets(marketsResponse.markets)
-
-                setQuestions(fetchedQuestions)
-
-                // Also set user questions if userId matches
-                const userQs = fetchedQuestions.filter(q => q.isUserQuestion)
+                // Use mock data instead of API call
+                setQuestions(mockQuestions)
+                
+                // Set user questions
+                const userQs = mockQuestions.filter(q => q.isUserQuestion)
                 setUserQuestions(userQs)
+                
+                // Set followed questions
+                const followedQs = mockQuestions.filter(q => q.isFollowing)
+                setFollowedQuestions(followedQs)
 
                 setError(null)
             } catch (err) {
@@ -92,24 +54,24 @@ export const useQuestions = (): UseQuestions => {
 
     const addQuestion = async (questionData: { question: string; initialProbability: number }) => {
         try {
-            const client = new MarketsClient()
-            const newMarket = await client.createMarket({
-                name: questionData.question,
-                description: 'Created via UI'
-            })
+            // Create new mock question
+            const newQuestion: Question = {
+                id: `${Date.now()}`,
+                question: questionData.question,
+                probability: questionData.initialProbability,
+                data: [
+                    {
+                        date: new Date().toLocaleDateString('en-US', { month: 'short' }),
+                        probability: questionData.initialProbability
+                    }
+                ],
+                articles: [],
+                isUserQuestion: true,
+                category: 'Technology' // Default category
+            }
 
-            // Create initial order to set probability
-            await client.createOrder(newMarket.id, {
-                user_id: userId,
-                side: 'bid',
-                price: questionData.initialProbability,
-                quantity: 100 // Initial liquidity
-            })
-
-            // Refetch questions to include the new one
-            const marketsResponse = await client.getMarkets(userId)
-            const updatedQuestions = await questionsFromMarkets(marketsResponse.markets)
-            setQuestions(updatedQuestions)
+            setQuestions(prev => [...prev, newQuestion])
+            setUserQuestions(prev => [...prev, newQuestion])
         } catch (error) {
             console.error('Error adding question:', error)
             throw error

@@ -52,7 +52,6 @@ export const ArticlePage: React.FC = () => {
       if (!paragraph) return;
 
       const offset = paragraph.offsetTop;
-
       const adjustedOffset = offset + 414;
 
       console.log("Original offset:", offset);
@@ -100,7 +99,14 @@ export const ArticlePage: React.FC = () => {
             {article.content.map((item, index) => (
               <Fragment key={index}>
                 {item.type === "text" && (
-                  <p id={`paragraph-${index}`} className="mb-4">
+                  <p
+                    id={`paragraph-${index}`}
+                    className={`mb-4 transition-all duration-200 ${
+                      index === relatedQuestion.paragraphIndex
+                        ? "bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500"
+                        : ""
+                    }`}
+                  >
                     {item.content}
                   </p>
                 )}

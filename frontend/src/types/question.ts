@@ -45,3 +45,8 @@ export interface QuestionCardProps {
   data: DataPoint[];
   articles: Article[];
 }
+
+export interface Cluster {
+  cluster_topic: string;
+  article_ids: string[];
+}

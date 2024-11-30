@@ -5,22 +5,30 @@ import { ArticleList } from '../components/articles/ArticleList';
 import { useQuestions } from '../hooks/useQuestions';
 import { Article } from '../types/question';
 import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
+import { useState } from 'react';
+import TopicGraph from 'components/TopicGraph';
 
-// Define Event type if not already defined in types/question.ts
-interface Event {
-  date: string;
-  title: string;
-}
-
-// Type guard to ensure article has required fields
-function isValidArticle(article: Article): article is Article & { published_date: string } {
-  return article.isKeyEvent === true && typeof article.published_date === 'string';
-}
+// Mock clusters data - replace with actual API data
+const mockClusters = [
+  {
+    cluster_topic: "Economic Impact",
+    article_ids: ["1", "2", "3"]
+  },
+  {
+    cluster_topic: "Technology Adoption",
+    article_ids: ["4", "5"]
+  },
+  {
+    cluster_topic: "Social Implications",
+    article_ids: ["6", "7", "8"]
+  }
+];
 
 const QuestionPage = () => {
   const { id } = useParams();
   const { questions } = useQuestions();
-  console.log(questions);
+  const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
+  
   const question = questions.find(q => q.id === id);
 
   if (!question) {
@@ -31,18 +39,16 @@ const QuestionPage = () => {
     );
   }
 
+  const handleClusterSelect = (cluster: string) => {
+    console.log('Selected cluster:', cluster);
+    setSelectedCluster(cluster);
+  };
+
   const currentProbability = question.data[question.data.length - 1].probability;
 
-  const validEvents: Event[] = question.articles
-    .filter(isValidArticle)
-    .map(article => ({
-      date: article.published_date,
-      title: article.title
-    }));
-
   return (
-    <div className="max-w-4xl mx-auto">
-      <Card className="bg-[rgb(255,241,229)] border-none shadow-lg">
+    <div className="max-w-6xl mx-auto">
+      <Card className="bg-[rgb(255,241,229)] border-none shadow-lg mb-8">
         <CardHeader className="border-b border-gray-200">
           <CardTitle className="text-2xl font-georgia text-[rgb(38,42,51)]">
             {question.question}
@@ -69,11 +75,19 @@ const QuestionPage = () => {
           <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm mb-6">
             <ProbabilityGraph 
               data={question.data}
-              events={validEvents}
+              events={[]}
             />
           </div>
 
           <TradingButtons marketId={question.id} probability={currentProbability} />
+
+          <div className="mt-8 mb-8">
+            <h3 className="text-xl font-georgia text-[rgb(38,42,51)] mb-4">Topic Network</h3>
+            <TopicGraph 
+              clusters={mockClusters}
+              onClusterSelect={handleClusterSelect}
+            />
+          </div>
 
           <div className="mt-8">
             <h3 className="text-xl font-georgia text-[rgb(38,42,51)] mb-4">Related Articles</h3>
