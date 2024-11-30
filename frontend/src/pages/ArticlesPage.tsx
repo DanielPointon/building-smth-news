@@ -6,21 +6,21 @@ import { Card, CardContent } from 'components/ui/card';
 interface Article {
   id: string;
   title: string;
-  published_date: string;
+  description: string;
   author: string;
+  published_date: string;
+  main_image_url?: string;
   content: Array<{
-    type: "text" | "image";
+    type: string;
     content?: string;
     image_url?: string;
     description?: string;
   }>;
-  main_image_url: string;
-  description: string;
 }
 
 const ArticlesPage = () => {
-  const [articles, setArticles] = useState([] as Article[]);
-  const [loading, setLoading] = useState(true);
+  const [articles, setArticles] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,45 +57,47 @@ const ArticlesPage = () => {
       <h1 className="text-3xl font-georgia text-[rgb(38,42,51)] mb-6">Latest Articles</h1>
       <div className="space-y-6">
         {articles.map((article) => (
-          <Card 
+          <div
             key={article.id}
             className="bg-[rgb(255,241,229)] hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-            // onClick={() => handleArticleClick(article.id)}
+            onClick={() => handleArticleClick(article.id)}
           >
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex-1">
-                  <h2 className="text-xl font-georgia text-[rgb(38,42,51)] mb-2">
-                    {article.title}
-                  </h2>
-                  <p className="text-gray-600 mb-4">{article.description}</p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-2">
-                      <User size={16} />
-                      <span>{article.author}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CalendarDays size={16} />
-                      <span>{new Date(article.published_date).toLocaleDateString()}</span>
+            <Card className="bg-[rgb(255,241,229)] hover:shadow-xl transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-georgia text-[rgb(38,42,51)] mb-2">
+                      {article.title}
+                    </h2>
+                    <p className="text-gray-600 mb-4">{article.description}</p>
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-2">
+                        <User size={16} />
+                        <span>{article.author}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CalendarDays size={16} />
+                        <span>{new Date(article.published_date).toLocaleDateString()}</span>
+                      </div>
                     </div>
                   </div>
+                  {article.main_image_url && (
+                    <img 
+                      src={article.main_image_url} 
+                      alt={article.title}
+                      className="w-32 h-32 object-cover rounded-lg"
+                    />
+                  )}
                 </div>
-                {article.main_image_url && (
-                  <img 
-                    src={article.main_image_url} 
-                    alt={article.title}
-                    className="w-32 h-32 object-cover rounded-lg"
-                  />
-                )}
-              </div>
-              <div className="flex justify-end mt-4">
-                <div className="flex items-center gap-1 text-[rgb(13,118,128)] text-sm group">
-                  <span>Read more</span>
-                  <ExternalLink size={16} className="group-hover:translate-x-1 transition-transform" />
+                <div className="flex justify-end mt-4">
+                  <div className="flex items-center gap-1 text-[rgb(13,118,128)] text-sm group">
+                    <span>Read more</span>
+                    <ExternalLink size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         ))}
       </div>
     </div>
