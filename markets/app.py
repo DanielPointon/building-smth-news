@@ -6,6 +6,7 @@ from models import (
     MarketClob,
     MarketClobOrder,
     MarketCreateInfo,
+    MarketList,
     MarketTrade,
     MarketTrades,
     Order,
@@ -57,6 +58,11 @@ async def create_user() -> User:
 
 markets = FastAPI()
 app.mount("/markets", markets, name="markets")
+
+
+@markets.get("/")
+async def get_markets() -> MarketList:
+    return MarketList(markets=list(MARKETS.store.values()))
 
 
 @markets.post("/")

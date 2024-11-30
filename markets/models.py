@@ -37,6 +37,10 @@ class OrderCreateInfo(BaseModel):
     quantity: int
 
 
+class MarketList(BaseModel):
+    markets: list[Market]
+
+
 class MarketTrade(BaseModel):
     time: datetime
     price: int
