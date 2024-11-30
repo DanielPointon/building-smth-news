@@ -46,3 +46,7 @@ h1, h2, h3, h4, h5, h6 {
 .ft-divider {
   @apply border-t border-gray-700;
 }
+
+.sigma-container {
+  height: 600px; /* or any other desired height */
+}

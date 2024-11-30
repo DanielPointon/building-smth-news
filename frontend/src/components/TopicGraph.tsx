@@ -4,7 +4,6 @@ import Graph from 'graphology';
 import { Attributes } from 'graphology-types';
 import { Cluster } from 'types/question';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
-import useDebounce from './use-debounce';
 import { drawHover, drawLabel } from 'canvasUtils';
 
 interface TopicGraphProps {
