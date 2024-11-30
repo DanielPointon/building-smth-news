@@ -27,7 +27,7 @@ export const BrowsePage: React.FC = () => {
               key={q.id}
               question={q.question}
               data={q.data}
-              articles={q.articles}
+            articles={q.articles}
             />
           ))}
         </div>

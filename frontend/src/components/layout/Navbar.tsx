@@ -1,6 +1,5 @@
-// /frontend/src/components/layout/Navbar.tsx
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { History, Coins, DollarSign, Globe, Map } from 'lucide-react';
 import { NavbarBalance } from './NavbarBalance';
 import { NavbarProps } from '../../types/navbar';
@@ -13,10 +12,17 @@ const BALANCES: Balance[] = [
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({ onHistoryClick, onGlobalClick, onExplorerClick, className = '' }) => {
+  const navigate = useNavigate();
+
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-[rgb(38,42,51)] text-white border-b border-gray-700">
       <div className="flex items-center space-x-6">
-        <span className="text-2xl font-bold font-georgia text-white">Prediction Market</span>
+        <button 
+          onClick={() => navigate('/')}
+          className="text-2xl font-bold font-georgia text-white hover:text-[rgb(13,118,128)] transition-colors"
+        >
+          Prediction Market
+        </button>
         <button
           className="flex items-center space-x-3 hover:text-[rgb(13,118,128)] transition-colors"
           onClick={onHistoryClick}
@@ -26,7 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onHistoryClick, onGlobalClick, o
         </button>
         <button
           className="flex items-center space-x-3 hover:text-[rgb(13,118,128)] transition-colors"
-          onClick={onGlobalClick}
+          onClick={() => navigate('/global')}
         >
           <Globe className="w-6 h-6" />
           <span className="text-lg">Global</span>
