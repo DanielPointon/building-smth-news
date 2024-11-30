@@ -93,7 +93,7 @@ async def users_get_trades(id: Uuid) -> UserTrades:
                     )
                 )
 
-    trades.sort(key=lambda k: k.time, reverse=True)
+    trades.sort(key=lambda k: k.time)
     return UserTrades(user_id=id, trades=trades)
 
 
@@ -163,7 +163,7 @@ async def markets_get_trades(id: Uuid) -> MarketTrades:
         for t in clob.trades
     ]
 
-    trades.sort(key=lambda k: k.time, reverse=True)
+    trades.sort(key=lambda k: k.time)
 
     return MarketTrades(market_id=id, midpoint=clob.midpoint(), trades=trades)
 

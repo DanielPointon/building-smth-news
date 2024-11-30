@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { UserContext } from '../App'
+import { ApiContentContext, UserContext } from '../App'
 import { Market, MarketsClient } from '../utils/MarketsClient'
 import { Question } from 'types/question'
 
@@ -38,8 +38,10 @@ const questionsFromMarkets = async (markets: Market[]): Promise<Question[]> => {
             // Format trades into the data points expected by the UI
             const data = trades.trades.map(t => ({
                 date: new Date(t.time).toLocaleDateString('en-US', { month: 'short' }),
-                probability: Math.round(t.price) // Ensure we have whole numbers for percentages
+                probability: Math.round(t.price)
             }))
+
+            console.log(`last: ${data[data.length - 1].probability}`)
 
             // Only add markets that have trade data
             if (data.length > 0) {
@@ -62,13 +64,14 @@ const questionsFromMarkets = async (markets: Market[]): Promise<Question[]> => {
 }
 
 export const useQuestions = (): UseQuestions => {
+    const [reloadKey, _setReloadKey] = useContext(ApiContentContext);
+    const userId = useContext(UserContext)
+
     const [questions, setQuestions] = useState<Question[]>([])
     const [userQuestions, setUserQuestions] = useState<Question[]>([])
     const [followedQuestions, setFollowedQuestions] = useState<Question[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-
-    const userId = useContext(UserContext)
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -99,7 +102,7 @@ export const useQuestions = (): UseQuestions => {
         }
 
         fetchQuestions()
-    }, [userId])
+    }, [userId, reloadKey])
 
     const addQuestion = async (questionData: { question: string; initialProbability: number }) => {
         try {

@@ -48,7 +48,7 @@ export const useTransactions: () => UseTransactions = () => {
     };
 
     fetchTransactions();
-  }, [reloadKey]);
+  }, [userId, reloadKey]);
 
   return {
     transactions
