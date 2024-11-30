@@ -178,11 +178,7 @@ async def get_article(article_id: str):
     Article content can be either a string (text) or an image with caption.
     Fetch a specific article by ID from the database.
     """
-    article = next(
-        (article for article in database["articles"] 
-         if str(article["id"]) == article_id),
-        None
-    )
+    article = database["articles"].get(article_id, None)
     
     if not article:
         raise HTTPException(
