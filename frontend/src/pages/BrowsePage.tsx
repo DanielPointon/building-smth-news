@@ -10,18 +10,29 @@ export const BrowsePage: React.FC = () => {
   const { questions, addQuestion } = useQuestions();
 
   return (
-    <div className="space-y-6">
+    <div>
+      <div className="bg-[rgb(242,223,206)] p-6 mb-8">
+        <h1 className="text-2xl font-georgia text-[rgb(38,42,51)] mb-4">
+          Market Predictions
+        </h1>
+        <p className="text-[rgb(38,42,51)]">
+          Track and trade on future outcomes across global markets and events
+        </p>
+      </div>
       <div className="space-y-6">
-        {questions.map((q) => (
-          <QuestionCard 
-            id={q.id}
-            key={q.id}
-            question={q.question}
-            data={q.data}
-            articles={q.articles}
-          />
-        ))}
+        <div className="space-y-6">
+          {questions.map((q) => (
+            <QuestionCard
+              id={q.id}
+              key={q.id}
+              question={q.question}
+              data={q.data}
+              articles={q.articles}
+            />
+          ))}
+        </div>
       </div>
     </div>
+
   );
 };
