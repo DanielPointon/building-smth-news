@@ -12,7 +12,7 @@ interface CountryFeature {
   properties: CountryProperties;
   geometry: {
     type: string;
-    coordinates: number[][][] | number[][][][]; // Updated type to handle both Polygon and MultiPolygon
+    coordinates: number[][][] | number[][][][];
   };
 }
 
@@ -28,28 +28,25 @@ interface ClickPopupState {
 }
 
 // Get country center coordinates
-const getCountryCoordinates = (countryFeature: CountryFeature): [number, number] => {
-  const geometry = countryFeature.geometry;
+const getCountryCoordinates = (geometry: any): [number, number] => {
   let totalLat = 0;
   let totalLon = 0;
   let points = 0;
 
+  const processCoordinates = (coords: number[]) => {
+    totalLon += coords[0];
+    totalLat += coords[1];
+    points++;
+  };
+
+  const processPolygon = (coordinates: any[]) => {
+    coordinates[0].forEach(processCoordinates);
+  };
+
   if (geometry.type === 'Polygon') {
-    const coordinates = geometry.coordinates as number[][][];
-    coordinates[0].forEach(coord => {
-      totalLon += coord[0];
-      totalLat += coord[1];
-      points++;
-    });
+    processPolygon(geometry.coordinates);
   } else if (geometry.type === 'MultiPolygon') {
-    const coordinates = geometry.coordinates as number[][][][];
-    coordinates.forEach(polygon => {
-      polygon[0].forEach(coord => {
-        totalLon += coord[0];
-        totalLat += coord[1];
-        points++;
-      });
-    });
+    geometry.coordinates.forEach(processPolygon);
   }
 
   return [totalLat / points, totalLon / points];
@@ -73,9 +70,9 @@ const generateCountryColor = (countryId: string): string => {
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-const GlobeVisualization: React.FC<GlobeVisualizationProps> = ({ 
+const GlobeVisualization: React.FC<GlobeVisualizationProps> = ({
   onCountrySelect,
-  selectedCountry 
+  selectedCountry
 }) => {
   const globeRef = useRef<GlobeMethods>();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -130,12 +127,10 @@ const GlobeVisualization: React.FC<GlobeVisualizationProps> = ({
 
   const focusOnCountry = (countryFeature: CountryFeature) => {
     if (!globeRef.current) return;
-    
-    const [lat, lon] = getCountryCoordinates(countryFeature);
 
-    // Animate to new position
-    const globe = globeRef.current;
-    globe.pointOfView({
+    const [lat, lon] = getCountryCoordinates(countryFeature.geometry);
+
+    globeRef.current.pointOfView({
       lat,
       lng: lon,
       altitude: 1.75
@@ -145,21 +140,18 @@ const GlobeVisualization: React.FC<GlobeVisualizationProps> = ({
   const handleCountryClick = (polygon: any, event: any) => {
     if (!polygon || !event) return;
 
-    // Calculate position for popup
-    const x = event.clientX;
-    const y = event.clientY;
+    const coordinates = { x: event.clientX, y: event.clientY };
 
-    // Show popup with country information
     setClickPopup({
       country: polygon.properties.ADMIN,
-      screenPosition: { x, y },
+      screenPosition: coordinates,
       visible: true
     });
 
     // Focus globe on selected country
     focusOnCountry(polygon);
 
-    // Notify parent component about selection
+    // Notify parent component
     if (onCountrySelect) {
       onCountrySelect(
         polygon.properties.ADMIN,
@@ -167,7 +159,7 @@ const GlobeVisualization: React.FC<GlobeVisualizationProps> = ({
       );
     }
 
-    // Hide popup after animation
+    // Hide popup after delay
     setTimeout(() => {
       setClickPopup(prev => ({ ...prev, visible: false }));
     }, 2000);
@@ -195,16 +187,15 @@ const GlobeVisualization: React.FC<GlobeVisualizationProps> = ({
 
       {clickPopup.visible && (
         <div 
-          className="fixed z-50 pointer-events-none"
+          className="fixed z-50 transform -translate-x-1/2 -translate-y-full pointer-events-none"
           style={{ 
             left: clickPopup.screenPosition.x,
             top: clickPopup.screenPosition.y,
-            transform: 'translate(-50%, -120%)',
           }}
         >
-          <div className="bg-[rgb(38,42,51)] text-white px-4 py-2 rounded-lg shadow-lg whitespace-nowrap animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div className="font-bold text-[rgb(13,118,128)]">
-              Selected: {clickPopup.country}
+          <div className="bg-[rgb(242,223,206)] text-[rgb(38,42,51)] px-4 py-2 rounded-lg shadow-lg mb-2 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <div className="font-bold">
+              {clickPopup.country}
             </div>
           </div>
         </div>
@@ -228,9 +219,9 @@ const GlobeVisualization: React.FC<GlobeVisualizationProps> = ({
         }}
         onPolygonClick={handleCountryClick}
         polygonLabel={(d: any) => `
-          <div class="bg-[rgb(38,42,51)] p-2 rounded-lg">
-            <div class="font-bold text-[rgb(13,118,128)]">${d.properties.ADMIN} (${d.properties.ISO_A2})</div>
-            <div class="text-white">Population: ${(d.properties.POP_EST / 1e6).toFixed(2)}M</div>
+          <div class="bg-[rgb(242,223,206)] p-2 rounded-lg">
+            <div class="font-bold text-[rgb(38,42,51)]">${d.properties.ADMIN} (${d.properties.ISO_A2})</div>
+            <div class="text-[rgb(38,42,51)]">Population: ${(d.properties.POP_EST / 1e6).toFixed(2)}M</div>
           </div>
         `}
         showGraticules={true}
