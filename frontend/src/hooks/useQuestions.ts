@@ -3,18 +3,6 @@ import { ApiContentContext, UserContext } from '../App'
 import { Market, MarketsClient } from '../utils/MarketsClient'
 import { Question } from 'types/question'
 
-// Define Article type
-interface Article {
-    id: string
-    author: string
-    title: string
-    published_date: string
-    isKeyEvent: boolean
-    description: string
-    main_image_url: string
-    content: any[] // You might want to define a more specific type for content
-}
-
 // Update the interface to include loading and error
 interface UseQuestions {
     questions: Question[]

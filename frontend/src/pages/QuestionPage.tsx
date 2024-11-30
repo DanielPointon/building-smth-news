@@ -20,6 +20,7 @@ function isValidArticle(article: Article): article is Article & { published_date
 const QuestionPage = () => {
   const { id } = useParams();
   const { questions } = useQuestions();
+  console.log(questions);
   const question = questions.find(q => q.id === id);
 
   if (!question) {
