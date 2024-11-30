@@ -4,7 +4,9 @@ import GlobeVisualization from 'components/globe/GlobeVisualisation';
 
 export const GlobePage: React.FC = () => {
   return (
-    <GlobeVisualization />
+    <div className="relative h-screen">
+        <GlobeVisualization />
+    </div>
   );
 };
 
