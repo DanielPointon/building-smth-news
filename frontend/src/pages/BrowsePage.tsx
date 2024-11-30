@@ -14,7 +14,7 @@ export const BrowsePage: React.FC = () => {
       <div className="space-y-6">
         {questions.map((q) => (
           <QuestionCard 
-            id={`PLACEHOLDER-FIX`}
+            id={q.id}
             key={q.id}
             question={q.question}
             data={q.data}
