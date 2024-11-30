@@ -60,8 +60,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       
       {/* Rest of the component remains the same */}
       <div className="py-6">
-        <div className="bg-[rgb(28,32,41)] p-4 mb-6 rounded-lg shadow-md">
-          <ProbabilityGraph 
+      <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
+        <ProbabilityGraph 
             data={data}
             events={events}
           />
