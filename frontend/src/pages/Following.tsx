@@ -14,8 +14,14 @@ export const FollowingPage: React.FC = () => {
         </div>
       ) : (
         followedQuestions.map((q) => (
+<<<<<<< HEAD
           <QuestionCard 
             id={q.id}
+||||||| parent of 7bb3636 (rm trailing whitespace)
+          <QuestionCard 
+=======
+          <QuestionCard
+>>>>>>> 7bb3636 (rm trailing whitespace)
             key={q.id}
             question={q.question}
             data={q.data}

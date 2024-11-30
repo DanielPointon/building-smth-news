@@ -49,12 +49,12 @@ export const ProbabilityGraph: React.FC<ProbabilityGraphProps> = ({ data, events
           />
           
           <Tooltip content={<GraphTooltip />} />
-          
+
           {events?.map((event, index) => (
-            <EventLabel 
-              key={index} 
-              event={event} 
-              color={EVENT_COLORS[index % EVENT_COLORS.length]} 
+            <EventLabel
+              key={index}
+              event={event}
+              color={EVENT_COLORS[index % EVENT_COLORS.length]}
             />
           ))}
           
@@ -66,8 +66,8 @@ export const ProbabilityGraph: React.FC<ProbabilityGraphProps> = ({ data, events
             strokeDasharray="5 5"
             dot={false}
             activeDot={{ 
-              r: 6,
-              fill: "#EF4444",
+              r: 8,
+              fill: "#8B5CF6",
               stroke: "#fff",
               strokeWidth: 2
             }}

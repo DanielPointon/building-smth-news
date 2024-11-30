@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { DollarSign } from 'lucide-react';
 import { TradingModalProps } from 'types/trades';
 
-export const TradingModal: React.FC<TradingModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  probability, 
-  onTrade 
+export const TradingModal: React.FC<TradingModalProps> = ({
+  isOpen,
+  onClose,
+  probability,
+  onTrade
 }) => {
   const [amount, setAmount] = useState<string>('');
   const [processing, setProcessing] = useState(false);

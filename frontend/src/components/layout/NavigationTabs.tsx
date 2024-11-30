@@ -42,7 +42,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({ activeTab }) => 
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
         const Icon = tab.icon;
-        
+
         return (
           <button
             key={tab.id}
@@ -50,8 +50,8 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({ activeTab }) => 
             className={`
               flex-1 py-4 px-6 transition-all duration-200
               flex items-center justify-center gap-2 font-georgia
-              ${isActive 
-                ? 'text-[rgb(13,118,128)] border-b-2 border-[rgb(13,118,128)] bg-[rgb(38,42,51)]' 
+              ${isActive
+                ? 'text-[rgb(13,118,128)] border-b-2 border-[rgb(13,118,128)] bg-[rgb(38,42,51)]'
                 : 'text-gray-400 hover:text-[rgb(13,118,128)] hover:bg-[rgb(38,42,51)]'
               }
             `}

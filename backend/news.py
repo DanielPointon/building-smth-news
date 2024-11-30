@@ -252,7 +252,7 @@ async def generate_questions_for_article(article: dict):
     )
     generated_questions = response_generate.choices[0].message.content
 
-    prompt_link = f""" 
+    prompt_link = f"""
     The article content is as follows:
     {flattened_content}
 
@@ -318,13 +318,13 @@ async def get_events_for_question(question_id: int):
     # Build GPT prompt
     prompt_events = f"""
     The following are contents of articles related to a specific prediction market question:
-    
+
     Question: {question["text"]}
 
     Articles:
     {json.dumps(article_contents, indent=2)}
 
-    Based on these articles, extract a list of relevant events specific to the question. 
+    Based on these articles, extract a list of relevant events specific to the question.
     Each event should include:
     - "event_title": The title of the event.
     - "event_date": The date of the event, if available. Leave blank if not mentioned. Do NOT make this up.
@@ -379,13 +379,13 @@ async def get_clusters_for_question(question_id: int):
     # Build GPT prompt
     prompt_clusters = f"""a
     The following are contents of articles related to a specific prediction market question:
-    
+
     Question: {question["text"]}
 
     Articles:
     {json.dumps(related_articles, indent=2)}
 
-    Based on these articles, generate clusters of sub-topics relevant to the question. 
+    Based on these articles, generate clusters of sub-topics relevant to the question.
     Each cluster should have:
     - "cluster_topic": A short title for the sub-topic.
     - "article_ids": A list of article IDs related to this sub-topic.

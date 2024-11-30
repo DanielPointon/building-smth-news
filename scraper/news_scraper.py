@@ -209,6 +209,7 @@ if __name__ == "__main__":
 
     # print(articles)
 
+<<<<<<< HEAD
     # article_contents = [
     #     scraper.get_article_content_with_img(article["url"]) for article in articles
     # ]
@@ -219,6 +220,16 @@ if __name__ == "__main__":
         if content:  # Only append if content was successfully retrieved
             content["id"] = i
             article_contents.append(content)
+||||||| parent of 7bb3636 (rm trailing whitespace)
+    article_contents = [
+        scraper.get_article_content_with_img(article["url"]) for article in articles
+    ]
+    
+=======
+    article_contents = [
+        scraper.get_article_content_with_img(article["url"]) for article in articles
+    ]
+>>>>>>> 7bb3636 (rm trailing whitespace)
 
     # print(article_contents)
 
