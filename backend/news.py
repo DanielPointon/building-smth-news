@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Union
 from pydantic import BaseModel, RootModel
 import json
@@ -13,15 +14,27 @@ OPENAI_API_KEY = json.loads(open("secrets.json").read())["OPENAI_API_KEY"]
 
 client = Client(api_key=OPENAI_API_KEY)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-DB_PATH = Path("database.json")
+# DB_PATH = Path("database.json")
+DB_PATH = Path("../scraper/out/ft_articles.json")
 
 if DB_PATH.exists():
     with open(DB_PATH, "r") as db_file:
-        database = json.load(db_file)
+        print(db_file)
+        database = {}
+        database["articles"] = json.load(db_file)
 else:
     database = {"articles": [], "questions": []}
+    # database = {}
 
+# print(database)
 
 def save_database():
     with open(DB_PATH, "w") as db_file:
@@ -33,11 +46,38 @@ class ImageContent(BaseModel):
     image_caption: str
 
 
-class ArticleContent(RootModel[Union[str, ImageContent]]):
+class ArticleContent(BaseModel):
+    type: str
+    content: str | None = None
+    image_url: str | None = None
+    description: str | None = None
+
+class Article(BaseModel):
+    title: str
+    description: str
+    author: str
+    published_date: str
+    content: List[ArticleContent]
+    url: str
+
+@router.get("/articles/{article_id}")
+async def get_article(article_id: str):
     """
-    Article content can be either a string (text) or an image with caption.
+    Fetch a specific article by ID from the database.
     """
-    pass
+    article = next(
+        (article for article in database["articles"] 
+         if str(article["id"]) == article_id),
+        None
+    )
+    
+    if not article:
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found"
+        )
+    
+    return article
 
 
 class QuestionInput(BaseModel):

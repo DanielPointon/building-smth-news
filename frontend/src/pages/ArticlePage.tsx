@@ -4,10 +4,15 @@ import { useParams } from "react-router-dom";
 interface Article {
   id: string;
   title: string;
-  date: string;
+  published_date: string;
   author: string;
-  content: string;
-  imageUrl: string;
+  content: Array<{
+    type: "text" | "image";
+    content?: string;
+    image_url?: string;
+    description?: string;
+  }>;
+  main_image_url: string;
   description: string;
 }
 
@@ -17,23 +22,16 @@ export const ArticlePage: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    // This is a placeholder for the future database fetch
-    // TODO: Implement actual database fetch
     const fetchArticle = async () => {
       try {
         setLoading(true);
-        // Simulate API call
-        // Replace this with actual API call later
-        const mockArticle: Article = {
-          id: id || "",
-          title: "Sample Article",
-          date: "2024-03-21",
-          author: "John Kelly",
-          content: "This is a sample article content.",
-          imageUrl: "https://avatars.githubusercontent.com/u/32420055?v=4",
-          description: "This is a sample article description.",
-        };
-        setArticle(mockArticle);
+        const response = await fetch(`http://localhost:8000/articles/${id}`);
+        if (!response.ok) {
+          throw new Error("Article not found");
+        }
+        const data = await response.json();
+        console.log(data);
+        setArticle(data);
       } catch (error) {
         console.error("Error fetching article:", error);
       } finally {
@@ -53,23 +51,34 @@ export const ArticlePage: React.FC = () => {
   }
 
   return (
-    // <div className="bg-white rounded-lg shadow-md p-8">
     <div className="p-8 shadow-lg rounded-lg">
       <h1 className="text-3xl font-bold mb-4">{article.title}</h1>
       <p className="text-gray-600 text-lg mb-4">{article.description}</p>
       <div className="text-gray-600 mb-6">
-        <span>{new Date(article.date).toLocaleDateString()}</span>
+        <span>{new Date(article.published_date).toLocaleDateString()}</span>
         <span className="mx-2">•</span>
         <span>{article.author}</span>
       </div>
-      {article.imageUrl && (
-        <img
-          src={article.imageUrl}
-          alt={article.title}
-          className="max-w-[200px] w-full h-auto mb-6 rounded-lg mx-auto block"
-        />
-      )}
-      <div className="prose max-w-none">{article.content}</div>
+      <img
+        src={article.main_image_url}
+        alt={article.description}
+        className="w-full h-auto mb-6 rounded-lg"
+      />
+
+      <div className="prose max-w-none">
+        {article.content.map((item, index) => (
+          <React.Fragment key={index}>
+            {item.type === "text" && <p className="mb-4">{item.content}</p>}
+            {item.type === "image" && (
+              <img
+                src={item.image_url}
+                alt={item.description || "Article image"}
+                className="max-w-[400px] w-full h-auto my-6 rounded-lg mx-auto block"
+              />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
 };

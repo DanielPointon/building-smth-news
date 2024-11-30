@@ -107,8 +107,9 @@ class FTScraper:
                     "content": article_data.get("articleBody"),
                     # 'word_count': article_data.get('wordCount'),
                     "url": url,
-                    "image_url": article_data.get("image", {}).get("url"),
+                    "main_image_url": article_data.get("image", {}).get("url"),
                 }
+                # print(article_info)
 
                 return article_info
             else:
@@ -152,6 +153,7 @@ class FTScraper:
                     "description": article_data.get("description"),
                     "author": article_data.get("author", [{}])[0].get("name") if article_data["author"] else "John Doe",
                     "published_date": article_data.get("datePublished"),
+                    "main_image_url": article_data.get("image", {}).get("url"),
                 }
 
             # Find the main article container
@@ -201,15 +203,23 @@ class FTScraper:
 if __name__ == "__main__":
     scraper = FTScraper()
 
-    sections_to_scrape = ["world", "world-uk", "companies", "technology", "markets", "climate-capital", "opinion", "lex"]
+    # sections_to_scrape = ["world", "world-uk", "companies", "technology", "markets", "climate-capital", "opinion", "lex"]
+    sections_to_scrape = ["world"]
     articles = [article for section in sections_to_scrape for article in scraper.get_articles(section)]
 
     # print(articles)
 
-    article_contents = [
-        scraper.get_article_content_with_img(article["url"]) for article in articles
-    ]
-    
+    # article_contents = [
+    #     scraper.get_article_content_with_img(article["url"]) for article in articles
+    # ]
+
+    article_contents = []
+    for i, article in enumerate(articles):
+        content = scraper.get_article_content_with_img(article["url"])
+        if content:  # Only append if content was successfully retrieved
+            content["id"] = i
+            article_contents.append(content)
+
     # print(article_contents)
 
     out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out")
