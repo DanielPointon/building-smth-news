@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../App';
 import { Market, MarketsClient } from '../utils/MarketsClient';
+import { Question } from 'types/question';
 
 // Define Article type
 interface Article {
@@ -12,21 +13,6 @@ interface Article {
   description: string;
   main_image_url: string;
   content: any[]; // You might want to define a more specific type for content
-}
-
-// Define Question type
-interface Question {
-  id: string;
-  question: string;
-  category?: string;
-  totalPredictions: number;
-  data: Array<{
-    date: string;
-    probability: number;
-  }>;
-  articles: Article[];
-  isUserQuestion?: boolean;
-  isFollowing?: boolean;
 }
 
 // Update the interface to include loading and error

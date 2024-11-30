@@ -12,7 +12,7 @@ interface CountryFeature {
   properties: CountryProperties;
   geometry: {
     type: string;
-    coordinates: number[][][];
+    coordinates: number[][][] | number[][][][]; // Updated type to handle both Polygon and MultiPolygon
   };
 }
 
@@ -26,6 +26,34 @@ interface ClickPopupState {
   screenPosition: { x: number; y: number };
   visible: boolean;
 }
+
+// Get country center coordinates
+const getCountryCoordinates = (countryFeature: CountryFeature): [number, number] => {
+  const geometry = countryFeature.geometry;
+  let totalLat = 0;
+  let totalLon = 0;
+  let points = 0;
+
+  if (geometry.type === 'Polygon') {
+    const coordinates = geometry.coordinates as number[][][];
+    coordinates[0].forEach(coord => {
+      totalLon += coord[0];
+      totalLat += coord[1];
+      points++;
+    });
+  } else if (geometry.type === 'MultiPolygon') {
+    const coordinates = geometry.coordinates as number[][][][];
+    coordinates.forEach(polygon => {
+      polygon[0].forEach(coord => {
+        totalLon += coord[0];
+        totalLat += coord[1];
+        points++;
+      });
+    });
+  }
+
+  return [totalLat / points, totalLon / points];
+};
 
 const seededRandom = (seed: string) => {
   let hash = 0;
@@ -100,21 +128,22 @@ const GlobeVisualization: React.FC<GlobeVisualizationProps> = ({
       });
   }, []);
 
-  useEffect(() => {
-    if (globeRef.current) {
-      const controls = (globeRef.current as any).controls();
-      if (controls) {
-        controls.autoRotate = false;
-      }
-    }
-  }, []);
+  const focusOnCountry = (countryFeature: CountryFeature) => {
+    if (!globeRef.current) return;
+    
+    const [lat, lon] = getCountryCoordinates(countryFeature);
+
+    // Animate to new position
+    const globe = globeRef.current;
+    globe.pointOfView({
+      lat,
+      lng: lon,
+      altitude: 1.75
+    }, 1000);
+  };
 
   const handleCountryClick = (polygon: any, event: any) => {
     if (!polygon || !event) return;
-
-    // Get click coordinates relative to the container
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    if (!containerRect) return;
 
     // Calculate position for popup
     const x = event.clientX;
@@ -126,6 +155,9 @@ const GlobeVisualization: React.FC<GlobeVisualizationProps> = ({
       screenPosition: { x, y },
       visible: true
     });
+
+    // Focus globe on selected country
+    focusOnCountry(polygon);
 
     // Notify parent component about selection
     if (onCountrySelect) {
@@ -161,7 +193,6 @@ const GlobeVisualization: React.FC<GlobeVisualizationProps> = ({
         </div>
       )}
 
-      {/* Click Popup */}
       {clickPopup.visible && (
         <div 
           className="fixed z-50 pointer-events-none"
