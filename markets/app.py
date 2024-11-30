@@ -13,6 +13,7 @@ from models import (
     Order,
     OrderCreateInfo,
     User,
+    UserTrades,
     Uuid,
 )
 from db import Db, HasId
@@ -65,13 +66,49 @@ async def create_user() -> User:
     return user
 
 
+@app.get("/users/{id}/trades")
+async def users_get_trades(id: Uuid) -> UserTrades:
+    print(id)
+    trades: list[MarketTrade] = []
+
+    for c in CLOBS.store.values():
+        for t in c.trades:
+            if t.buy_user_id == id:
+                trades.append(
+                    MarketTrade(
+                        market_id=c.id,
+                        side="bid",
+                        time=t.time,
+                        price=t.price,
+                        quantity=t.quantity,
+                    )
+                )
+            elif t.sell_user_id == id:
+                trades.append(
+                    MarketTrade(
+                        market_id=c.id,
+                        side="ask",
+                        time=t.time,
+                        price=t.price,
+                        quantity=t.quantity,
+                    )
+                )
+
+    return UserTrades(user_id=id, trades=trades)
+
+
 markets = FastAPI()
 app.mount("/markets", markets, name="markets")
 
 
 @markets.get("/")
-async def get_markets() -> MarketList:
-    return MarketList(markets=list(MARKETS.store.values()))
+async def get_markets(user_id: str | None = None) -> MarketList:
+    markets = MARKETS.store.values()
+
+    if user_id is not None:
+        markets = [m for m in markets if user_id in CLOBS[m.id].users]
+
+    return MarketList(markets=list(markets))
 
 
 @markets.post("/")
@@ -118,7 +155,9 @@ async def markets_get_trades(id: Uuid) -> MarketTrades:
     clob = get_by_id(CLOBS, id)
 
     trades = [
-        MarketTrade(time=t.time, price=t.price, quantity=t.quantity)
+        MarketTrade(
+            market_id=id, side=None, time=t.time, price=t.price, quantity=t.quantity
+        )
         for t in clob.trades
     ]
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronRight, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { Transaction, TransactionHistoryProps } from 'types/trades';
+import { useTransactions } from 'hooks/useTransactions';
 
 const SAMPLE_TRANSACTIONS: Transaction[] = [
   {
@@ -22,6 +23,8 @@ const SAMPLE_TRANSACTIONS: Transaction[] = [
 ];
 
 export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ isOpen, onClose }) => {
+  const { transactions } = useTransactions();
+
   return (
     <div className={`fixed right-0 top-0 h-full w-80 bg-gray-900 border-l border-gray-800 transform transition-transform ${isOpen ? 'translate-x-0' : 'translate-x-full'} z-50`}>
       <div className="p-4">
@@ -32,7 +35,7 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ isOpen, 
           </button>
         </div>
         <div className="space-y-3">
-          {SAMPLE_TRANSACTIONS.map((tx) => (
+          {transactions.map((tx) => (
             <div key={tx.id} className="p-3 bg-gray-800 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 {tx.type === 'buy' ? (

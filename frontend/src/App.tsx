@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { createContext, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -16,6 +16,8 @@ import GlobalPage from "pages/GlobalPage";
 import { ArticlePage } from "pages/ArticlePage";
 import QuestionPage from "pages/QuestionPage";
 import ArticlesPage from "./pages/ArticlesPage";
+
+export const UserContext = createContext("");
 
 const MainContent: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
@@ -56,7 +58,9 @@ const MainContent: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <Router>
-      <MainContent />
+      <UserContext.Provider value="foo">
+        <MainContent />
+      </UserContext.Provider>
     </Router>
   );
 };

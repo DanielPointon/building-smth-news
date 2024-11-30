@@ -87,6 +87,8 @@ class OrderPriceList:
 
 @dataclass
 class Trade:
+    buy_user_id: str
+    sell_user_id: str
     time: datetime
     price: int
     quantity: int
@@ -95,6 +97,8 @@ class Trade:
 class Clob:
     # market id
     id: Uuid
+
+    users: set[str]
 
     bids: OrderPriceList
     asks: OrderPriceList
@@ -105,6 +109,7 @@ class Clob:
 
     def __init__(self, id: Uuid):
         self.id = id
+        self.users = set()
         self.bids = OrderPriceList(PriceOrder.DESC)
         self.asks = OrderPriceList(PriceOrder.ASC)
         self.orders = {}
@@ -151,6 +156,8 @@ class Clob:
         return order
 
     def insert_order(self, order: Order):
+        self.users.add(order.user_id)
+
         self._process_order(order)
 
         if order.quantity == 0:
@@ -197,7 +204,17 @@ class Clob:
             order.quantity -= size
             counter.quantity -= size
 
-            self.trades.append(Trade(datetime.now(), price, size))
+            match order.side:
+                case "bid":
+                    buy_user = order.user_id
+                    sell_user = counter.user_id
+                case "ask":
+                    buy_user = counter.user_id
+                    sell_user = order.user_id
+
+            self.trades.append(
+                Trade(buy_user, sell_user, datetime.now(), order.price, size)
+            )
             self.on_order_fill(order, order.price, size)
             self.on_order_fill(counter, order.price, size)
 

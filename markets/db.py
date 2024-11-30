@@ -15,6 +15,9 @@ class Db[V: HasId]:
     def get(self, key: Uuid) -> V | None:
         return self.store.get(key)
 
+    def __getitem__(self, key: Uuid) -> V:
+        return self.store[key]
+
     def insert(self, v: V):
         if v.id in self.store:
             raise KeyError("Exists")

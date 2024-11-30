@@ -42,6 +42,8 @@ class MarketList(BaseModel):
 
 
 class MarketTrade(BaseModel):
+    market_id: str
+    side: OrderSide | None
     time: datetime
     price: int
     quantity: int
@@ -49,6 +51,11 @@ class MarketTrade(BaseModel):
 
 class MarketTrades(BaseModel):
     market_id: Uuid
+    trades: list[MarketTrade]
+
+
+class UserTrades(BaseModel):
+    user_id: Uuid
     trades: list[MarketTrade]
 
 

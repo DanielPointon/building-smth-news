@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../App';
 import { Question } from '../types/question';
 import { Market, MarketsClient } from '../utils/MarketsClient';
 
@@ -174,8 +175,8 @@ const questionsFromMarkets = async (markets: Market[]) => {
   return questions
 }
 
-export const useQuestions = (): UseQuestions => {
-  const [questions, setQuestions] = useState<Question[]>(INITIAL_QUESTIONS);
+export const useQuestions: () => UseQuestions = () => {
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [userQuestions, setUserQuestions] = useState<Question[]>([]);
   const [followedQuestions, setFollowedQuestions] = useState<Question[]>([]);
 
@@ -189,6 +190,19 @@ export const useQuestions = (): UseQuestions => {
 
     fetchQuestions();
   }, []);
+
+  const userId = useContext(UserContext);
+  
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      const client = new MarketsClient();
+      const markets = await client.getMarkets(userId);
+      const questions = await questionsFromMarkets(markets.markets);
+      setQuestions(_prev => questions);
+    };
+
+    fetchQuestions();
+  }, [userId]);
 
   const addQuestion = (questionData: { question: string; initialProbability: number }) => {
     const newQuestion: Question = {
@@ -239,3 +253,4 @@ export const useQuestions = (): UseQuestions => {
     getQuestionsByCategory
   };
 };
+

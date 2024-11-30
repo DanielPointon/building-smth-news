@@ -31,6 +31,8 @@ export interface MarketList {
 }
 
 export interface MarketTrade {
+  market_id: string
+  side: OrderSide
   time: string; // ISO date string
   price: number;
   quantity: number;
@@ -38,6 +40,11 @@ export interface MarketTrade {
 
 export interface MarketTrades {
   market_id: Uuid;
+  trades: MarketTrade[];
+}
+
+export interface UserTrades {
+  user_id: Uuid;
   trades: MarketTrade[];
 }
 
@@ -103,12 +110,20 @@ export class MarketsClient {
     return this.request<Market>("/markets/", "POST", info);
   }
 
-  async getMarkets(): Promise<MarketList> {
-    return this.request<MarketList>("/markets", "GET");
+  async getMarkets(userId: string | null = null): Promise<MarketList> {
+    if (userId != null) {
+      return this.request<MarketList>("/markets", "GET");
+    } else {
+      return this.request<MarketList>(`/markets?userId=${userId}`, "GET");
+    }
   }
 
   async getTrades(marketId: Uuid): Promise<MarketTrades> {
     return this.request<MarketTrades>(`/markets/${marketId}/trades`, "GET");
+  }
+
+  async getUserTrades(userId: Uuid): Promise<UserTrades> {
+    return this.request<UserTrades>(`/users/${userId}/trades`, "GET");
   }
 
   async getMarket(marketId: Uuid): Promise<Market> {
