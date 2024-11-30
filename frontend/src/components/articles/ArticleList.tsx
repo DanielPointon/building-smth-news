@@ -1,7 +1,7 @@
 import React from 'react';
 import { Article } from '../../types/question';
-import { ArticleLink } from './ArticleLink';
 import { COLORS } from '../../constants/color';
+import ArticleLink from './ArticleLink';
 
 interface ArticleListProps {
   articles: Article[];

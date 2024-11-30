@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import { TrendingUp, Sparkles, ChevronRight } from 'lucide-react';
+import { TrendingUp, ChevronRight } from 'lucide-react';
 import { ProbabilityGraph } from '../graph/ProbabilityGraph';
 import { TradingButtons } from '../trading/TradingButtons';
 import { ArticleList } from '../articles/ArticleList';
 import { QuestionCardProps, Article } from '../../types/question';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from 'components/ui/card';
-import { COLORS } from '../../constants/color';
+import { Event } from '../../types/graph';
 
-const isValidEvent = (article: Article): article is (Article & { date: string }) => {
-  return article.isKeyEvent && typeof article.date === 'string';
-};
-
-export const QuestionCard: React.FC<QuestionCardProps> = ({
+const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   data,
   articles
@@ -21,69 +16,71 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   const previousProbability = data[data.length - 2]?.probability;
   const trending = currentProbability > previousProbability;
 
-  const events = articles
-    .filter(isValidEvent)
+  // Fixed type checking for events
+  const events: Event[] = articles
+    .filter((article): article is Article & { date: string } => {
+      return article.isKeyEvent && typeof article.date === 'string';
+    })
     .map(article => ({
       date: article.date,
       title: article.title
     }));
 
   return (
-    <Card className="bg-white border border-gray-200 shadow-lg">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-semibold text-gray-800">
+    <div className="mb-12 border-b border-gray-200 pb-8">
+      {/* Headline Section */}
+      <div className="mb-4">
+        <h2 className="font-serif text-2xl font-bold leading-tight tracking-tight text-gray-900 mb-2">
+          {question}
+        </h2>
+        <div className="flex items-center gap-3 text-sm text-gray-500 font-serif">
+          <span>PREDICTION MARKETS</span>
+          <span>•</span>
           <div className="flex items-center gap-2">
-            {question}
-            {trending && <Sparkles size={16} className="text-purple-500" />}
-          </div>
-        </CardTitle>
-        <div className="flex items-center gap-2">
-          <span 
-            className={`text-2xl font-bold ${
-              trending ? 'text-green-500' : 'text-red-500'
-            }`}
-          >
-            {currentProbability}%
-          </span>
-          <TrendingUp 
-            size={20} 
-            className={`${
-              trending ? 'text-green-500 rotate-0' : 'text-red-500 rotate-180'
-            }`}
-          />
-        </div>
-      </CardHeader>
-      
-      <CardContent>
-        <ProbabilityGraph 
-          data={data}
-          events={events}
-        />
-        <TradingButtons probability={currentProbability} />
-        <div className="mt-4">
-          <ArticleList 
-            articles={articles} 
-            showAll={showAllNews}
-          />
-        </div>
-      </CardContent>
-
-      {articles.length > 2 && (
-        <CardFooter>
-          <button
-            onClick={() => setShowAllNews(prev => !prev)}
-            className="flex items-center gap-2 text-sm text-purple-500 hover:text-purple-600 transition-colors mt-2 group"
-          >
-            {showAllNews ? 'Show less' : 'Explore more'}
-            <ChevronRight 
+            <span className={`font-bold ${trending ? 'text-green-700' : 'text-red-700'}`}>
+              {currentProbability}%
+            </span>
+            <TrendingUp 
               size={16} 
-              className={`transition-transform duration-300 group-hover:translate-x-1 ${
-                showAllNews ? 'rotate-90' : ''
-              }`}
+              className={`${trending ? 'text-green-700 rotate-0' : 'text-red-700 rotate-180'}`}
             />
-          </button>
-        </CardFooter>
-      )}
-    </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* Graph Section */}
+      <div className="mb-6">
+        <ProbabilityGraph data={data} events={events} />
+      </div>
+
+      {/* Trading Section */}
+      <div className="mb-6">
+        <TradingButtons probability={currentProbability} />
+      </div>
+
+      {/* Related Articles Section */}
+      <div className="mt-8">
+        <h3 className="font-serif text-lg font-bold mb-4 text-gray-900">Related Coverage</h3>
+        <div className="space-y-4">
+          <ArticleList articles={articles} showAll={showAllNews} />
+          {articles.length > 2 && (
+            <button
+              onClick={() => setShowAllNews(prev => !prev)}
+              className="font-serif text-sm text-gray-500 hover:text-gray-700 transition-colors mt-4 flex items-center gap-1 group"
+            >
+              {showAllNews ? 'Show Less' : 'See More Coverage'}
+              <ChevronRight 
+                size={14} 
+                className={`transition-transform duration-300 group-hover:translate-x-1 ${
+                  showAllNews ? 'rotate-90' : ''
+                }`}
+              />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
+
+export default QuestionCard;

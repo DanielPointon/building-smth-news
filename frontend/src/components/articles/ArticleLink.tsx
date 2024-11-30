@@ -1,34 +1,35 @@
 import React from 'react';
-import { ExternalLink, Newspaper, Sparkles } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { Article } from '../../types/question';
-import { COLORS } from '../../constants/color';
 
 interface ArticleLinkProps {
   article: Article;
 }
 
-export const ArticleLink: React.FC<ArticleLinkProps> = ({ article }) => (
+const ArticleLink: React.FC<ArticleLinkProps> = ({ article }) => (
   <a 
     href={article.url} 
     target="_blank" 
     rel="noopener noreferrer"
-    className={`flex items-center justify-between p-3 rounded-lg transition-all duration-300 ${
-      article.isKeyEvent 
-        ? 'bg-gradient-to-r from-COLORS.graph.events[0]/50 to-COLORS.graph.events[1]/50 border border-COLORS.graph.events[0]/30' 
-        : 'bg-COLORS.background.card/50 hover:bg-COLORS.background.card/70'
-    } group backdrop-blur-sm`}
+    className="block group"
   >
-    <div className="flex items-center gap-3">
-      {article.isKeyEvent ? (
-        <Sparkles size={16} className="text-COLORS.graph.events[0]" />
-      ) : (
-        <Newspaper size={16} className="text-COLORS.text.muted" />
-      )}
-      <span className="text-sm text-COLORS.text.secondary">{article.title}</span>
+    <div className="flex items-center justify-between py-3 border-t border-gray-100 first:border-t-0">
+      <div className="flex-1">
+        <h4 className="font-serif text-base text-gray-900 group-hover:text-gray-600 transition-colors leading-snug">
+          {article.title}
+        </h4>
+        {article.isKeyEvent && (
+          <span className="text-xs uppercase tracking-wider text-gray-500 mt-1">
+            Key Development
+          </span>
+        )}
+      </div>
+      <ExternalLink 
+        size={14} 
+        className="text-gray-400 group-hover:text-gray-600 transition-colors ml-4" 
+      />
     </div>
-    <ExternalLink 
-      size={16} 
-      className={`text-COLORS.text.muted group-hover:text-COLORS.graph.events[0] transition-colors`} 
-    />
   </a>
 );
+
+export default ArticleLink;

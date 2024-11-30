@@ -1,6 +1,6 @@
 import React from 'react';
-import { QuestionCard } from '../components/questions/QuestionCard';
 import { useQuestions } from '../hooks/useQuestions';
+import QuestionCard from 'components/questions/QuestionCard';
 
 export const MyQuestionsPage: React.FC = () => {
   const { userQuestions } = useQuestions();
