@@ -54,6 +54,8 @@ class MarketClobOrder(BaseModel):
 
 
 class MarketClob(BaseModel):
+    midpoint: float | None
+
     bids: list[MarketClobOrder]
     asks: list[MarketClobOrder]
 

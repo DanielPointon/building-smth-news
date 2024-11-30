@@ -136,4 +136,8 @@ async def markets_get_clob(id: Uuid) -> MarketClob:
 
         ask = ask.succ
 
-    return MarketClob(bids=bids, asks=asks)
+    midpoint = None
+    if bids and asks:
+        midpoint = (bids[0].price + asks[0].price) / 2
+
+    return MarketClob(midpoint=midpoint, bids=bids, asks=asks)
