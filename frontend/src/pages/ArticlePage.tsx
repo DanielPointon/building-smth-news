@@ -7,6 +7,7 @@ export const ArticlePage: React.FC = () => {
   const { id } = useParams();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+  const [paragraphOffset, setParagraphOffset] = useState(0);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -41,6 +42,30 @@ export const ArticlePage: React.FC = () => {
     articles: [],
   };
 
+  useEffect(() => {
+    if (!article) return;
+
+    const calculateOffset = () => {
+      const paragraph = document.getElementById(
+        `paragraph-${relatedQuestion.paragraphIndex}`
+      );
+      if (!paragraph) return;
+
+      const offset = paragraph.offsetTop;
+
+      const adjustedOffset = offset + 414;
+
+      console.log("Original offset:", offset);
+      console.log("Adjusted offset:", adjustedOffset);
+
+      setParagraphOffset(adjustedOffset);
+    };
+
+    calculateOffset();
+    window.addEventListener("resize", calculateOffset);
+    return () => window.removeEventListener("resize", calculateOffset);
+  }, [relatedQuestion.paragraphIndex, article]);
+
   if (loading) {
     return <div className="text-center py-8">Loading...</div>;
   }
@@ -74,7 +99,11 @@ export const ArticlePage: React.FC = () => {
           <div className="prose max-w-none relative">
             {article.content.map((item, index) => (
               <Fragment key={index}>
-                {item.type === "text" && <p className="mb-4">{item.content}</p>}
+                {item.type === "text" && (
+                  <p id={`paragraph-${index}`} className="mb-4">
+                    {item.content}
+                  </p>
+                )}
                 {item.type === "image" && (
                   <img
                     src={item.image_url}
@@ -89,7 +118,13 @@ export const ArticlePage: React.FC = () => {
       </div>
 
       <div className="col-span-4">
-        <div className="sticky top-8 transform scale-90 origin-top-left relative">
+        <div
+          style={{
+            marginTop: paragraphOffset,
+          }}
+          className="relative"
+        >
+          <div className="absolute -left-8 top-1/2 w-8 h-[2px] bg-gray-300"></div>
           <QuestionCard {...relatedQuestion} />
         </div>
       </div>
