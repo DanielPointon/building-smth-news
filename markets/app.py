@@ -72,7 +72,9 @@ async def markets_get(id: Uuid) -> Market:
 async def markets_create_order(id: Uuid, info: OrderCreateInfo) -> Order:
     clob = get_by_id(CLOBS, id)
 
-    order = Order(side=info.side, price=info.price, quantity=info.quantity)
+    order = Order(
+        user_id=info.user_id, side=info.side, price=info.price, quantity=info.quantity
+    )
     clob.insert_order(order)
 
     return order

@@ -84,6 +84,12 @@ class OrderPriceList:
             head = head.succ
 
 
+@dataclass
+class Trade:
+    price: int
+    quantity: int
+
+
 class Clob:
     # market id
     id: Uuid
@@ -91,16 +97,16 @@ class Clob:
     bids: OrderPriceList
     asks: OrderPriceList
 
-    last_traded_price: int | None
+    trades: list[Trade]
 
     orders: dict[Uuid, OrderPrice]
 
     def __init__(self, id: Uuid):
         self.id = id
-        self.last_traded_price = None
         self.bids = OrderPriceList(PriceOrder.DESC)
         self.asks = OrderPriceList(PriceOrder.ASC)
         self.orders = {}
+        self.trades = []
 
     def _add_order(self, order: Order, price_list: OrderPriceList):
         price_node = price_list.get_order_price(order)
@@ -116,14 +122,14 @@ class Clob:
 
         ask = self.asks.last
         while ask:
-            s += f"{ask.price} : {[o.quantity for o in ask.orders]}\n"
+            s += f"{ask.price: >4} : {[o.quantity for o in ask.orders]}\n"
             ask = ask.pred
 
-        s += "------\n"
+        s += "-------------\n"
 
         bid = self.bids.first
         while bid:
-            s += f"{bid.price} : {[o.quantity for o in bid.orders]}\n"
+            s += f"{bid.price: >4} : {[o.quantity for o in bid.orders]}\n"
             bid = bid.succ
 
         return s
@@ -143,53 +149,63 @@ class Clob:
         return order
 
     def insert_order(self, order: Order):
+        self._process_order(order)
+
+        if order.quantity == 0:
+            return
+
         match order.side:
             case "bid":
                 self._add_order(order, self.bids)
             case "ask":
                 self._add_order(order, self.asks)
 
-        self._process_orders()
+    def on_order_fill(self, order: Order, price: int, fill: int):
+        self.trades.append(Trade(price, fill))
 
-    def on_order_fill(self, order: Order, fill: int):
         # TODO:
-        print(f"Order {order.id} ({order.side}): filled {fill}")
+        print(
+            f"Order {order.id} ({order.side}): filled {fill} @ {price} (limit={order.price})"
+        )
 
     def _clean_orders(self):
         self.bids.clean_orders()
         self.asks.clean_orders()
 
-    def _process_orders(self):
-        bb = self.bids.first
-        ba = self.asks.first
+    def _process_order(self, order: Order):
+        match order.side:
+            case "bid":
+                price_list = self.asks
+                price_mul = 1
+            case "ask":
+                price_list = self.bids
+                price_mul = -1
 
-        while bb and ba:
-            if bb.price < ba.price:
+        node = price_list.first
+
+        price = order.price * price_mul
+
+        while node:
+            node_price = node.price * price_mul
+            if node_price > price:
                 break
 
-            if not bb.orders:
-                bb = bb.succ
-                continue
+            counter = node.orders[0]
 
-            if not ba.orders:
-                ba = ba.succ
-                continue
+            size = min(order.quantity, counter.quantity)
 
-            cur_bid = bb.orders[0]
-            cur_ask = ba.orders[0]
+            order.quantity -= size
+            counter.quantity -= size
 
-            size = min(cur_bid.quantity, cur_ask.quantity)
+            self.on_order_fill(order, order.price, size)
+            self.on_order_fill(counter, order.price, size)
 
-            cur_bid.quantity -= size
-            cur_ask.quantity -= size
+            if counter.quantity == 0:
+                _ = self.delete_order(counter.id)
 
-            self.on_order_fill(cur_bid, size)
-            self.on_order_fill(cur_ask, size)
+            if order.quantity == 0:
+                return
 
-            # remove order if empty
-            if cur_bid.quantity == 0:
-                _ = self.delete_order(cur_bid.id)
-            if cur_ask.quantity == 0:
-                _ = self.delete_order(cur_ask.id)
+            node = node.succ
 
         self._clean_orders()

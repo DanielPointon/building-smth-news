@@ -22,6 +22,7 @@ m = requests.post(
 clob = requests.get(
     f"http://localhost:8000/markets/{id}/clob",
 )
+print("CLOB")
 print(clob.json())
 
 oid = m.json()["id"]

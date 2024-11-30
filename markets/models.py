@@ -31,6 +31,7 @@ type OrderSide = Literal["bid", "ask"]
 
 
 class OrderCreateInfo(BaseModel):
+    user_id: Uuid
     side: OrderSide
     price: int
     quantity: int
@@ -47,6 +48,7 @@ class MarketClob(BaseModel):
 
 
 class Order(Model):
+    user_id: Uuid
     side: OrderSide
     price: int
     quantity: int
