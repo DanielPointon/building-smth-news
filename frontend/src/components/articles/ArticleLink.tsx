@@ -1,3 +1,5 @@
+// /frontend/src/components/articles/ArticleLink.tsx
+
 import React from 'react';
 import { ExternalLink, Newspaper, Sparkles } from 'lucide-react';
 import { Article } from '../../types/question';
@@ -11,7 +13,7 @@ export const ArticleLink: React.FC<ArticleLinkProps> = ({ article }) => (
     href={article.url} 
     target="_blank" 
     rel="noopener noreferrer"
-    className={`flex items-center justify-between p-4 transition-all duration-300 ${
+    className={`flex items-center justify-between p-4 transition-all duration-300 rounded-lg shadow-md ${
       article.isKeyEvent 
         ? 'bg-[rgb(28,32,41)] text-white border border-[rgb(13,118,128)]/30' 
         : 'bg-[rgb(28,32,41)] text-gray-200 hover:bg-[rgb(33,37,46)]'

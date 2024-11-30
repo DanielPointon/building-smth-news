@@ -1,3 +1,5 @@
+// /frontend/src/components/questions/QuestionCard.tsx
+
 import React, { useState } from 'react';
 import { TrendingUp, Sparkles, ChevronRight } from 'lucide-react';
 import { ProbabilityGraph } from '../graph/ProbabilityGraph';
@@ -27,29 +29,29 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     }));
 
   return (
-    <div className="ft-gradient p-6 mb-6 shadow-xl">
-      <div className="flex flex-row items-center justify-between pb-4 border-b border-gray-700">
-        <div className="text-xl font-georgia text-white flex items-center gap-2">
+    <div className="bg-[rgb(255,241,229)] p-6 mb-6 shadow-lg rounded-lg border border-gray-200">
+      <div className="flex flex-row items-center justify-between pb-4 border-b border-gray-300">
+        <div className="text-xl font-georgia text-[rgb(38,42,51)] flex items-center gap-2">
           {question}
           {trending && <Sparkles size={16} className="text-[rgb(13,118,128)]" />}
         </div>
         <div className="flex items-center gap-2">
           <span className={`text-2xl font-bold font-georgia ${
-            trending ? 'text-[rgb(13,118,128)]' : 'text-red-400'
+            trending ? 'text-[rgb(13,118,128)]' : 'text-red-600'
           }`}>
             {currentProbability}%
           </span>
           <TrendingUp 
             size={20} 
             className={`${
-              trending ? 'text-[rgb(13,118,128)] rotate-0' : 'text-red-400 rotate-180'
+              trending ? 'text-[rgb(13,118,128)] rotate-0' : 'text-red-600 rotate-180'
             }`}
           />
         </div>
       </div>
       
-      <div className="py-6 bg-opacity-50">
-        <div className="bg-[rgb(28,32,41)] p-4 mb-6 rounded">
+      <div className="py-6">
+        <div className="bg-[rgb(28,32,41)] p-4 mb-6 rounded-lg shadow-md">
           <ProbabilityGraph 
             data={data}
             events={events}
@@ -65,10 +67,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       </div>
 
       {articles.length > 2 && (
-        <div className="pt-4 border-t border-gray-700">
+        <div className="pt-4 border-t border-gray-300">
           <button
             onClick={() => setShowAllNews(prev => !prev)}
-            className="flex items-center gap-2 text-sm text-[rgb(13,118,128)] hover:text-white transition-colors group"
+            className="flex items-center gap-2 text-sm text-[rgb(13,118,128)] hover:text-[rgb(11,98,108)] transition-colors group"
           >
             {showAllNews ? 'Show less' : 'Explore more'}
             <ChevronRight 

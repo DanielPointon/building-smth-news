@@ -29,13 +29,9 @@ const MainContent: React.FC = () => {
       />
       
       <div className="max-w-6xl mx-auto px-6 pt-8">
-        <div className="bg-[rgb(38,42,51)] p-6 mb-8 shadow-xl">
-          <NavigationTabs activeTab={getActiveTab()} />
-        </div>
-        
-        <div className="ft-gradient p-6 mb-8 shadow-xl">
-          <h1 className="text-2xl font-georgia text-white mb-4">Market Predictions</h1>
-          <p className="text-gray-300">Track and trade on future outcomes across global markets and events</p>
+        <div className="bg-[rgb(242,223,206)] p-6 mb-8">
+          <h1 className="text-2xl font-georgia text-[rgb(38,42,51)] mb-4">Market Predictions</h1>
+          <p className="text-[rgb(38,42,51)]">Track and trade on future outcomes across global markets and events</p>
         </div>
 
         <Routes>
