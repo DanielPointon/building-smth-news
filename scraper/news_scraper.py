@@ -209,16 +209,21 @@ if __name__ == "__main__":
 
     # print(articles)
 
+    # article_contents = [
+    #     scraper.get_article_content_with_img(article["url"]) for article in articles
+    # ]
+
+    article_contents = []
+    for i, article in enumerate(articles):
+        content = scraper.get_article_content_with_img(article["url"])
+        if content:  # Only append if content was successfully retrieved
+            content["id"] = i
+            article_contents.append(content)
+            
     article_contents = [
         scraper.get_article_content_with_img(article["url"]) for article in articles
     ]
-
-    # article_contents = []
-    # for i, article in enumerate(articles):
-    #     content = scraper.get_article_content_with_img(article["url"])
-    #     if content:  # Only append if content was successfully retrieved
-    #         content["id"] = i
-    #         article_contents.append(content)
+    
 
     # print(article_contents)
 
