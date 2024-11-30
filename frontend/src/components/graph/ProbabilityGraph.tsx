@@ -4,7 +4,7 @@ import { EventLabel } from './EventLabel';
 import { GraphTooltip } from './GraphTooltip';
 import { ProbabilityGraphProps } from '../../types/graph';
 
-const EVENT_COLORS = [
+export const EVENT_COLORS = [
   "#8B5CF6", // Purple
   "#3B82F6", // Blue
   "#10B981", // Green

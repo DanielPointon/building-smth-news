@@ -6,7 +6,6 @@ import { BrowsePage } from './pages/BrowsePage';
 import { MyQuestionsPage } from './pages/MyQuestionsPage';
 import { FollowingPage } from './pages/Following';
 import { NavigationTabs } from './components/layout/NavigationTabs';
-import { COLORS } from './constants/color';
 import GlobalPage from 'pages/GlobalPage';
 
 const MainContent: React.FC = () => {
@@ -19,18 +18,25 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen text-gray-900 ${COLORS.background.dark}`}>
+    <div className="min-h-screen bg-[rgb(255,241,229)]">
       <Navbar
         onHistoryClick={() => setShowHistory(true)}
-        className={`bg-white border-b border-gray-200 shadow-sm`}
+        className="shadow-xl"
       />
       <TransactionHistory
         isOpen={showHistory}
         onClose={() => setShowHistory(false)}
       />
-
-      {/* <div className="max-w-4xl mx-auto p-6 pt-20"> */}
-        {/* <NavigationTabs activeTab={getActiveTab()} /> */}
+      
+      <div className="max-w-6xl mx-auto px-6 pt-8">
+        <div className="bg-[rgb(38,42,51)] p-6 mb-8 shadow-xl">
+          <NavigationTabs activeTab={getActiveTab()} />
+        </div>
+        
+        <div className="ft-gradient p-6 mb-8 shadow-xl">
+          <h1 className="text-2xl font-georgia text-white mb-4">Market Predictions</h1>
+          <p className="text-gray-300">Track and trade on future outcomes across global markets and events</p>
+        </div>
 
         <Routes>
           <Route path="/" element={<Navigate to="/browse" replace />} />
@@ -38,9 +44,8 @@ const MainContent: React.FC = () => {
           <Route path="/my-questions" element={<MyQuestionsPage />} />
           <Route path="/following" element={<FollowingPage />} />
           <Route path="/global" element={<GlobalPage />} />
-
         </Routes>
-      {/* </div> */}
+      </div>
     </div>
   );
 };

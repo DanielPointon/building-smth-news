@@ -1,31 +1,48 @@
+/* /frontend/src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --ft-background: rgb(255,241,229);
+  --ft-dark: rgb(38,42,51);
+  --ft-teal: rgb(13,118,128);
+  --ft-darker: rgb(28,32,41);
+  --ft-lighter: rgb(255,246,239);
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Georgia', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  @apply bg-gray-100 text-gray-800;
+  @apply bg-[rgb(255,241,229)] text-gray-800;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Georgia', serif;
 }
 
-.animate-fade-in {
-  animation: fade-in 0.5s ease-out;
+.ft-button {
+  @apply bg-[rgb(13,118,128)] hover:bg-[rgb(11,98,108)] text-white transition-colors duration-200;
 }
 
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+.ft-section {
+  @apply bg-[rgb(38,42,51)] text-white;
+}
+
+.ft-card {
+  @apply bg-[rgb(38,42,51)] text-white border-0 shadow-lg;
+}
+
+.ft-gradient {
+  background: linear-gradient(to bottom, rgb(38,42,51), rgb(28,32,41));
+}
+
+.ft-highlight {
+  background: linear-gradient(to right, rgba(13,118,128,0.1), rgba(13,118,128,0));
+}
+
+.ft-divider {
+  @apply border-t border-gray-700;
 }

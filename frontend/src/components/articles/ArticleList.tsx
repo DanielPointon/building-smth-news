@@ -1,7 +1,6 @@
 import React from 'react';
 import { Article } from '../../types/question';
-import { COLORS } from '../../constants/color';
-import ArticleLink from './ArticleLink';
+import { ArticleLink } from './ArticleLink';
 
 interface ArticleListProps {
   articles: Article[];
@@ -12,7 +11,7 @@ export const ArticleList: React.FC<ArticleListProps> = ({ articles, showAll }) =
   const displayedArticles = showAll ? articles : articles.slice(0, 2);
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {displayedArticles.map((article, idx) => (
         <ArticleLink key={idx} article={article} />
       ))}

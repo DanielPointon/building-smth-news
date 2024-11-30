@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Compass, User, Star, Clock } from 'lucide-react';
 import { TabRoute, NavigationTab } from '../../types/navigation';
-import { COLORS } from '../../constants/color';
 
 const TABS: NavigationTab[] = [
   {
@@ -39,7 +38,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({ activeTab }) => 
   const navigate = useNavigate();
 
   return (
-    <div className="flex space-x-1 bg-white border border-gray-200 p-1 rounded-lg mb-6">
+    <div className="flex space-x-1 bg-[rgb(28,32,41)] border-b border-gray-700">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
         const Icon = tab.icon;
@@ -49,16 +48,16 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({ activeTab }) => 
             key={tab.id}
             onClick={() => navigate(tab.path)}
             className={`
-              flex-1 py-2 px-4 rounded-md transition-all duration-200
-              flex items-center justify-center gap-2
+              flex-1 py-4 px-6 transition-all duration-200
+              flex items-center justify-center gap-2 font-georgia
               ${isActive 
-                ? 'bg-gray-100 text-purple-500' 
-                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-200'
+                ? 'text-[rgb(13,118,128)] border-b-2 border-[rgb(13,118,128)] bg-[rgb(38,42,51)]' 
+                : 'text-gray-400 hover:text-[rgb(13,118,128)] hover:bg-[rgb(38,42,51)]'
               }
             `}
           >
             <Icon size={18} />
-            <span className="text-sm font-medium">{tab.label}</span>
+            <span className="text-sm">{tab.label}</span>
           </button>
         );
       })}

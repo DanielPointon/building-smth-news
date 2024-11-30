@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { TrendingUp, ChevronRight } from 'lucide-react';
+import { TrendingUp, Sparkles, ChevronRight } from 'lucide-react';
 import { ProbabilityGraph } from '../graph/ProbabilityGraph';
 import { TradingButtons } from '../trading/TradingButtons';
 import { ArticleList } from '../articles/ArticleList';
 import { QuestionCardProps, Article } from '../../types/question';
-import { Event } from '../../types/graph';
 
-const QuestionCard: React.FC<QuestionCardProps> = ({
+const isValidEvent = (article: Article): article is (Article & { date: string }) => {
+  return article.isKeyEvent && typeof article.date === 'string';
+};
+
+export const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   data,
   articles
@@ -16,71 +19,67 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   const previousProbability = data[data.length - 2]?.probability;
   const trending = currentProbability > previousProbability;
 
-  // Fixed type checking for events
-  const events: Event[] = articles
-    .filter((article): article is Article & { date: string } => {
-      return article.isKeyEvent && typeof article.date === 'string';
-    })
+  const events = articles
+    .filter(isValidEvent)
     .map(article => ({
       date: article.date,
       title: article.title
     }));
 
   return (
-    <div className="mb-12 border-b border-gray-200 pb-8">
-      {/* Headline Section */}
-      <div className="mb-4">
-        <h2 className="font-serif text-2xl font-bold leading-tight tracking-tight text-gray-900 mb-2">
+    <div className="ft-gradient p-6 mb-6 shadow-xl">
+      <div className="flex flex-row items-center justify-between pb-4 border-b border-gray-700">
+        <div className="text-xl font-georgia text-white flex items-center gap-2">
           {question}
-        </h2>
-        <div className="flex items-center gap-3 text-sm text-gray-500 font-serif">
-          <span>PREDICTION MARKETS</span>
-          <span>•</span>
-          <div className="flex items-center gap-2">
-            <span className={`font-bold ${trending ? 'text-green-700' : 'text-red-700'}`}>
-              {currentProbability}%
-            </span>
-            <TrendingUp 
-              size={16} 
-              className={`${trending ? 'text-green-700 rotate-0' : 'text-red-700 rotate-180'}`}
-            />
-          </div>
+          {trending && <Sparkles size={16} className="text-[rgb(13,118,128)]" />}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={`text-2xl font-bold font-georgia ${
+            trending ? 'text-[rgb(13,118,128)]' : 'text-red-400'
+          }`}>
+            {currentProbability}%
+          </span>
+          <TrendingUp 
+            size={20} 
+            className={`${
+              trending ? 'text-[rgb(13,118,128)] rotate-0' : 'text-red-400 rotate-180'
+            }`}
+          />
         </div>
       </div>
-
-      {/* Graph Section */}
-      <div className="mb-6">
-        <ProbabilityGraph data={data} events={events} />
-      </div>
-
-      {/* Trading Section */}
-      <div className="mb-6">
+      
+      <div className="py-6 bg-opacity-50">
+        <div className="bg-[rgb(28,32,41)] p-4 mb-6 rounded">
+          <ProbabilityGraph 
+            data={data}
+            events={events}
+          />
+        </div>
         <TradingButtons probability={currentProbability} />
-      </div>
-
-      {/* Related Articles Section */}
-      <div className="mt-8">
-        <h3 className="font-serif text-lg font-bold mb-4 text-gray-900">Related Coverage</h3>
-        <div className="space-y-4">
-          <ArticleList articles={articles} showAll={showAllNews} />
-          {articles.length > 2 && (
-            <button
-              onClick={() => setShowAllNews(prev => !prev)}
-              className="font-serif text-sm text-gray-500 hover:text-gray-700 transition-colors mt-4 flex items-center gap-1 group"
-            >
-              {showAllNews ? 'Show Less' : 'See More Coverage'}
-              <ChevronRight 
-                size={14} 
-                className={`transition-transform duration-300 group-hover:translate-x-1 ${
-                  showAllNews ? 'rotate-90' : ''
-                }`}
-              />
-            </button>
-          )}
+        <div className="mt-6 space-y-2">
+          <ArticleList 
+            articles={articles} 
+            showAll={showAllNews}
+          />
         </div>
       </div>
+
+      {articles.length > 2 && (
+        <div className="pt-4 border-t border-gray-700">
+          <button
+            onClick={() => setShowAllNews(prev => !prev)}
+            className="flex items-center gap-2 text-sm text-[rgb(13,118,128)] hover:text-white transition-colors group"
+          >
+            {showAllNews ? 'Show less' : 'Explore more'}
+            <ChevronRight 
+              size={16} 
+              className={`transition-transform duration-300 group-hover:translate-x-1 ${
+                showAllNews ? 'rotate-90' : ''
+              }`}
+            />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
-
-export default QuestionCard;
