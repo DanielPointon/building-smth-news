@@ -4,7 +4,7 @@ from pydantic import BaseModel, RootModel
 import json
 from pathlib import Path
 from openai import Client
-
+import uuid
 
 app = FastAPI()
 router = APIRouter()
@@ -45,7 +45,6 @@ class QuestionInput(BaseModel):
     text: str
     metadata: dict
 
-
 class ArticleInput(BaseModel):
     id: int
     title: str
@@ -64,9 +63,7 @@ async def create_article(article: ArticleInput):
     Create a new article with detailed question data and metadata. If a question already exists
     (based on text and metadata), link the article to the existing question.
     """
-    # Check for duplicate article ID
-    if any(existing_article["id"] == article.id for existing_article in database["articles"]):
-        raise HTTPException(status_code=400, detail="Article with the given ID already exists.")
+    article.id = uuid.uuid4().int
 
     # Add the article to the database
     new_article = {
