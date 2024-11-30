@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useParams } from "react-router-dom";
 
 interface Article {
@@ -18,10 +18,10 @@ interface Article {
 
 export const ArticlePage: React.FC = () => {
   const { id } = useParams();
-  const [article, setArticle] = React.useState<Article | null>(null);
-  const [loading, setLoading] = React.useState(true);
+  const [article, setArticle] = useState<Article | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchArticle = async () => {
       try {
         setLoading(true);
@@ -67,7 +67,7 @@ export const ArticlePage: React.FC = () => {
 
       <div className="prose max-w-none">
         {article.content.map((item, index) => (
-          <React.Fragment key={index}>
+          <Fragment key={index}>
             {item.type === "text" && <p className="mb-4">{item.content}</p>}
             {item.type === "image" && (
               <img
@@ -76,7 +76,7 @@ export const ArticlePage: React.FC = () => {
                 className="max-w-[400px] w-full h-auto my-6 rounded-lg mx-auto block"
               />
             )}
-          </React.Fragment>
+          </Fragment>
         ))}
       </div>
     </div>
