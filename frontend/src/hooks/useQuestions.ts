@@ -29,195 +29,7 @@ interface Question {
   isFollowing?: boolean;
 }
 
-const INITIAL_QUESTIONS: Question[] = [
-  {
-    id: '1',
-    question: "Will AI surpass human intelligence by 2030?",
-    category: 'AI',
-    totalPredictions: 15234,
-    data: [
-      { date: 'Jan', probability: 45 },
-      { date: 'Feb', probability: 48 },
-      { date: 'Mar', probability: 52 },
-      { date: 'Apr', probability: 58 }
-    ],
-    articles: [
-      {
-        id: 'a',
-        author: 'Mas',
-        title: "Google DeepMind Achieves Major Breakthrough in AGI Research",
-        published_date: 'Feb',
-        isKeyEvent: true,
-        content: [],
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-      },
-      {
-        id: 'b',
-        author: 'Shoehas',
-        title: "Leading AI Researchers Debate Intelligence Metrics",
-        published_date: 'Feb',
-        isKeyEvent: false,
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-        content: [],
-      },
-      {
-        id: 'c',
-        author: 'George',
-        title: "New Neural Architecture Shows Human-Level Reasoning",
-        published_date: 'Mar',
-        isKeyEvent: true,
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-        content: [],
-      },
-      {
-        id: 'd',
-        author: 'Jeremy',
-        title: "Ethics Board Releases AI Safety Guidelines",
-        published_date: 'Apr',
-        isKeyEvent: false,
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-        content: [],
-      }
-    ]
-  },
-  {
-    id: '2',
-    question: "Will SpaceX successfully land on Mars by 2026?",
-    category: 'Space',
-    totalPredictions: 8721,
-    data: [
-      { date: 'Jan', probability: 65 },
-      { date: 'Feb', probability: 62 },
-      { date: 'Mar', probability: 59 },
-      { date: 'Apr', probability: 64 }
-    ],
-    articles: [
-      {
-        id: 'a',
-        author: 'Mas',
-        title: "SpaceX Starship Completes Orbital Test Flight",
-        published_date: 'Feb',
-        isKeyEvent: true,
-        content: [],
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-      },
-      {
-        id: 'b',
-        author: 'Shoehas',
-        title: "Mars Mission Timeline Updated",
-        published_date: 'Mar',
-        isKeyEvent: true,
-        content: [],
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-      },
-      {
-        id: 'c',
-        author: 'John',
-        title: "Revolutionary Propulsion System Test Successful",
-        published_date: 'Mar',
-        isKeyEvent: true,
-        content: [],
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-      }
-    ]
-  },
-  {
-    id: '3',
-    question: "Will global temperatures rise by more than 1.5°C by 2025?",
-    category: 'Climate',
-    totalPredictions: 12453,
-    data: [
-      { date: 'Jan', probability: 72 },
-      { date: 'Feb', probability: 75 },
-      { date: 'Mar', probability: 78 },
-      { date: 'Apr', probability: 82 }
-    ],
-    articles: [
-      {
-        id: '1',
-        author: 'Anonymous',
-        title: "Record Breaking Temperatures in Pacific Region",
-        published_date: 'Feb',
-        isKeyEvent: true,
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-        content: [],
-      },
-      {
-        id: '2',
-        author: 'Anonymous',
-        title: "New Climate Model Predictions Released",
-        published_date: 'Mar',
-        isKeyEvent: true,
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-        content: [],
-      },
-      {
-        id: '3',
-        author: 'Anonymous',
-        title: "Global Climate Summit Announces New Measures",
-        published_date: 'Apr',
-        isKeyEvent: false,
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-        content: [],
-      }
-    ]
-  },
-  {
-    id: '4',
-    question: "Will Apple release AR glasses in 2024?",
-    category: 'Technology',
-    totalPredictions: 9876,
-    data: [
-      { date: 'Jan', probability: 82 },
-      { date: 'Feb', probability: 78 },
-      { date: 'Mar', probability: 85 },
-      { date: 'Apr', probability: 88 }
-    ],
-    articles: [
-      {
-        id: '1',
-        author: 'Anonymous',
-        title: "Apple Supplier Leaks AR Component Production",
-        published_date: 'Feb',
-        isKeyEvent: true,
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-        content: [],
-      },
-      {
-        id: '2',
-        author: 'Anonymous',
-        title: "Patent Filing Reveals New AR Interface",
-        published_date: 'Mar',
-        isKeyEvent: true,
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-        content: [],
-      },
-      {
-        id: '3',
-        author: 'Anonymous',
-        title: "Industry Analysts Predict Q4 Launch",
-        published_date: 'Apr',
-        isKeyEvent: false,
-        description: 'Lorem Ipsum',
-        main_image_url: '',
-        content: [],
-      }
-    ]
-  }
-];
-
+// Update the interface to include loading and error
 interface UseQuestions {
   questions: Question[];
   userQuestions: Question[];
@@ -225,78 +37,107 @@ interface UseQuestions {
   addQuestion: (questionData: { question: string; initialProbability: number }) => void;
   toggleFollowQuestion: (questionId: string) => void;
   getQuestionsByCategory: (category: Question['category']) => Question[];
+  loading: boolean;
+  error: string | null;
 }
 
-const questionsFromMarkets = async (markets: Market[]) => {
-  let client = new MarketsClient();
-
-  let questions: Question[] = [];
+const questionsFromMarkets = async (markets: Market[]): Promise<Question[]> => {
+  const client = new MarketsClient();
+  const questions: Question[] = [];
 
   for (const m of markets) {
-    let trades = await client.getTrades(m.id);
+    try {
+      const trades = await client.getTrades(m.id);
+      
+      // Format trades into the data points expected by the UI
+      const data = trades.trades.map(t => ({
+        date: new Date(t.time).toLocaleDateString('en-US', { month: 'short' }),
+        probability: Math.round(t.price) // Ensure we have whole numbers for percentages
+      }));
 
-    let data = trades.trades.map(t => ({
-      date: t.time,
-      probability: t.price
-    }));
-
-    questions.push({
-      id: m.id,
-      question: m.name,
-      category: 'AI',
-      totalPredictions: data.length,
-      data: data,
-      articles: []
-    });
+      // Only add markets that have trade data
+      if (data.length > 0) {
+        questions.push({
+          id: m.id,
+          question: m.name,
+          category: 'AI', // You might want to get this from market metadata
+          totalPredictions: data.length,
+          data: data,
+          articles: [], // You might want to fetch related articles if available
+        });
+      }
+    } catch (error) {
+      console.error(`Error fetching trades for market ${m.id}:`, error);
+    }
   }
 
   return questions;
 };
 
-export const useQuestions: () => UseQuestions = () => {
+export const useQuestions = (): UseQuestions => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [userQuestions, setUserQuestions] = useState<Question[]>([]);
   const [followedQuestions, setFollowedQuestions] = useState<Question[]>([]);
-
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      const client = new MarketsClient();
-      const markets = await client.getMarkets();
-      const questions = await questionsFromMarkets(markets.markets);
-      setQuestions(_prev => questions);
-    };
-
-    fetchQuestions();
-  }, []);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const userId = useContext(UserContext);
-  
+
   useEffect(() => {
     const fetchQuestions = async () => {
-      const client = new MarketsClient();
-      const markets = await client.getMarkets(userId);
-      const questions = await questionsFromMarkets(markets.markets);
-      setQuestions(_prev => questions);
+      try {
+        setLoading(true);
+        const client = new MarketsClient();
+        const marketsResponse = await client.getMarkets(userId);
+        
+        if (!marketsResponse.markets) {
+          throw new Error('No markets data received');
+        }
+
+        const fetchedQuestions = await questionsFromMarkets(marketsResponse.markets);
+        
+        setQuestions(fetchedQuestions);
+        
+        // Also set user questions if userId matches
+        const userQs = fetchedQuestions.filter(q => q.isUserQuestion);
+        setUserQuestions(userQs);
+        
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching questions:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch questions');
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchQuestions();
   }, [userId]);
 
-  const addQuestion = (questionData: { question: string; initialProbability: number }) => {
-    const newQuestion: Question = {
-      id: Date.now().toString(),
-      question: questionData.question,
-      data: [{
-        date: new Date().toLocaleDateString(),
-        probability: questionData.initialProbability
-      }],
-      articles: [],
-      totalPredictions: 0,
-      isUserQuestion: true
-    };
+  const addQuestion = async (questionData: { question: string; initialProbability: number }) => {
+    try {
+      const client = new MarketsClient();
+      const newMarket = await client.createMarket({
+        name: questionData.question,
+        description: 'Created via UI'
+      });
 
-    setQuestions(prev => [...prev, newQuestion]);
-    setUserQuestions(prev => [...prev, newQuestion]);
+      // Create initial order to set probability
+      await client.createOrder(newMarket.id, {
+        user_id: userId,
+        side: 'bid',
+        price: questionData.initialProbability,
+        quantity: 100 // Initial liquidity
+      });
+
+      // Refetch questions to include the new one
+      const marketsResponse = await client.getMarkets(userId);
+      const updatedQuestions = await questionsFromMarkets(marketsResponse.markets);
+      setQuestions(updatedQuestions);
+    } catch (error) {
+      console.error('Error adding question:', error);
+      throw error;
+    }
   };
 
   const toggleFollowQuestion = (questionId: string) => {
@@ -328,6 +169,8 @@ export const useQuestions: () => UseQuestions = () => {
     followedQuestions,
     addQuestion,
     toggleFollowQuestion,
-    getQuestionsByCategory
+    getQuestionsByCategory,
+    loading,
+    error
   };
 };

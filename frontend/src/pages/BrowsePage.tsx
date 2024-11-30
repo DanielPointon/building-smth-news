@@ -1,13 +1,28 @@
-// /frontend/src/components/pages/BrowsePage.tsx
-
 import React from 'react';
-import { AddQuestionForm } from '../components/questions/AddQuestionForm';
 import { useQuestions } from '../hooks/useQuestions';
 import { Alert, AlertDescription } from 'components/ui/alert';
 import { QuestionCard } from 'components/questions/QuestionCard';
 
 export const BrowsePage: React.FC = () => {
-  const { questions, addQuestion } = useQuestions();
+  const { questions, loading, error } = useQuestions();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[rgb(13,118,128)]"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert>
+        <AlertDescription>
+          Error loading questions: {error}
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div>
@@ -19,20 +34,24 @@ export const BrowsePage: React.FC = () => {
           Track and trade on future outcomes across global markets and events
         </p>
       </div>
-      <div className="space-y-6">
+      
+      {questions.length === 0 ? (
+        <div className="text-center py-8 text-gray-600">
+          No predictions available at the moment.
+        </div>
+      ) : (
         <div className="space-y-6">
           {questions.map((q) => (
             <QuestionCard
-              id={q.id}
               key={q.id}
+              id={q.id}
               question={q.question}
               data={q.data}
-            articles={q.articles}
+              articles={q.articles}
             />
           ))}
         </div>
-      </div>
+      )}
     </div>
-
   );
 };
