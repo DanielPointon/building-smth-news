@@ -37,6 +37,17 @@ class OrderCreateInfo(BaseModel):
     quantity: int
 
 
+class MarketTrade(BaseModel):
+    time: datetime
+    price: int
+    quantity: int
+
+
+class MarketTrades(BaseModel):
+    market_id: Uuid
+    trades: list[MarketTrade]
+
+
 class MarketClobOrder(BaseModel):
     price: int
     quantity: int

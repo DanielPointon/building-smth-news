@@ -6,6 +6,8 @@ from models import (
     MarketClob,
     MarketClobOrder,
     MarketCreateInfo,
+    MarketTrade,
+    MarketTrades,
     Order,
     OrderCreateInfo,
     User,
@@ -37,6 +39,11 @@ app = FastAPI(
 @app.get("/users/{id}")
 async def get_user(id: Uuid) -> User:
     return get_by_id(USERS, id)
+
+
+# @app.get("/users/{id}")
+# async def get_user_orders(id: Uuid) -> User:
+#     return get_by_id(USERS, id)
 
 
 @app.post("/users")
@@ -89,6 +96,18 @@ async def markets_delete_order(id: Uuid, order_id: Uuid) -> Order | None:
         raise HTTPException(status_code=404)
 
     return order
+
+
+@markets.get("/{id}/trades")
+async def markets_get_trades(id: Uuid) -> MarketTrades:
+    clob = get_by_id(CLOBS, id)
+
+    trades = [
+        MarketTrade(time=t.time, price=t.price, quantity=t.quantity)
+        for t in clob.trades
+    ]
+
+    return MarketTrades(market_id=id, trades=trades)
 
 
 @markets.get("/{id}/clob")

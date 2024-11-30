@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from enum import Enum
 from typing import override
 from pydantic.dataclasses import dataclass
@@ -86,6 +87,7 @@ class OrderPriceList:
 
 @dataclass
 class Trade:
+    time: datetime
     price: int
     quantity: int
 
@@ -161,7 +163,7 @@ class Clob:
                 self._add_order(order, self.asks)
 
     def on_order_fill(self, order: Order, price: int, fill: int):
-        self.trades.append(Trade(price, fill))
+        self.trades.append(Trade(datetime.now(), price, fill))
 
         # TODO:
         print(
