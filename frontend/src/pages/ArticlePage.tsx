@@ -32,7 +32,7 @@ export const ArticlePage: React.FC = () => {
 
   const relatedQuestion = {
     id: "1",
-    question: "Will Russia win the war in Ukraine by 2025?",
+    question: {question: "Will Russia win the war in Ukraine by 2025?"},
     paragraphIndex: 2,
     data: [
       { date: "2024-01-01", probability: 25 },

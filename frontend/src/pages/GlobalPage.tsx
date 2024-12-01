@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import GlobeVisualization from 'components/globe/GlobeVisualisation';
 import { ChevronRight, Globe, MapPin, X } from 'lucide-react';
 import { Card, CardContent } from 'components/ui/card';
@@ -9,14 +9,20 @@ const GlobalPage: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionData, setQuestionData] = useState<any>(null);
-  const newsClient = new NewsClient();
+  
+  // Create newsClient once using useMemo
+  const newsClient = useMemo(() => new NewsClient(), []);
 
   useEffect(() => {
+    let isSubscribed = true;
+
     const fetchQuestions = async () => {
       if (selectedCountry) {
         try {
           const questions = await newsClient.getQuestionsByCountry(selectedCountry.code);
-          setQuestions(questions);
+          if (isSubscribed) {
+            setQuestions(questions);
+          }
         } catch (error) {
           console.error('Error fetching questions:', error);
         }
@@ -24,7 +30,12 @@ const GlobalPage: React.FC = () => {
     };
 
     fetchQuestions();
-  }, [selectedCountry, newsClient]);
+
+    // Cleanup function to prevent setting state on unmounted component
+    return () => {
+      isSubscribed = false;
+    };
+  }, [selectedCountry]); // Remove newsClient from dependencies
 
   const handleCountrySelect = (countryName: string, countryCode: string) => {
     setSelectedCountry({ name: countryName, code: countryCode });
@@ -36,6 +47,7 @@ const GlobalPage: React.FC = () => {
     setQuestionData(null);
   };
 
+  // Rest of the component remains the same...
   return (
     <div className="h-screen flex">
       {/* Sidebar */}
@@ -80,7 +92,7 @@ const GlobalPage: React.FC = () => {
                   id={q.id}
                   question={{
                     ...q,
-                  probability: undefined,
+                    probability: undefined,
                   }}
                   setQuestionData={setQuestionData}
                 />

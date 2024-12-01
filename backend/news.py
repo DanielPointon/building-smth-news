@@ -288,19 +288,16 @@ async def get_questions_by_country(country_code: str):
     related_articles = [
         article
         for article in database["articles"].values()
-        if country_code in article["metadata"].get("countries", [])
+        if country_code in article["metadata"].get("countries", [])[:3]
     ]
 
-    question_ids = {
-        q_id for article in related_articles for q_id in article["question_ids"]
-    }
+    all_questions = []
+    
+    for article in related_articles:
+        if "questions" in article:
+            all_questions.extend(article["questions"])
 
-    questions = [
-        question
-        for question in database["questions"].values()
-        if question["id"] in question_ids
-    ]
-    return questions
+    return all_questions
 
 
 def flatten_article_content(content: List[Union[str, dict]]) -> str:

@@ -60,12 +60,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       </div>
       
       <div className="py-6">
-      {question.data && (<div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
+      <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
         <ProbabilityGraph 
-            data={question.data}
+            data={question.data ?? []}
             events={events}
           />
-      </div>)}
+      </div>
 
           {question.probability && question.data && question.articles && (<TradingButtons question={question as Question} setQuestionData={setQuestionData} />)}
         { question.articles && (<div className="mt-6 space-y-2">
