@@ -127,12 +127,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           <ProbabilityGraph data={overallData} events={events} />
         </div>
 
-        {overallProbability && overallData && (
+        {(
           <TradingButtons
             question={{
               ...question,
-              probability: overallProbability,
-              data: overallData,
+              probability: currentProbability,
+              data: overallData ?? [],
               articles: question.articles || [],
             }}
             setQuestionData={setQuestionData}
