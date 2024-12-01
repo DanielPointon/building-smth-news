@@ -5,110 +5,119 @@ import { Question } from 'types/question'
 import { mockQuestions } from 'MockQuestions'
 
 interface UseQuestions {
-    questions: Question[]
-    userQuestions: Question[]
-    followedQuestions: Question[]
-    addQuestion: (questionData: { question: string; initialProbability: number }) => void
-    toggleFollowQuestion: (questionId: string) => void
-    getQuestionsByCategory: (category: Question['category']) => Question[]
-    loading: boolean
-    error: string | null
+  questions: Question[]
+  userQuestions: Question[]
+  followedQuestions: Question[]
+  addQuestion: (questionData: { question: string; initialProbability: number }) => void
+  toggleFollowQuestion: (questionId: string) => void
+  getQuestionsByCategory: (category: Question['category']) => Question[]
+  loading: boolean
+  error: string | null
 }
 
 export const useQuestions = (): UseQuestions => {
-    const [reloadKey, _setReloadKey] = useContext(ApiContentContext);
-    const userId = useContext(UserContext)
+  for (const question of mockQuestions) {
+    const client = new MarketsClient();
+    client.createMarket({ name: question.question, description: "" }).then(
+      market => question.id = market.id
+    );
+  }
 
-    const [questions, setQuestions] = useState<Question[]>([])
-    const [userQuestions, setUserQuestions] = useState<Question[]>([])
-    const [followedQuestions, setFollowedQuestions] = useState<Question[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
+  const [reloadKey, _setReloadKey] = useContext(ApiContentContext);
+  const userId = useContext(UserContext)
 
-    useEffect(() => {
-        const fetchQuestions = async () => {
-            try {
-                setLoading(true)
-                // Use mock data instead of API call
-                setQuestions(mockQuestions)
-                
-                // Set user questions
-                const userQs = mockQuestions.filter(q => q.isUserQuestion)
-                setUserQuestions(userQs)
-                
-                // Set followed questions
-                const followedQs = mockQuestions.filter(q => q.isFollowing)
-                setFollowedQuestions(followedQs)
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [userQuestions, setUserQuestions] = useState<Question[]>([])
+  const [followedQuestions, setFollowedQuestions] = useState<Question[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-                setError(null)
-            } catch (err) {
-                console.error('Error fetching questions:', err)
-                setError(err instanceof Error ? err.message : 'Failed to fetch questions')
-            } finally {
-                setLoading(false)
-            }
-        }
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        setLoading(true)
+        // Use mock data instead of API call
+        setQuestions(mockQuestions)
 
-        fetchQuestions()
-    }, [userId, reloadKey])
+        console.log(mockQuestions);
 
-    const addQuestion = async (questionData: { question: string; initialProbability: number }) => {
-        try {
-            // Create new mock question
-            const newQuestion: Question = {
-                id: `${Date.now()}`,
-                question: questionData.question,
-                probability: questionData.initialProbability,
-                data: [
-                    {
-                        date: new Date().toLocaleDateString('en-US', { month: 'short' }),
-                        probability: questionData.initialProbability
-                    }
-                ],
-                articles: [],
-                isUserQuestion: true,
-                category: 'Technology' // Default category
-            }
+        // Set user questions
+        const userQs = mockQuestions.filter(q => q.isUserQuestion)
+        setUserQuestions(userQs)
 
-            setQuestions(prev => [...prev, newQuestion])
-            setUserQuestions(prev => [...prev, newQuestion])
-        } catch (error) {
-            console.error('Error adding question:', error)
-            throw error
-        }
+        // Set followed questions
+        const followedQs = mockQuestions.filter(q => q.isFollowing)
+        setFollowedQuestions(followedQs)
+
+        setError(null)
+      } catch (err) {
+        console.error('Error fetching questions:', err)
+        setError(err instanceof Error ? err.message : 'Failed to fetch questions')
+      } finally {
+        setLoading(false)
+      }
     }
 
-    const toggleFollowQuestion = (questionId: string) => {
-        const question = questions.find(q => q.id === questionId)
-        if (!question) return
+    fetchQuestions()
+  }, [userId, reloadKey])
 
-        const updatedQuestion = { ...question, isFollowing: !question.isFollowing }
+  const addQuestion = async (questionData: { question: string; initialProbability: number }) => {
+    try {
+      // Create new mock question
+      const newQuestion: Question = {
+        id: `${Date.now()}`,
+        question: questionData.question,
+        probability: questionData.initialProbability,
+        data: [
+          {
+            date: new Date().toLocaleDateString('en-US', { month: 'short' }),
+            probability: questionData.initialProbability
+          }
+        ],
+        articles: [],
+        isUserQuestion: true,
+        category: 'Technology' // Default category
+      }
 
-        setQuestions(prev =>
-            prev.map(q => q.id === questionId ? updatedQuestion : q)
-        )
-
-        if (updatedQuestion.isFollowing) {
-            setFollowedQuestions(prev => [...prev, updatedQuestion])
-        } else {
-            setFollowedQuestions(prev =>
-                prev.filter(q => q.id !== questionId)
-            )
-        }
+      setQuestions(prev => [...prev, newQuestion])
+      setUserQuestions(prev => [...prev, newQuestion])
+    } catch (error) {
+      console.error('Error adding question:', error)
+      throw error
     }
+  }
 
-    const getQuestionsByCategory = (category: Question['category']) => {
-        return questions.filter(q => q.category === category)
-    }
+  const toggleFollowQuestion = (questionId: string) => {
+    const question = questions.find(q => q.id === questionId)
+    if (!question) return
 
-    return {
-        questions,
-        userQuestions,
-        followedQuestions,
-        addQuestion,
-        toggleFollowQuestion,
-        getQuestionsByCategory,
-        loading,
-        error
+    const updatedQuestion = { ...question, isFollowing: !question.isFollowing }
+
+    setQuestions(prev =>
+      prev.map(q => q.id === questionId ? updatedQuestion : q)
+    )
+
+    if (updatedQuestion.isFollowing) {
+      setFollowedQuestions(prev => [...prev, updatedQuestion])
+    } else {
+      setFollowedQuestions(prev =>
+        prev.filter(q => q.id !== questionId)
+      )
     }
+  }
+
+  const getQuestionsByCategory = (category: Question['category']) => {
+    return questions.filter(q => q.category === category)
+  }
+
+  return {
+    questions,
+    userQuestions,
+    followedQuestions,
+    addQuestion,
+    toggleFollowQuestion,
+    getQuestionsByCategory,
+    loading,
+    error
+  }
 }
