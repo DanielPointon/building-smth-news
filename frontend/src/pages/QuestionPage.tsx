@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { ProbabilityGraph } from '../components/graph/ProbabilityGraph';
 import { TradingButtons } from '../components/trading/TradingButtons';
 import { ArticleList } from '../components/articles/ArticleList';
-import { useQuestions } from '../hooks/useQuestions';
+import { useQuestion, useQuestions } from '../hooks/useQuestions';
 import { Article, Question } from '../types/question';
 import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
 import { useState } from 'react';
@@ -146,11 +146,11 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => (
 
 const QuestionPage: React.FC = () => {
   const { id } = useParams();
-  const { questions, setQuestionData } = useQuestions();
+
+  const { question, setQuestionData } = useQuestion(id);
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
   
-  const currentQuestion = questions.find(q => q.id === id);
-  const otherQuestions = questions.filter(q => q.id !== id);
+  const currentQuestion = question
 
   if (!currentQuestion) {
     return (

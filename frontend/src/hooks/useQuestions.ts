@@ -17,6 +17,82 @@ interface UseQuestions {
   setQuestionData: (question: Question) => void
 }
 
+interface UseQuestion {
+  question: Question | null
+  setQuestionData: (question: Question | null) => void
+}
+
+export const useQuestion = (id: string | undefined): UseQuestion => {
+  const userId = useContext(UserContext)
+
+  const [question, setQuestion] = useState<Question | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const setQuestionData = async (q: Question | null) => {
+    if (!q) {
+      return
+    }
+
+    const marketsClient = new MarketsClient();
+    const info = await marketsClient.getTrades(q.id.toString());
+    const data = info.trades.map(t => ({ date: t.time, probability: t.price }));
+    const midpoint = info.midpoint;
+
+    q.data = data;
+    q.probability = midpoint;
+
+    setQuestion(_prev => q);
+  };
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+
+    const fetchQuestion = async () => {
+      try {
+        setLoading(true)
+        // Use mock data instead of API call
+
+        const newsClient = new NewsClient();
+        const marketsClient = new MarketsClient();
+
+        const info = await marketsClient.getTrades(id.toString());
+        const data = info.trades.map(t => ({ date: t.time, probability: t.price }));
+        const midpoint = info.midpoint;
+
+        const q = await newsClient.getQuestion(id.toString());
+        const articles = await newsClient.getArticlesForQuestion(q.id.toString());
+
+        if (articles) {
+          setQuestion({
+            id: id,
+            question: q.question,
+            probability: midpoint,
+            data: data,
+            articles: articles as unknown as Article[]
+          })
+        }
+
+        setError(null)
+      } catch (err) {
+        console.error('Error fetching questions:', err)
+        setError(err instanceof Error ? err.message : 'Failed to fetch questions')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchQuestion()
+  }, [userId])
+
+  return {
+    question,
+    setQuestionData
+  }
+}
+
 export const useQuestions = (): UseQuestions => {
   const [reloadKey, _setReloadKey] = useContext(ApiContentContext);
   const userId = useContext(UserContext)
