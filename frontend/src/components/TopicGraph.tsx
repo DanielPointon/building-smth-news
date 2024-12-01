@@ -46,7 +46,6 @@ const GraphDataController: React.FC<{ selectedClusters: Record<string, boolean> 
   return null;
 };
 
-// Panel component remains the same...
 const Panel: React.FC<{
   title: React.ReactNode;
   children: React.ReactNode;
@@ -55,12 +54,12 @@ const Panel: React.FC<{
   const [isDeployed, setIsDeployed] = useState(initiallyDeployed);
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-lg mb-4">
-      <h2 className="flex items-center justify-between text-lg font-georgia mb-2">
+    <div className="bg-[rgb(255,241,229)] p-4 rounded-lg shadow-lg mb-4 border-black">
+      <h2 className="flex items-center justify-between text-lg font-georgia text-[rgb(38,42,51)]">
         {title}
         <button 
           onClick={() => setIsDeployed(!isDeployed)}
-          className="w-6 h-6 flex items-center justify-center border border-gray-300 rounded"
+          className="w-6 h-6 flex items-center justify-center border border-[rgb(38,42,51)]/20 rounded hover:bg-[rgb(38,42,51)]/10 transition-colors"
         >
           {isDeployed ? '−' : '+'}
         </button>
@@ -70,17 +69,16 @@ const Panel: React.FC<{
   );
 };
 
-// SearchField component remains the same...
 const SearchField: React.FC<{ onSearch: (value: string) => void }> = ({ onSearch }) => {
   return (
     <div className="relative mb-4">
       <input
         type="search"
         placeholder="Search in nodes..."
-        className="w-full h-12 pl-10 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:border-[rgb(13,118,128)]"
+        className="w-full h-12 pl-10 pr-4 rounded-lg border border-[rgb(38,42,51)]/20 bg-[rgb(255,241,229)] focus:outline-none focus:border-[rgb(13,118,128)] transition-colors"
         onChange={(e) => onSearch(e.target.value)}
       />
-      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[rgb(38,42,51)]/60">🔍</span>
     </div>
   );
 };
@@ -161,7 +159,7 @@ const TopicGraph: React.FC<{
           labelDensity: 0.07,
           labelGridCellSize: 60,
           labelRenderedSizeThreshold: 15,
-          labelFont: "Lato, sans-serif",
+          labelFont: "Georgia, serif",
           zIndex: true,
           minCameraRatio: 0.1,
           maxCameraRatio: 2,
@@ -174,38 +172,36 @@ const TopicGraph: React.FC<{
 
         {/* Controls */}
         <div className="absolute bottom-4 left-4 flex flex-col gap-2">
-          <div className="bg-white p-2 rounded-lg shadow-lg">
+          <div className="bg-[rgb(255,241,229)] p-2 rounded-lg shadow-lg">
             <button
               onClick={() => setShowContents(!showContents)}
-              className="p-2 hover:text-[rgb(13,118,128)]"
+              className="p-2 text-[rgb(38,42,51)] hover:text-[rgb(13,118,128)] transition-colors"
               title="Toggle contents"
             >
               📑
             </button>
           </div>
-          <FullScreenControl className="bg-white p-2 rounded-lg shadow-lg">
-            <span className="block p-2">⤢</span>
-            <span className="block p-2">⤡</span>
+          <FullScreenControl className="bg-[rgb(255,241,229)] p-2 rounded-lg shadow-lg">
+            <span className="block p-2 text-[rgb(38,42,51)]">⤢</span>
+            <span className="block p-2 text-[rgb(38,42,51)]">⤡</span>
           </FullScreenControl>
-          <ZoomControl className="bg-white p-2 rounded-lg shadow-lg">
-            <span className="block p-2">+</span>
-            <span className="block p-2">−</span>
-            <span className="block p-2">⦿</span>
+          <ZoomControl className="bg-[rgb(255,241,229)] p-2 rounded-lg shadow-lg">
+            <span className="block p-2 text-[rgb(38,42,51)]">+</span>
+            <span className="block p-2 text-[rgb(38,42,51)]">−</span>
+            <span className="block p-2 text-[rgb(38,42,51)]">⦿</span>
           </ZoomControl>
         </div>
 
         {/* Sidebar */}
         {showContents && (
-          <div className="absolute right-4 top-4 w-80 max-h-[calc(100%-2rem)] overflow-y-auto bg-white rounded-lg shadow-lg">
-            <div className="p-4">
-              <SearchField onSearch={() => {}} />
-              
+          <div className="absolute right-4 top-4 w-80 max-h-[calc(100%-2rem)] overflow-y-auto">
+            <div className="border-black">
               <Panel
                 title={
                   <>
-                    <span className="flex items-center">
-                      <span className="mr-2">📁</span> Topics
-                      <span className="text-sm text-gray-500 ml-2">
+                    <span className="flex items-center text-[rgb(38,42,51)]">
+                      <span className="mr-2">Topics</span>
+                      <span className="text-sm text-[rgb(38,42,51)]/60 ml-2">
                         ({Object.values(selectedClusters).filter(Boolean).length} / {clusters.length})
                       </span>
                     </span>
@@ -215,13 +211,13 @@ const TopicGraph: React.FC<{
               >
                 <div className="mb-4 flex gap-2">
                   <button
-                    className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+                    className="px-3 py-1 text-sm border border-[rgb(38,42,51)]/20 rounded hover:bg-[rgb(38,42,51)]/10 text-[rgb(38,42,51)] transition-colors"
                     onClick={() => setSelectedClusters(Object.fromEntries(clusters.map(c => [c.cluster_topic, true])))}
                   >
                     ✓ Check all
                   </button>
                   <button
-                    className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+                    className="px-3 py-1 text-sm border border-[rgb(38,42,51)]/20 rounded hover:bg-[rgb(38,42,51)]/10 text-[rgb(38,42,51)] transition-colors"
                     onClick={() => setSelectedClusters({})}
                   >
                     ✕ Uncheck all
@@ -256,8 +252,8 @@ const TopicGraph: React.FC<{
                               border: `2px solid ${clusterColor}`
                             }}
                           />
-                          <span className="flex-grow">{cluster.cluster_topic}</span>
-                          <span className="text-sm text-gray-500">
+                          <span className="flex-grow text-[rgb(38,42,51)]">{cluster.cluster_topic}</span>
+                          <span className="text-sm text-[rgb(38,42,51)]/60">
                             ({cluster.article_ids.length})
                           </span>
                         </label>

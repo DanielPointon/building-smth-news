@@ -107,15 +107,15 @@ interface ArticleCardProps {
 }
 
 const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => (
-  <Card className="bg-[rgb(255,241,229)] hover:shadow-xl transition-shadow duration-300">
+  <Card className="bg-[rgb(242,223,206)] hover:shadow-xl transition-shadow duration-300 mb-4">
     <CardContent className="p-6">
       <div className="flex justify-between items-start gap-4">
         <div className="flex-1">
           <h2 className="text-xl font-georgia text-[rgb(38,42,51)] mb-2">
             {article.title}
           </h2>
-          <p className="text-gray-600 mb-4">{article.description}</p>
-          <div className="flex items-center gap-4 text-sm text-gray-500">
+          <p className="text-[rgb(38,42,51)]/80 mb-4">{article.description}</p>
+          <div className="flex items-center gap-4 text-sm text-[rgb(38,42,51)]/60">
             <div className="flex items-center gap-2">
               <User size={16} />
               <span>{article.author}</span>
