@@ -14,16 +14,10 @@ interface UseQuestions {
     getQuestionsByCategory: (category: Question['category']) => Question[]
     loading: boolean
     error: string | null
+    setQuestionData: (question: Question) => void
 }
 
 export const useQuestions = (): UseQuestions => {
-    // for (const question of mockQuestions) {
-    //   // const client = new MarketsClient();
-    //   // client.createMarket({ name: question.question, description: "" }).then(
-    //     // market => question.id = market.id
-    //   // );
-    // }
-
     const [reloadKey, _setReloadKey] = useContext(ApiContentContext)
     const userId = useContext(UserContext)
 
@@ -32,6 +26,22 @@ export const useQuestions = (): UseQuestions => {
     const [followedQuestions, setFollowedQuestions] = useState<Question[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+
+    const setQuestionData = async (q: Question) => {
+        const marketsClient = new MarketsClient()
+        const info = await marketsClient.getTrades(q.id.toString())
+        const data = info.trades.map(t => ({ date: t.time, probability: t.price }))
+        const midpoint = info.midpoint
+
+        q.data = data
+        q.probability = midpoint
+
+        setQuestions(prev => {
+            const idx = userQuestions.findIndex(e => e.id == q.id)
+            return [...prev.slice(0, idx), q, ...prev.slice(idx)]
+        })
+    }
+
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -46,10 +56,19 @@ export const useQuestions = (): UseQuestions => {
 
                 let newQuestions: Question[] = []
 
-                for (const q of Object.values(newsQuestions)) {
-                    const info = await marketsClient.getTrades(q.id.toString())
+                let i = 0
+                for (const q of newsQuestions) {
+                    let data: DataPoint[]
+                    let midpoint: number | null = null
 
-                    const data: DataPoint[] = info.trades.map(t => ({ date: t.time, probability: t.price }))
+                    if (i < 10) {
+                        const info = await marketsClient.getTrades(q.id.toString())
+                        data = info.trades.map(t => ({ date: t.time, probability: t.price }))
+                        midpoint = info.midpoint
+                    } else {
+                        data = []
+                    }
+
                     const articles = await newsClient.getArticlesForQuestion(q.id.toString())
 
                     if (!articles) {
@@ -87,7 +106,7 @@ export const useQuestions = (): UseQuestions => {
         }
 
         fetchQuestions()
-    }, [userId, reloadKey])
+    }, [userId])
 
     const addQuestion = async (questionData: { question: string; initialProbability: number }) => {
         try {
@@ -115,37 +134,38 @@ export const useQuestions = (): UseQuestions => {
         }
     }
 
-    const toggleFollowQuestion = (questionId: string) => {
-        const question = questions.find(q => q.id === questionId)
-        if (!question) return
 
-        const updatedQuestion = { ...question, isFollowing: !question.isFollowing }
+    const updatedQuestion = { ...question, isFollowing: !question.isFollowing }
 
-        setQuestions(prev =>
-            prev.map(q => q.id === questionId ? updatedQuestion : q)
+    setQuestions(prev =>
+        prev.map(q => q.id === questionId ? updatedQuestion : q)
+    )
+
+    if (updatedQuestion.isFollowing) {
+        setFollowedQuestions(prev => [...prev, updatedQuestion])
+    } else {
+        setFollowedQuestions(prev =>
+            prev.filter(q => q.id !== questionId)
         )
-
-        if (updatedQuestion.isFollowing) {
-            setFollowedQuestions(prev => [...prev, updatedQuestion])
-        } else {
-            setFollowedQuestions(prev =>
-                prev.filter(q => q.id !== questionId)
-            )
-        }
     }
+}
 
-    const getQuestionsByCategory = (category: Question['category']) => {
-        return questions.filter(q => q.category === category)
-    }
+const getQuestionsByCategory = (category: Question['category']) => {
+    return questions.filter(q => q.category === category)
+}
 
-    return {
-        questions,
-        userQuestions,
-        followedQuestions,
-        addQuestion,
-        toggleFollowQuestion,
-        getQuestionsByCategory,
-        loading,
-        error
-    }
+const getQuestionsByCategory = (category: Question['category']) => {
+    return questions.filter(q => q.category === category)
+}
+
+return {
+    questions,
+    userQuestions,
+    followedQuestions,
+    addQuestion,
+    toggleFollowQuestion,
+    getQuestionsByCategory,
+    loading,
+    error,
+    setQuestionData
 }

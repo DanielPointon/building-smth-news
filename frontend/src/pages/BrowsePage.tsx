@@ -4,7 +4,7 @@ import { Alert, AlertDescription } from 'components/ui/alert';
 import { QuestionCard } from 'components/questions/QuestionCard';
 
 export const BrowsePage: React.FC = () => {
-  const { questions, loading, error } = useQuestions();
+  const { questions, loading, error, setQuestionData } = useQuestions();
 
   if (loading) {
     return (
@@ -45,10 +45,8 @@ export const BrowsePage: React.FC = () => {
             <QuestionCard
               key={q.id}
               id={q.id}
-              question={q.question}
-              probability={q.probability}
-              data={q.data}
-              articles={q.articles}
+              question={q}
+              setQuestionData={setQuestionData}
             />
           ))}
         </div>

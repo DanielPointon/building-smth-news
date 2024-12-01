@@ -13,19 +13,17 @@ const isValidEvent = (article: Article): article is (Article & { date: string })
 export const QuestionCard: React.FC<QuestionCardProps> = ({
   id,
   question,
-  probability,
-  data,
-  articles
+  setQuestionData,
 }) => {
   const navigate = useNavigate();
   const [showAllNews, setShowAllNews] = useState<boolean>(false);
-  const currentProbability = probability ?? 0.5;
+  const currentProbability = question.probability ?? 0.5;
   // const previousProbability = data[data.length - 2]?.probability;
   // const trending = currentProbability > previousProbability;
   // TODO:
   const trending = false;
 
-  const events = articles
+  const events = question.articles
     .filter(isValidEvent)
     .map(article => ({
       date: article.date,
@@ -43,12 +41,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         onClick={handleQuestionClick}
       >
         <div className="text-xl font-georgia text-[rgb(38,42,51)] flex items-center gap-2">
-          {question}
+          {question.question}
           {trending && <Sparkles size={16} className="text-[rgb(13,118,128)]" />}
         </div>
         <div className="flex items-center gap-2">
           <span className={`text-2xl font-bold font-georgia ${
-            trending ? 'text-[rgb(13,118,128)]' : 'text-red-600'
+           trending ? 'text-[rgb(13,118,128)]' : 'text-red-600'
           }`}>
             {currentProbability}%
           </span>
@@ -65,20 +63,20 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       <div className="py-6">
       <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
         <ProbabilityGraph 
-            data={data}
+            data={question.data}
             events={events}
           />
         </div>
-        <TradingButtons marketId={id} probability={currentProbability} />
+          <TradingButtons question={question} setQuestionData={setQuestionData} />
         <div className="mt-6 space-y-2">
           <ArticleList 
-            articles={articles} 
+            articles={question.articles} 
             showAll={showAllNews}
           />
         </div>
       </div>
 
-      {articles.length > 2 && (
+      {question.articles.length > 2 && (
         <div className="pt-4 border-t border-gray-300">
           <button
             onClick={() => setShowAllNews(prev => !prev)}

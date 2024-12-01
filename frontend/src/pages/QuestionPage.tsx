@@ -146,7 +146,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => (
 
 const QuestionPage: React.FC = () => {
   const { id } = useParams();
-  const { questions } = useQuestions();
+  const { questions, setQuestionData } = useQuestions();
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
   
   const currentQuestion = questions.find(q => q.id === id);
@@ -200,7 +200,7 @@ const QuestionPage: React.FC = () => {
             />
           </div>
 
-          <TradingButtons marketId={currentQuestion.id} probability={currentProbability} />
+          <TradingButtons question={currentQuestion} setQuestionData={setQuestionData} />
 
           <div className="mt-8 mb-8">
             <h3 className="text-xl font-georgia text-[rgb(38,42,51)] mb-4">Topic Network</h3>

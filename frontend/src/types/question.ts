@@ -40,10 +40,8 @@ export interface Question {
 
 export interface QuestionCardProps {
   id: string;
-  question: string;
-  probability: number | null;
-  data: DataPoint[];
-  articles: Article[];
+  question: Question;
+  setQuestionData: (question: Question) => void;
 }
 
 export interface Cluster {

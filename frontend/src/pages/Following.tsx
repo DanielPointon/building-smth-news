@@ -3,7 +3,7 @@ import { useQuestions } from '../hooks/useQuestions';
 import { QuestionCard } from 'components/questions/QuestionCard';
 
 export const FollowingPage: React.FC = () => {
-  const { followedQuestions } = useQuestions();
+  const { followedQuestions, setQuestionData } = useQuestions();
 
   return (
     <div className="space-y-6">
@@ -17,10 +17,8 @@ export const FollowingPage: React.FC = () => {
           <QuestionCard 
             id={q.id}
             key={q.id}
-            question={q.question}
-            probability={q.probability}
-            data={q.data}
-            articles={q.articles}
+            question={q}
+            setQuestionData={setQuestionData}
           />
         ))
       )}

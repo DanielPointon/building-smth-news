@@ -5,7 +5,7 @@ import { TradeConfirmation } from './TradeConfirmation';
 import { TradingButtonsProps } from 'types/trades';
 import PrismIcon from 'components/prism';
 
-export const TradingButtons: React.FC<TradingButtonsProps> = ({ probability, marketId }) => {
+export const TradingButtons: React.FC<TradingButtonsProps> = ({ question, setQuestionData }) => {
   const [showModal, setShowModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [tradeType, setTradeType] = useState<'buy' | 'sell' | null>(null);
@@ -13,7 +13,8 @@ export const TradingButtons: React.FC<TradingButtonsProps> = ({ probability, mar
   const handleTradeComplete = (type: 'buy' | 'sell', amount: number) => {
     setTradeType(type);
     setShowConfirm(true);
-    setTimeout(() => setShowConfirm(false), 2000);
+
+    setQuestionData(question);
   };
 
   return (
@@ -30,12 +31,12 @@ export const TradingButtons: React.FC<TradingButtonsProps> = ({ probability, mar
       <TradingModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        probability={probability}
+        probability={question.probability ?? 50}
+        marketId={question.id}
         onTrade={handleTradeComplete}
-        marketId={marketId}
       />
       {showConfirm && tradeType && (
-        <TradeConfirmation type={tradeType} probability={probability} />
+        <TradeConfirmation type={tradeType} probability={question.probability ?? 50} />
       )}
     </>
   );

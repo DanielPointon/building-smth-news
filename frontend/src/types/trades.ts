@@ -1,3 +1,5 @@
+import { Question } from "./question";
+
 export interface Transaction {
   id: string;
   type: 'buy' | 'sell';
@@ -8,8 +10,8 @@ export interface Transaction {
 }
 
 export interface TradingButtonsProps {
-  marketId: string;
-  probability: number;
+  question: Question;
+  setQuestionData: (question: Question) => void;
 }
 
 export interface TradingModalProps {
