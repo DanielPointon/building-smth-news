@@ -3,6 +3,7 @@ import { useQuestions } from "../hooks/useQuestions";
 import { Alert, AlertDescription } from "components/ui/alert";
 import { QuestionCard } from "components/questions/QuestionCard";
 import { ViewToggle } from "../components/navigation/ViewToggle";
+import { FixedSizeList as List } from 'react-window';
 
 export const BrowsePage: React.FC = () => {
   const { questions, loading, error, setQuestionData } = useQuestions();
@@ -45,14 +46,24 @@ export const BrowsePage: React.FC = () => {
         </div>
       ) : (
         <div className="w-4/5 mx-auto space-y-6">
-          {truncatedQuestions.map((q) => (
-            <QuestionCard
-              key={q.id}
-              id={q.id}
-              question={q}
-              setQuestionData={setQuestionData}
-            />
-          ))}
+              <List
+                height={600} // height of the scrollable container (adjust as needed)
+                itemCount={questions.length} // total number of items
+                itemSize={500} // height of each item (adjust to match your QuestionCard height)
+                width="100%" // full width or whatever suits your layout
+              >
+                {({ index, style }) => (
+                  <div style={style}>
+                    <QuestionCard
+                      key={truncatedQuestions[index].id}
+                      id={truncatedQuestions[index].id}
+                      question={truncatedQuestions[index]}
+                      setQuestionData={setQuestionData}
+                    />
+                  </div>
+                )}
+              </List>
+
         </div>
       )}
     </div>
