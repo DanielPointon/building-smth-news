@@ -30,10 +30,10 @@ def process_question(i, a, n):
     )
 
     s = 50
-    for _ in range(2):
+    for _ in range(5):
         r = random.random() + 0.5
-        r = math.log(r)
-        s = int(s * r)
+        # r = math.log(r) + 0.05
+        s = max(0, min(100, int(s * r)))
         make_trade(id, s, 1)
 
 
