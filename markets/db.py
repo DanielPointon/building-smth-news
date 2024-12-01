@@ -6,19 +6,19 @@ class HasId(Protocol):
     id: Uuid
 
 
-class Db[V: HasId]:
-    store: dict[Uuid, V]
+class Db:
+    store: dict
 
     def __init__(self):
         self.store = {}
 
-    def get(self, key: Uuid) -> V | None:
+    def get(self, key: Uuid):
         return self.store.get(key)
 
-    def __getitem__(self, key: Uuid) -> V:
+    def __getitem__(self, key: Uuid):
         return self.store[key]
 
-    def insert(self, v: V):
+    def insert(self, v):
         if v.id in self.store:
             raise KeyError("Exists")
 

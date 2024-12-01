@@ -19,7 +19,7 @@ from models import (
 from db import Db, HasId
 
 
-def get_by_id[T: HasId](db: Db[T], id: Uuid) -> T:
+def get_by_id(db: Db, id: Uuid):
     v = db.get(id)
 
     if not v:
