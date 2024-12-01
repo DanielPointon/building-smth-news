@@ -216,7 +216,11 @@ async def get_homepage_articles():
     """
     Fetch a list of articles from the database to display on the homepage.
     """
-    return list(database["articles"].values())[0:30]
+    home_articles = list(database["articles"].values())[0:30]
+    for article in home_articles:
+        article["id"] = str(article["id"])
+    
+    return home_articles
 
 async def get_article_metadata(article: ArticleInput):
     """
