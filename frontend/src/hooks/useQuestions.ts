@@ -59,7 +59,7 @@ export const useQuestions = (): UseQuestions => {
                     newQuestions.push({
                         id: q.id,
                         question: q.question,
-                        probability: info.midpoint,
+                        probability: midpoint,
                         data: data,
                         articles: articles as unknown as Article[]
                     })
