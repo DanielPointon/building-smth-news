@@ -259,28 +259,12 @@ const QuestionPage: React.FC = () => {
               <TopicGraph
                 clusters={finalClusters}
                 articles={finalArticles}
-                onSelectCluster={handleClusterSelect}
-                selectedCluster={selectedCluster}
+                onClusterSelect={handleClusterSelect}
+                // selectedCluster={selectedCluster}
               />
             </div>
 
             <div className="space-y-6">
-              {clusters.map((cluster, index) => (
-                <div
-                  key={index}
-                  className={`bg-[rgb(242,223,206)] rounded-lg p-6 cursor-pointer transition-all duration-200 ${
-                    selectedCluster === cluster.cluster_topic
-                      ? "ring-2 ring-[rgb(13,118,128)]"
-                      : "hover:ring-2 hover:ring-[rgb(13,118,128)]/50"
-                  }`}
-                  onClick={() => handleClusterSelect(cluster.cluster_topic)}
-                >
-                  <h4 className="text-lg font-semibold text-[rgb(13,118,128)] mb-4">
-                    {cluster.cluster_topic}
-                  </h4>
-                  {/* ... rest of cluster content ... */}
-                </div>
-              ))}
             </div>
           </div>
 
