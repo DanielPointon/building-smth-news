@@ -80,6 +80,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       hour12: false,
     }),
   }));
+
   let overallProbability = question.probability ?? backupProbability;
 
   const handleQuestionClick = () => {
