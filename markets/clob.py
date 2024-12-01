@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import override
 from pydantic.dataclasses import dataclass
 
 from models import Order, Uuid
@@ -123,7 +122,6 @@ class Clob:
         assert order.id not in self.orders
         self.orders[order.id] = price_node
 
-    @override
     def __repr__(self) -> str:
         s = ""
 
