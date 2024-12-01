@@ -23,6 +23,7 @@ class Market(Model):
 
 
 class MarketCreateInfo(BaseModel):
+    id: str | None = None
     name: str
     description: str
 

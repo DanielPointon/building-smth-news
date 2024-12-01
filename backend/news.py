@@ -43,6 +43,7 @@ if "questions" not in database:
 
 # print(database)
 
+
 def save_database():
     def pydantic_to_serializable(obj):
         # if obj has attribute metadata
@@ -59,24 +60,28 @@ def save_database():
         json.dump(pydantic_to_serializable(database), db_file, indent=4)
 
 
-
 class ImageContent(BaseModel):
     image_url: str
     image_caption: str
-    
+
+
 class TextContent(BaseModel):
     text: str
-    
+
+
 class ArticleMetadataRequest(BaseModel):
     article_id: str
 
+
 class ClusterRequest(BaseModel):
     question_id: str
+
 
 class ArticleContent(RootModel[Union[TextContent, ImageContent]]):
     """
     Article content can be either a string (text) or an image with caption.
     """
+
     pass
 
 
@@ -85,19 +90,23 @@ class QuestionInput(BaseModel):
     text: str
     metadata: dict
 
+
 class QuestionMetadata(BaseModel):
     tags: List[str]
     related_topics: List[str]
-    
+
+
 class QuestionWithLink(BaseModel):
     question: str
     question_id: Optional[str] = None
     metadata: QuestionMetadata
     index_in_article: Optional[int] = None
-    
+
+
 class GeneratedQuestions(BaseModel):
     questions: List[QuestionWithLink]
-    
+
+
 class ArticleInput(BaseModel):
     id: Union[str, None]
     title: str
@@ -109,18 +118,22 @@ class ArticleInput(BaseModel):
     metadata: dict  # Includes fields like countries and other dynamic metadata
     questions: List[QuestionInput]
 
+
 class Event(BaseModel):
     event_title: Optional[str]
     event_date: Optional[str]  # "YYYY-MM-DD" or None
     article_id: int
 
+
 class ExtractedEvents(BaseModel):
     question_id: int
     events: List[Event]
-    
+
+
 class Cluster(BaseModel):
     cluster_topic: str
     article_ids: List[int]
+
 
 class ClusteredSubtopics(BaseModel):
     clusters: List[Cluster]
@@ -144,7 +157,7 @@ async def create_article(article: ArticleInput):
         elif isinstance(obj, dict):
             return {key: pydantic_to_serializable(value) for key, value in obj.items()}
         return obj  # Return the object as-is if not Pydantic
-    
+
     # Add the article to the database
     new_article = {
         "id": article.id,
@@ -157,10 +170,9 @@ async def create_article(article: ArticleInput):
         "metadata": await get_article_metadata(article),
         "questions": [],
     }
-    
+
     questions = await generate_questions_for_article(article)
     article.questions = questions["questions"]
-    
 
     # Process each question in the input
     for question in article.questions:
@@ -170,7 +182,13 @@ async def create_article(article: ArticleInput):
             # If the question exists, link the article to the existing question
             if article.id not in matching_question["article_ids"]:
                 matching_question["article_ids"].append(article.id)
-            new_article["questions"].append({"id": matching_question["id"], "question": matching_question["question"], "index_in_article": question.index_in_article})
+            new_article["questions"].append(
+                {
+                    "id": matching_question["id"],
+                    "question": matching_question["question"],
+                    "index_in_article": question.index_in_article,
+                }
+            )
         else:
             # If the question doesn't exist, create a new one
             new_question = {
@@ -183,16 +201,18 @@ async def create_article(article: ArticleInput):
             new_question_article = {
                 "id": new_question["id"],
                 "question": new_question["question"],
-                "index_in_article": question.index_in_article
+                "index_in_article": question.index_in_article,
             }
             new_article["questions"].append(new_question_article)
-            
 
     database["articles"][article.id] = new_article
     # Save the database
     save_database()
 
-    return {"article_id": article.id, "message": "Article and associated questions created/linked successfully."}
+    return {
+        "article_id": article.id,
+        "message": "Article and associated questions created/linked successfully.",
+    }
 
 
 @router.get("/articles/{article_id}")
@@ -202,14 +222,12 @@ async def get_article(article_id: str):
     Fetch a specific article by ID from the database.
     """
     article = database["articles"].get(article_id, None)
-    
+
     if not article:
-        raise HTTPException(
-            status_code=404,
-            detail="Article not found"
-        )
-    
+        raise HTTPException(status_code=404, detail="Article not found")
+
     return article
+
 
 @router.get("/homepage")
 async def get_homepage_articles():
@@ -219,8 +237,9 @@ async def get_homepage_articles():
     home_articles = list(database["articles"].values())[0:30]
     for article in home_articles:
         article["id"] = str(article["id"])
-    
+
     return home_articles
+
 
 async def get_article_metadata(article: ArticleInput):
     """
@@ -245,7 +264,7 @@ async def get_article_metadata(article: ArticleInput):
         "other_dynamic_field": "value"
     }}
     """
-    
+
     response_metadata = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt_metadata}],
@@ -266,10 +285,21 @@ async def get_questions_by_country(country_code: str):
     """
     Get questions related to a specific country based on the metadata of associated articles.
     """
-    related_articles = [article for article in database["articles"].values() if country_code in article["metadata"].get("countries", [])]
-    question_ids = {q_id["id"] for article in related_articles for q_id in article["questions"]}
+    related_articles = [
+        article
+        for article in database["articles"].values()
+        if country_code in article["metadata"].get("countries", [])
+    ]
 
-    questions = [question for question in database["questions"].values() if question["id"] in question_ids]
+    question_ids = {
+        q_id for article in related_articles for q_id in article["question_ids"]
+    }
+
+    questions = [
+        question
+        for question in database["questions"].values()
+        if question["id"] in question_ids
+    ]
     return questions
 
 
@@ -296,15 +326,16 @@ async def generate_questions_for_article(article: ArticleInput):
     flattened_content = flatten_article_content(article.content)
     try:
         # Step 1: Generate new questions
-        
+
         article_content_list = []
         for i, item in enumerate(article.content):
             if isinstance(item.root, TextContent):
                 article_content_list.append({"index": i, "text": item.root.text})
             if isinstance(item.root, ImageContent):
-                article_content_list.append({"index": i, "image_caption": item.root.image_caption})
-                
-                
+                article_content_list.append(
+                    {"index": i, "image_caption": item.root.image_caption}
+                )
+
         article_date = str(article.published_date)
         print(f"Generating questions for article published on {article_date}...")
         prompt_generate = f"""
@@ -335,11 +366,15 @@ async def generate_questions_for_article(article: ArticleInput):
             ],
             tools=[openai.pydantic_function_tool(GeneratedQuestions)],
         )
-        
-        generated_questions = question_generation_response.choices[0].message.tool_calls[0].function.parsed_arguments.questions
+
+        generated_questions = (
+            question_generation_response.choices[0]
+            .message.tool_calls[0]
+            .function.parsed_arguments.questions
+        )
         for q in generated_questions:
             q.question_id = str(uuid.uuid4().int)
-        
+
         for question in generated_questions:
             index = question.index_in_article
             if index is not None and 0 <= index < len(article_content_list):
@@ -349,7 +384,9 @@ async def generate_questions_for_article(article: ArticleInput):
 
         # Step 3: Check existing questions from the database for relevance
         existing_questions = database.get("questions", [])
-        existing_questions = random.sample(list(existing_questions.values()), min(250, len(existing_questions)))
+        existing_questions = random.sample(
+            list(existing_questions.values()), min(250, len(existing_questions))
+        )
         relevant_existing_questions = []
         if existing_questions:
             prompt_existing_questions = f"""
@@ -370,7 +407,11 @@ async def generate_questions_for_article(article: ArticleInput):
                 tools=[openai.pydantic_function_tool(GeneratedQuestions)],
             )
             try:
-                relevant_existing_questions = relevance_response.choices[0].message.tool_calls[0].function.parsed_arguments.questions
+                relevant_existing_questions = (
+                    relevance_response.choices[0]
+                    .message.tool_calls[0]
+                    .function.parsed_arguments.questions
+                )
             except Exception as e:
                 print(f"Error parsing relevant existing questions: {str(e)}")
                 relevant_existing_questions = []
@@ -386,13 +427,15 @@ async def generate_questions_for_article(article: ArticleInput):
         print(f"Error generating questions: {str(e)}")
         traceback.print_exc()  # Prints the exact traceback of the error
         return {"questions": []}
-    
+
+
 @router.get("/questions")
 async def get_questions():
     """
     Get all questions stored in the database.
     """
     return list(database["questions"].values())[0:65]
+
 
 @router.post("/questions/{question_id}/events", response_model=ExtractedEvents)
 async def get_events_for_question(question_id: str):
@@ -407,11 +450,14 @@ async def get_events_for_question(question_id: str):
 
     # Fetch related articles for the question
     related_articles = [
-        article for article in database["articles"].values()
+        article
+        for article in database["articles"].values()
         if article["id"] in question.get("article_ids", [])
     ]
     if not related_articles:
-        raise HTTPException(status_code=404, detail="No related articles found for the given question.")
+        raise HTTPException(
+            status_code=404, detail="No related articles found for the given question."
+        )
 
     # Prepare content for GPT processing
     article_contents = [
@@ -428,11 +474,9 @@ async def get_events_for_question(question_id: str):
         articles: List[dict]
 
     event_extraction_request = EventExtractionRequest(
-        question=question["question"],
-        articles=article_contents
+        question=question["text"], articles=article_contents
     )
-    
-    
+
     try:
         # Use structured data mode with OpenAI API
         completion = client.beta.chat.completions.parse(
@@ -441,7 +485,7 @@ async def get_events_for_question(question_id: str):
                 {
                     "role": "system",
                     "content": "You are an AI that extracts events from articles related to specific questions. "
-                               "Each event should include an event title, an optional event date, and the article ID from which it was derived.",
+                    "Each event should include an event title, an optional event date, and the article ID from which it was derived.",
                 },
                 {
                     "role": "user",
@@ -452,13 +496,16 @@ async def get_events_for_question(question_id: str):
         )
 
         # Parse the structured response
-        parsed_arguments = completion.choices[0].message.tool_calls[0].function.parsed_arguments
+        parsed_arguments = (
+            completion.choices[0].message.tool_calls[0].function.parsed_arguments
+        )
         return parsed_arguments
 
     except Exception as e:
         # return empty events list
         print(f"Error generating events: {str(e)}")
         return ExtractedEvents(question_id=question_id, events=[])
+
 
 @lru_cache
 @router.post("/get_clusters_for_question", response_model=ClusteredSubtopics)
@@ -475,12 +522,17 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
 
     # Fetch related articles for the question
     related_articles = [
-        {"article_id": article["id"], "content": flatten_article_content(article["content"])}
+        {
+            "article_id": article["id"],
+            "content": flatten_article_content(article["content"]),
+        }
         for article in database["articles"].values()
         if article["id"] in question.get("article_ids", [])
     ]
     if not related_articles:
-        raise HTTPException(status_code=404, detail="No related articles found for the given question.")
+        raise HTTPException(
+            status_code=404, detail="No related articles found for the given question."
+        )
 
     # Define the structured model for the OpenAI API
     class ClusterRequest(BaseModel):
@@ -488,8 +540,7 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
         articles: List[dict]
 
     cluster_request = ClusterRequest(
-        question=question["text"],
-        articles=related_articles
+        question=question["text"], articles=related_articles
     )
 
     try:
@@ -500,7 +551,7 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
                 {
                     "role": "system",
                     "content": "You are an AI that clusters sub-topics from articles related to specific questions. "
-                               "Each cluster should include a topic title and the IDs of related articles.",
+                    "Each cluster should include a topic title and the IDs of related articles.",
                 },
                 {
                     "role": "user",
@@ -511,11 +562,16 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
         )
 
         # Parse the structured response
-        parsed_arguments = completion.choices[0].message.tool_calls[0].function.parsed_arguments
+        parsed_arguments = (
+            completion.choices[0].message.tool_calls[0].function.parsed_arguments
+        )
         return parsed_arguments
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating clusters: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error generating clusters: {str(e)}"
+        )
+
 
 @lru_cache
 @router.get("/articles-for-question/{question_id}")
@@ -533,5 +589,6 @@ async def get_articles_for_question(question_id: str):
         if article:
             articles.append(article)
     return articles
+
 
 app.include_router(router)

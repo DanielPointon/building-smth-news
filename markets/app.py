@@ -113,7 +113,11 @@ async def get_markets(user_id: str | None = None) -> MarketList:
 
 @markets.post("/")
 async def create_market(info: MarketCreateInfo) -> Market:
-    market = Market(name=info.name, description=info.description)
+    market = (
+        Market(id=info.id, name=info.name, description=info.description)
+        if info.id
+        else Market(name=info.name, description=info.description)
+    )
     clob = Clob(id=market.id)
 
     MARKETS.insert(market)
