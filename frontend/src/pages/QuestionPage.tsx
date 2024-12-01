@@ -147,10 +147,18 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => (
 const QuestionPage: React.FC = () => {
   const { id } = useParams();
 
-  const { question, setQuestionData } = useQuestion(id);
+  const { loading, question, setQuestionData } = useQuestion(id);
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
   
   const currentQuestion = question
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[rgb(13,118,128)]"></div>
+      </div>
+    ); 
+  }
 
   if (!currentQuestion) {
     return (

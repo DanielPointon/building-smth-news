@@ -20,6 +20,7 @@ interface UseQuestions {
 interface UseQuestion {
   question: Question | null
   setQuestionData: (question: Question | null) => void
+  loading: boolean
 }
 
 export const useQuestion = (id: string | undefined): UseQuestion => {
@@ -89,7 +90,8 @@ export const useQuestion = (id: string | undefined): UseQuestion => {
 
   return {
     question,
-    setQuestionData
+    setQuestionData,
+    loading
   }
 }
 
