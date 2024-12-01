@@ -30,7 +30,7 @@ def process_question(i, a, n):
     )
 
     s = 50
-    for _ in range(50):
+    for _ in range(2):
         r = random.random() + 0.5
         r = math.log(r)
         s = int(s * r)
