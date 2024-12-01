@@ -312,10 +312,18 @@ def flatten_article_content(content: List[Union[str, dict]]) -> str:
     """
     flattened_content = []
     for item in content:
-        if isinstance(item.root, TextContent):
-            flattened_content.append(item.root.text)
-        if isinstance(item.root, ImageContent):
-            flattened_content.append(item.root.image_caption)
+        # Handle Pydantic models
+        if hasattr(item, 'root'):
+            if isinstance(item.root, TextContent):
+                flattened_content.append(item.root.text)
+            if isinstance(item.root, ImageContent):
+                flattened_content.append(item.root.image_caption)
+        # Handle dictionary content from database
+        else:
+            if "text" in item:
+                flattened_content.append(item["text"])
+            elif "image_caption" in item:
+                flattened_content.append(item["image_caption"])
     return "\n".join(flattened_content)
 
 
@@ -535,6 +543,7 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
     if not question:
         raise HTTPException(status_code=404, detail="Question not found.")
 
+    print(question)
     # Fetch related articles for the question
     related_articles = [
         {
@@ -555,7 +564,7 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
         articles: List[dict]
 
     cluster_request = ClusterRequest(
-        question=question["text"], articles=related_articles
+        question=question["question"], articles=related_articles
     )
 
     try:
