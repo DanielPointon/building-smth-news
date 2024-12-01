@@ -26,9 +26,9 @@ export const TradingModal: React.FC<TradingModalProps> = ({
     // market order
     let price;
     if (type == "buy") {
-      price = 100;
+      price = Math.min(100, probability + 10);
     } else {
-      price = 0;
+      price = Math.max(100, probability - 10);
     }
 
     const client = new MarketsClient();

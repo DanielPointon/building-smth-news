@@ -91,6 +91,7 @@ const QuestionPage: React.FC = () => {
           setClusters(data.clusters);
         } catch (error) {
           console.error("Error fetching clusters:", error);
+          setClusters([]);
         } finally {
           setLoadingClusters(false);
         }
@@ -123,7 +124,7 @@ const QuestionPage: React.FC = () => {
 
   let articleId = 1;
 
-  clusters && clusters.forEach((cluster) => { 
+  (clusters || []).forEach((cluster) => { 
     const articleIds: string[] = [];
  
     cluster && cluster.article_list && cluster.article_list.forEach((article) => {

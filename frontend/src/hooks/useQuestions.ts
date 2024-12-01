@@ -38,7 +38,8 @@ export const useQuestion = (id: string | undefined): UseQuestion => {
     const marketsClient = new MarketsClient();
     const info = await marketsClient.getTrades(q.id.toString());
     const data = info.trades.map(t => ({ date: t.time, probability: t.price }));
-    const midpoint = info.midpoint ?? data[data.length - 1].probability;
+    // const midpoint = info.midpoint ?? data[data.length - 1].probability;
+    const midpoint = data[data.length - 1].probability;
 
     q.data = data;
     q.probability = midpoint;
@@ -61,7 +62,8 @@ export const useQuestion = (id: string | undefined): UseQuestion => {
 
         const info = await marketsClient.getTrades(id.toString());
         const data = info.trades.map(t => ({ date: t.time, probability: t.price }));
-        const midpoint = info.midpoint ?? data[data.length - 1].probability;
+        // const midpoint = info.midpoint ?? data[data.length - 1].probability;
+        const midpoint = data[data.length - 1].probability;
 
         const q = await newsClient.getQuestion(id.toString());
         const articles = await newsClient.getArticlesForQuestion(q.id.toString());
@@ -109,7 +111,8 @@ export const useQuestions = (): UseQuestions => {
     const marketsClient = new MarketsClient();
     const info = await marketsClient.getTrades(q.id.toString());
     const data = info.trades.map(t => ({ date: t.time, probability: t.price }));
-    const midpoint = info.midpoint ?? data[data.length - 1].probability;
+    // const midpoint = info.midpoint ?? data[data.length - 1].probability;
+    const midpoint = data[data.length - 1].probability;
 
     q.data = data;
     q.probability = midpoint;
@@ -142,7 +145,8 @@ export const useQuestions = (): UseQuestions => {
           if (i < 10) {
             const info = await marketsClient.getTrades(q.id.toString());
             data = info.trades.map(t => ({ date: t.time, probability: t.price }));
-            midpoint = info.midpoint ?? data[data.length - 1].probability;
+            // midpoint = info.midpoint ?? data[data.length - 1].probability;
+            midpoint = data[data.length - 1].probability;
           } else {
             data = []
           }
