@@ -123,10 +123,10 @@ const QuestionPage: React.FC = () => {
 
   let articleId = 1;
 
-  clusters.forEach((cluster) => {
+  clusters && clusters.forEach((cluster) => { 
     const articleIds: string[] = [];
-
-    cluster.article_list.forEach((article) => {
+ 
+    cluster && cluster.article_list && cluster.article_list.forEach((article) => {
       const articleObj = {
         id: articleId.toString(),
         title: article.title,
