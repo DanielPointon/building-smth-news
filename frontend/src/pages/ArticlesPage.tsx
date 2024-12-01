@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CalendarDays, User, ExternalLink } from 'lucide-react';
-import { Card, CardContent } from 'components/ui/card';
-import React from 'react';
-import { Article } from 'types/question';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { CalendarDays, User, ExternalLink } from "lucide-react";
+import { Card, CardContent } from "components/ui/card";
+import React from "react";
+import { Article } from "types/question";
 
 const ArticlesPage = () => {
   const [articles, setArticles] = React.useState<Article[]>([]);
@@ -13,12 +13,12 @@ const ArticlesPage = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await fetch('http://localhost:8005/articles');
-        if (!response.ok) throw new Error('Failed to fetch articles');
+        const response = await fetch("http://localhost:8005/homepage");
+        if (!response.ok) throw new Error("Failed to fetch articles");
         const data = await response.json();
         setArticles(data);
       } catch (error) {
-        console.error('Error fetching articles:', error);
+        console.error("Error fetching articles:", error);
       } finally {
         setLoading(false);
       }
@@ -41,7 +41,9 @@ const ArticlesPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-georgia text-[rgb(38,42,51)] mb-6">Latest Articles</h1>
+      <h1 className="text-3xl font-georgia text-[rgb(38,42,51)] mb-6">
+        Latest Articles
+      </h1>
       <div className="space-y-6">
         {articles.map((article) => (
           <div
@@ -64,13 +66,17 @@ const ArticlesPage = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <CalendarDays size={16} />
-                        <span>{new Date(article.published_date).toLocaleDateString()}</span>
+                        <span>
+                          {new Date(
+                            article.published_date
+                          ).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
                   </div>
                   {article.main_image_url && (
-                    <img 
-                      src={article.main_image_url} 
+                    <img
+                      src={article.main_image_url}
                       alt={article.title}
                       className="w-32 h-32 object-cover rounded-lg"
                     />
@@ -79,7 +85,10 @@ const ArticlesPage = () => {
                 <div className="flex justify-end mt-4">
                   <div className="flex items-center gap-1 text-[rgb(13,118,128)] text-sm group">
                     <span>Read more</span>
-                    <ExternalLink size={16} className="group-hover:translate-x-1 transition-transform" />
+                    <ExternalLink
+                      size={16}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
                   </div>
                 </div>
               </CardContent>

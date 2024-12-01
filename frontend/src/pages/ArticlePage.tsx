@@ -98,7 +98,7 @@ export const ArticlePage: React.FC = () => {
           <div className="prose max-w-none relative">
             {article.content.map((item, index) => (
               <Fragment key={index}>
-                {item.type === "text" && (
+                {item.text && (
                   <p
                     id={`paragraph-${index}`}
                     className={`mb-4 transition-all duration-200 ${
@@ -107,15 +107,22 @@ export const ArticlePage: React.FC = () => {
                         : ""
                     }`}
                   >
-                    {item.content}
+                    {item.text}
                   </p>
                 )}
-                {item.type === "image" && (
-                  <img
-                    src={item.image_url}
-                    alt={item.description || "Article image"}
-                    className="max-w-[400px] w-full h-auto my-6 rounded-lg mx-auto block"
-                  />
+                {item.image_url && (
+                  <figure className="my-6">
+                    <img
+                      src={item.image_url}
+                      alt={item.image_caption || "Article image"}
+                      className="max-w-[400px] w-full h-auto rounded-lg mx-auto block"
+                    />
+                    {item.image_caption && (
+                      <figcaption className="text-center text-gray-600 mt-2">
+                        {item.image_caption}
+                      </figcaption>
+                    )}
+                  </figure>
                 )}
               </Fragment>
             ))}
