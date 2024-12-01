@@ -1,22 +1,12 @@
-// /frontend/src/pages/QuestionPage.tsx
-
 import { useParams } from "react-router-dom";
-// import { ProbabilityGraph } from "../components/graph/ProbabilityGraph";
 import { TradingButtons } from "../components/trading/TradingButtons";
-import { ArticleList } from "../components/articles/ArticleList";
-import { useQuestion, useQuestions } from "../hooks/useQuestions";
+import { useQuestion } from "../hooks/useQuestions";
 import { Article, Question } from "../types/question";
-import { Card, CardContent, CardHeader, CardTitle } from "components/ui/card";
+import { Card, CardContent } from "components/ui/card";
 import { useState, useEffect } from "react";
 import TopicGraph from "components/TopicGraph";
-import {
-  ChevronRight,
-  TrendingUp,
-  Calendar,
-  User,
-  ExternalLink,
-} from "lucide-react";
-import { QuestionCard } from "components/questions/QuestionCard";
+import { User, Calendar, ExternalLink } from "lucide-react";
+import QuestionCard from "components/questions/QuestionCard";
 
 interface ClusterArticle {
   title: string;
@@ -33,48 +23,6 @@ interface Cluster {
 interface ClusterResponse {
   clusters: Cluster[];
 }
-
-interface RelatedQuestionProps {
-  question: Question;
-}
-
-const RelatedQuestion: React.FC<RelatedQuestionProps> = ({ question }) => {
-  const currentProbability =
-    question.data[question.data.length - 1].probability;
-
-  return (
-    <div className="bg-[rgb(242,223,206)] p-4 rounded-lg hover:shadow-md transition-all duration-200">
-      <div className="flex justify-between items-start gap-4 mb-4">
-        <div className="flex-1">
-          <div className="text-sm text-[rgb(13,118,128)] font-semibold mb-2">
-            {question.category}
-          </div>
-          <h3 className="text-[rgb(38,42,51)] font-georgia">
-            {question.question}
-          </h3>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xl font-bold text-[rgb(13,118,128)]">
-            {currentProbability}%
-          </span>
-          <TrendingUp size={16} className="text-[rgb(13,118,128)]" />
-        </div>
-      </div>
-      <div className="flex justify-between items-center text-sm text-gray-600">
-        <span>
-          {question.totalPredictions?.toLocaleString() || 0} predictions
-        </span>
-        <button className="flex items-center gap-1 text-[rgb(13,118,128)] hover:text-[rgb(11,98,108)] transition-colors group">
-          View Details
-          <ChevronRight
-            size={14}
-            className="group-hover:translate-x-1 transition-transform"
-          />
-        </button>
-      </div>
-    </div>
-  );
-};
 
 interface ArticleCardProps {
   article: Article;
@@ -102,25 +50,19 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => (
             </div>
           </div>
         </div>
-        {/* {article.main_image_url && (
-          <img
-            src={article.main_image_url}
-            alt={article.title}
-            className="w-32 h-32 object-cover rounded-lg"
-          />
-        )} */}
       </div>
-      {/* <div className="flex justify-end mt-4"> */}
-      {/* <div className="flex items-center gap-1 text-[rgb(13,118,128)] text-sm group"> */}
-      {/* <span>Read more</span> */}
-      {/* <ExternalLink
-            size={16}
-            className="group-hover:translate-x-1 transition-transform"
-          /> */}
-      {/* </div> */}
-      {/* </div> */}
     </CardContent>
   </Card>
+);
+
+const LoadingTopicClusters: React.FC = () => (
+  <div className="animate-pulse space-y-4">
+    <div className="h-[600px] bg-[rgb(242,223,206)] rounded-lg opacity-50" />
+    <div className="space-y-2">
+      <div className="h-4 bg-[rgb(242,223,206)] rounded w-1/4" />
+      <div className="h-4 bg-[rgb(242,223,206)] rounded w-1/2" />
+    </div>
+  </div>
 );
 
 const QuestionPage: React.FC = () => {
@@ -128,12 +70,13 @@ const QuestionPage: React.FC = () => {
   const { loading, question, setQuestionData } = useQuestion(id);
   const [clusters, setClusters] = useState<Cluster[]>([]);
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
+  const [loadingClusters, setLoadingClusters] = useState(true);
 
-  // Add useEffect to fetch clusters
   useEffect(() => {
     const fetchClusters = async () => {
       if (id) {
         try {
+          setLoadingClusters(true);
           const response = await fetch(
             "http://localhost:8001/get_fake_clusters_for_question",
             {
@@ -146,9 +89,10 @@ const QuestionPage: React.FC = () => {
           );
           const data: ClusterResponse = await response.json();
           setClusters(data.clusters);
-          console.log(data);
         } catch (error) {
           console.error("Error fetching clusters:", error);
+        } finally {
+          setLoadingClusters(false);
         }
       }
     };
@@ -157,41 +101,6 @@ const QuestionPage: React.FC = () => {
   }, [id]);
 
   const currentQuestion = question;
-
-  const finalArticles: Article[] = [];
-  const finalClusters: { cluster_topic: string; article_ids: string[] }[] = [];
-
-  // Unique ID counter for articles
-  let articleId = 1;
-
-  // Transform the data
-  (clusters || []).forEach((cluster) => {
-    const articleIds: string[] = [];
-
-    cluster.article_list.forEach((article) => {
-      const articleObj = {
-        id: articleId.toString(),
-        title: article.title,
-        description: article.description,
-        author: article.author,
-        published_date: article.published_date,
-        content: [], // Placeholder for now
-        main_image_url: "https://via.placeholder.com/300", // Placeholder image
-        isKeyEvent: false, // Default value
-      };
-      finalArticles.push(articleObj);
-      articleIds.push(articleObj.id);
-      articleId++;
-    });
-
-    finalClusters.push({
-      cluster_topic: cluster.cluster_topic,
-      article_ids: articleIds,
-    });
-  });
-
-  console.log("Articles:", finalArticles);
-  console.log("Clusters:", finalClusters);
 
   if (loading) {
     return (
@@ -209,15 +118,40 @@ const QuestionPage: React.FC = () => {
     );
   }
 
-  // const currentProbability =
-  //   currentQuestion.data[currentQuestion.data.length - 1].probability;
+  const finalArticles: Article[] = [];
+  const finalClusters: { cluster_topic: string; article_ids: string[] }[] = [];
+
+  let articleId = 1;
+
+  clusters.forEach((cluster) => {
+    const articleIds: string[] = [];
+
+    cluster.article_list.forEach((article) => {
+      const articleObj = {
+        id: articleId.toString(),
+        title: article.title,
+        description: article.description,
+        author: article.author,
+        published_date: article.published_date,
+        content: [],
+        main_image_url: "https://via.placeholder.com/300",
+        isKeyEvent: false,
+      };
+      finalArticles.push(articleObj);
+      articleIds.push(articleObj.id);
+      articleId++;
+    });
+
+    finalClusters.push({
+      cluster_topic: cluster.cluster_topic,
+      article_ids: articleIds,
+    });
+  });
 
   const handleClusterSelect = (cluster: string) => {
-    console.log("Selected cluster:", cluster);
     setSelectedCluster(cluster);
   };
 
-  // Get the articles for the selected cluster
   const getSelectedClusterArticles = (): Article[] => {
     if (!selectedCluster) return [];
 
@@ -232,9 +166,9 @@ const QuestionPage: React.FC = () => {
       description: article.description,
       author: article.author,
       published_date: article.published_date,
-      content: [], // Placeholder for now
-      main_image_url: "https://via.placeholder.com/300", // Placeholder image
-      isKeyEvent: false, // Default value
+      content: [],
+      main_image_url: "https://via.placeholder.com/300",
+      isKeyEvent: false,
     }));
   };
 
@@ -256,15 +190,15 @@ const QuestionPage: React.FC = () => {
             </h3>
 
             <div className="mb-8">
-              <TopicGraph
-                clusters={finalClusters}
-                articles={finalArticles}
-                onClusterSelect={handleClusterSelect}
-                // selectedCluster={selectedCluster}
-              />
-            </div>
-
-            <div className="space-y-6">
+              {loadingClusters ? (
+                <LoadingTopicClusters />
+              ) : (
+                <TopicGraph
+                  clusters={finalClusters}
+                  articles={finalArticles}
+                  onClusterSelect={handleClusterSelect}
+                />
+              )}
             </div>
           </div>
 
