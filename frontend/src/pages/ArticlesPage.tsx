@@ -43,7 +43,7 @@ const ArticlesPage = () => {
   return (
     <div>
       {/* <div className="bg-[rgb(242,223,206)] p-6 mb-8 rounded-lg"> */}
-      <div className="border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
+      <div className="w-4/5 mx-auto space-y-3 border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-georgia text-[rgb(38,42,51)]">
             Latest Articles
@@ -54,7 +54,7 @@ const ArticlesPage = () => {
           Stay informed with our latest analysis and insights
         </p>
       </div>
-      <div className="space-y-6">
+      <div className="w-4/5 mx-auto space-y-3">
         {articles.map((article) => (
           <div
             key={article.id}
@@ -94,11 +94,6 @@ const ArticlesPage = () => {
                 </div>
                 <div className="flex justify-end mt-4">
                   <div className="flex items-center gap-1 text-[rgb(13,118,128)] text-sm group">
-                    <span>Read more</span>
-                    <ExternalLink
-                      size={16}
-                      className="group-hover:translate-x-1 transition-transform"
-                    />
                   </div>
                 </div>
               </CardContent>

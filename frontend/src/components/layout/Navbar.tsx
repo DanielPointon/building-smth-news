@@ -4,7 +4,6 @@ import { History, Coins, DollarSign, Globe, Map } from 'lucide-react';
 import { NavbarBalance } from './NavbarBalance';
 import { NavbarProps } from '../../types/navbar';
 import { Balance } from '../../types/balance';
-import { COLORS } from '../../constants/color';
 import PrismIcon from 'components/prism';
 
 const BALANCES: Balance[] = [
@@ -15,23 +14,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onHistoryClick, onGlobalClick, o
   const navigate = useNavigate();
 
   return (
-    <nav className="flex items-center justify-between px-6 py-4 bg-[rgb(38,42,51)] text-white border-b border-gray-700">
+    <nav className="flex items-center justify-between px-6 py-6 bg-gradient-to-r from-[rgb(38,42,51)] to-[rgb(48,52,61)] text-gray-200 shadow-md border-b border-gray-700">
       <div className="flex items-center space-x-6">
+        {/* Brand Logo */}
         <button 
           onClick={() => navigate('/')}
-          className="text-2xl font-bold font-georgia text-white hover:text-[rgb(13,118,128)] transition-colors"
+          className="text-2xl font-bold font-georgia text-gray-100 hover:text-[#FFD700] transition-colors"
         >
           Delphi
         </button>
+        {/* Navigation Links */}
         <button
-          className="flex items-center space-x-3 hover:text-[rgb(13,118,128)] transition-colors"
+          className="flex items-center space-x-3 text-gray-300 hover:text-[#FFD700] transition-colors"
           onClick={() => navigate('/global')}
         >
           <Globe className="w-6 h-6" />
           <span className="text-lg">Global</span>
         </button>
         <button
-          className="flex items-center space-x-3 hover:text-[rgb(13,118,128)] transition-colors"
+          className="flex items-center space-x-3 text-gray-300 hover:text-[#FFD700] transition-colors"
           onClick={onExplorerClick}
         >
           <Map className="w-6 h-6" />
@@ -40,7 +41,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onHistoryClick, onGlobalClick, o
       </div>
       
       <div className="flex items-center space-x-6">
-      {BALANCES.map((balance, idx) => (
+        {/* Balances */}
+        {BALANCES.map((balance, idx) => (
           <NavbarBalance
             key={idx}
             currency={balance.currency}
@@ -48,8 +50,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onHistoryClick, onGlobalClick, o
             icon={balance.icon}
           />
         ))}
-       <button
-          className="flex items-center space-x-3 hover:text-[rgb(13,118,128)] transition-colors"
+        {/* History Button */}
+        <button
+          className="flex items-center space-x-3 text-gray-300 hover:text-[#FFD700] transition-colors"
           onClick={onHistoryClick}
         >
           <History className="w-6 h-6" />
