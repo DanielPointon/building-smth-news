@@ -137,7 +137,7 @@ class ClusterArticle(BaseModel):
 
 class Cluster(BaseModel):
     cluster_topic: str
-    article: ClusterArticle
+    article_list: List[ClusterArticle]
 
 
 class ClusteredSubtopics(BaseModel):
@@ -575,7 +575,7 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
                 {
                     "role": "system",
                     "content": "You are an AI that clusters sub-topics from articles related to specific questions. "
-                    "Each cluster should include a topic title and the IDs of related articles. If there are not many or no other articles come up with plausible and realistic fake clusters and articles. Aim for at least 4 clusters and a MINIMUM of 2-3 articles per cluster.",
+                    "Each cluster should include a topic title and the IDs of related articles. You SHOULD come up with plausible and realistic fake clusters and articles. Aim for at least 4 clusters and a MINIMUM of 3 articles per cluster.",
                 },
                 {
                     "role": "user",
