@@ -4,6 +4,7 @@ import { CalendarDays, User, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "components/ui/card";
 import React from "react";
 import { Article } from "types/question";
+import { ViewToggle } from "../components/navigation/ViewToggle";
 
 const ArticlesPage = () => {
   const [articles, setArticles] = React.useState<Article[]>([]);
@@ -13,7 +14,7 @@ const ArticlesPage = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await fetch("http://localhost:8005/homepage");
+        const response = await fetch("http://localhost:8001/homepage");
         if (!response.ok) throw new Error("Failed to fetch articles");
         const data = await response.json();
         setArticles(data);
@@ -40,10 +41,19 @@ const ArticlesPage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-georgia text-[rgb(38,42,51)] mb-6">
-        Latest Articles
-      </h1>
+    <div>
+      {/* <div className="bg-[rgb(242,223,206)] p-6 mb-8 rounded-lg"> */}
+      <div className="border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-georgia text-[rgb(38,42,51)]">
+            Latest Articles
+          </h1>
+          <ViewToggle />
+        </div>
+        <p className="text-[rgb(38,42,51)]">
+          Stay informed with our latest analysis and insights
+        </p>
+      </div>
       <div className="space-y-6">
         {articles.map((article) => (
           <div

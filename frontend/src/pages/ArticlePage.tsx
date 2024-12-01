@@ -13,7 +13,7 @@ export const ArticlePage: React.FC = () => {
     const fetchArticle = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8005/articles/${id}`);
+        const response = await fetch(`http://localhost:8001/articles/${id}`);
         if (!response.ok) {
           throw new Error("Article not found");
         }
