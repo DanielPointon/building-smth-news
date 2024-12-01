@@ -511,6 +511,7 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating clusters: {str(e)}")
 
+@lru_cache
 @router.get("/articles-for-question/{question_id}")
 async def get_articles_for_question(question_id: str):
     """
