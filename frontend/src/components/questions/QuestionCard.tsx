@@ -40,17 +40,21 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           if(!question.data){
             const marketsClient = new MarketsClient();
             const trades = await marketsClient.getTrades(id);
-            setBackupProbability(trades.trades[trades.trades.length - 1].price);
-            setBackupData(trades.trades.map(
+            let processedResults = trades.trades.map(
               (event: MarketTrade) => {
                 return {
                 date: event.time,
                 probability: event.price,
                 }
               }
-            ));
+            );
+  
+            setBackupProbability(trades.trades[trades.trades.length - 1].price);
+            setBackupData(processedResults);
+            console.log(trades);
             console.log(backupProbability);
             console.log(backupData);
+            console.log(processedResults);
           }
         };
 
@@ -60,7 +64,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
   let overallData = question.data ?? backupData;
   let overallProbability = question.probability ?? backupProbability;
-    
+  
+  console.log(overallData);
+  console.log(overallProbability);
 
   const handleQuestionClick = () => {
     navigate(`/question/${id}`);
@@ -94,12 +100,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       <div className="py-6">
       <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
         <ProbabilityGraph 
-            data={question.data ?? []}
+            data={overallData}
             events={events}
           />
       </div>
 
-          {overallProbability && overallData && question.articles && (<TradingButtons question={
+          {overallProbability && overallData && (<TradingButtons question={
             {
               ...question,
               probability: overallProbability,

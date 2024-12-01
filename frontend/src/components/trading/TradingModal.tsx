@@ -32,6 +32,7 @@ export const TradingModal: React.FC<TradingModalProps> = ({
     }
 
     const client = new MarketsClient();
+    console.log(marketId);
     client.createOrder(marketId, {
       user_id: userId,
       side: type == "buy" ? "bid" : "ask",

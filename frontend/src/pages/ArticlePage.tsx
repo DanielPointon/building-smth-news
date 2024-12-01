@@ -33,7 +33,7 @@ export const ArticlePage: React.FC = () => {
   }, [id]);
 
   const relatedQuestion = questions && questions[0];
-
+  console.log(relatedQuestion);
   useEffect(() => {
     if (!article) return;
 
