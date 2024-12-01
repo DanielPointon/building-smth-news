@@ -12,7 +12,7 @@ BASE_URL = "http://127.0.0.1:8000"  # Update if your app runs on a different add
 
 news_articles = json.loads(open("../scraper/out/ft_articles.json").read())
 
-news_articles = news_articles[189:]  # Limit the number of articles for testing
+news_articles = news_articles[215:]  # Limit the number of articles for testing
 
 def generate_metadata(article):
     print(f"Generating metadata for article: {article['title']}...")
@@ -87,6 +87,9 @@ def clean_article(article):
 def process_articles(articles):
     all_results = []
     for article in articles:
+        if 'title' not in article:
+            print("Skipping article without title...")
+            continue
         print(f"Processing article: {article['title']}...")
         
         article['id'] = str(uuid.uuid4().int)

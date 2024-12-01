@@ -209,6 +209,13 @@ async def get_article(article_id: str):
     
     return article
 
+@router.get("/homepage")
+async def get_homepage_articles():
+    """
+    Fetch a list of articles from the database to display on the homepage.
+    """
+    return list(database["articles"].values())[0:30]
+
 async def get_article_metadata(article: ArticleInput):
     """
     Generate metadata for an article using GPT-4o.
@@ -349,7 +356,7 @@ async def generate_questions_for_article(article: ArticleInput):
             Select between 0 and 3 questions that are relevant to this article. Return them in the same JSON format.
             """
             relevance_response = client.beta.chat.completions.parse(
-                model="gpt-4o",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": prompt_existing_questions},
                 ],
