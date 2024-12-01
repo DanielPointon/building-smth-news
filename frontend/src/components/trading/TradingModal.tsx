@@ -52,7 +52,7 @@ export const TradingModal: React.FC<TradingModalProps> = ({
         <h3 className="text-xl font-georgia mb-6 text-[rgb(38,42,51)]">Confirm Trade</h3>
         <div className="space-y-4">
           <div className="bg-[rgb(242,223,206)] p-3">
-            <label className="text-sm text-[rgb(38,42,51)] font-georgia">Amount of shares</label>
+            <label className="text-sm text-[rgb(38,42,51)] font-georgia">Number of prisms</label>
             <input
               type="number"
               value={amount}

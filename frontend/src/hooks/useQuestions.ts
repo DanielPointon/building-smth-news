@@ -17,10 +17,10 @@ interface UseQuestions {
 
 export const useQuestions = (): UseQuestions => {
   for (const question of mockQuestions) {
-    const client = new MarketsClient();
-    client.createMarket({ name: question.question, description: "" }).then(
-      market => question.id = market.id
-    );
+    // const client = new MarketsClient();
+    // client.createMarket({ name: question.question, description: "" }).then(
+      // market => question.id = market.id
+    // );
   }
 
   const [reloadKey, _setReloadKey] = useContext(ApiContentContext);

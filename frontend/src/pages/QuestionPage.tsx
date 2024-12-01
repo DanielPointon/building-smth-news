@@ -20,7 +20,7 @@ const mockArticles: Article[] = [
     author: 'Sarah Johnson',
     published_date: '2024-03-15',
     content: [],
-    main_image_url: '/api/placeholder/800/400',
+    main_image_url: 'https://assets.bwbx.io/images/users/iqjWHBFdfxIU/iKyAakezKfMI/v1/1200x801.webp',
     isKeyEvent: true
   },
   {
@@ -30,7 +30,7 @@ const mockArticles: Article[] = [
     author: 'Michael Chen',
     published_date: '2024-03-14',
     content: [],
-    main_image_url: '/api/placeholder/800/400',
+    main_image_url: 'https://assets.bwbx.io/images/users/iqjWHBFdfxIU/iZ7EgrLuQdYQ/v0/300x200.webp',
     isKeyEvent: false
   },
   {
@@ -40,7 +40,7 @@ const mockArticles: Article[] = [
     author: 'Alex Rivera',
     published_date: '2024-03-13',
     content: [],
-    main_image_url: '/api/placeholder/800/400',
+    main_image_url: 'https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ijI0shNG61S8/v2/459x306.webp',
     isKeyEvent: true
   }
 ];
