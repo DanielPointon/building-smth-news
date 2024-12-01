@@ -386,7 +386,7 @@ async def get_questions():
     """
     Get all questions stored in the database.
     """
-    return database["questions"][0:65]
+    return list(database["questions"].values())[0:65]
 
 @router.post("/questions/{question_id}/events", response_model=ExtractedEvents)
 async def get_events_for_question(question_id: str):
