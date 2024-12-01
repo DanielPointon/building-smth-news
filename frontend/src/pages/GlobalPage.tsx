@@ -4,12 +4,13 @@ import { ChevronRight, Globe, MapPin, X } from 'lucide-react';
 import { Card, CardContent } from 'components/ui/card';
 import { NewsClient, Question } from 'utils/NewsClient';
 import { QuestionCard } from 'components/questions/QuestionCard';
+import { FixedSizeList as List } from 'react-window';
 
 const GlobalPage: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionData, setQuestionData] = useState<any>(null);
-  
+
   // Create newsClient once using useMemo
   const newsClient = useMemo(() => new NewsClient(), []);
 
@@ -54,7 +55,7 @@ const GlobalPage: React.FC = () => {
   return (
     <div className="h-screen flex">
       {/* Sidebar */}
-      <div className="w-96 bg-[rgb(255,241,229)] border-r border-gray-200 flex flex-col">
+      <div className="w-128 bg-[rgb(255,241,229)] border-r border-gray-200 flex flex-col">
         {/* Header Content */}
         <div className="p-6 bg-[rgb(242,223,206)] border-b border-gray-200">
           <div className="flex items-center gap-2 mb-4">
@@ -89,17 +90,26 @@ const GlobalPage: React.FC = () => {
             </div>
 
             <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-              {questions.map((q) => (
-                <QuestionCard
-                  key={q.id}
-                  id={q.id}
-                  question={{
-                    ...q,
-                    probability: undefined,
-                  }}
-                  setQuestionData={setQuestionData}
-                />
-              ))}
+              <List
+                height={600} // height of the scrollable container (adjust as needed)
+                itemCount={questions.length} // total number of items
+                itemSize={500} // height of each item (adjust to match your QuestionCard height)
+                width="750px" // full width or whatever suits your layout
+              >
+                {({ index, style }) => (
+                  <div style={style}>
+                    <QuestionCard
+                      key={questions[index].id}
+                      id={questions[index].id}
+                      question={{
+                        ...questions[index],
+                        probability: undefined,
+                      }}
+                      setQuestionData={setQuestionData}
+                    />
+                  </div>
+                )}
+              </List>
             </div>
           </div>
         ) : (

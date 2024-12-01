@@ -43,7 +43,7 @@ const MainContent: React.FC = () => {
           onClose={() => setShowHistory(false)}
         />
 
-        <div className="max-w-6xl mx-auto px-6 pt-8">
+        <div className="max-w-8xl mx-auto px-6 pt-8">
           <Routes>
             <Route path="/" element={<Navigate to="/browse" replace />} />
             <Route path="/browse" element={<BrowsePage />} />

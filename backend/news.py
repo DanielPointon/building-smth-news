@@ -292,7 +292,7 @@ async def get_questions_by_country(country_code: str):
     ]
 
     all_questions = []
-    
+
     for article in related_articles:
         if "questions" in article:
             all_questions.extend(article["questions"])
@@ -435,7 +435,7 @@ async def get_questions():
 
 
 @router.get("/questions/{question_id}")
-async def get_questions(question_id:str):
+async def get_questions(question_id: str):
     """
     Get all questions stored in the database.
     """
@@ -444,10 +444,9 @@ async def get_questions(question_id:str):
         if question == question_id:
             return database["questions"][question]
 
+    raise HTTPException(status_code=404, detail="No question found.")
 
-    raise HTTPException(
-        status_code=404, detail="No question found."
-    )
+
 @router.post("/questions/{question_id}/events", response_model=ExtractedEvents)
 async def get_events_for_question(question_id: str):
     """
