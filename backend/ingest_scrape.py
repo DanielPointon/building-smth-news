@@ -12,12 +12,12 @@ BASE_URL = "http://127.0.0.1:8000"  # Update if your app runs on a different add
 
 news_articles = json.loads(open("../scraper/out/ft_articles.json").read())
 
-news_articles = news_articles[:5]  # Limit the number of articles for testing
+news_articles = news_articles[:1]  # Limit the number of articles for testing
 
 def generate_metadata(article):
     print(f"Generating metadata for article: {article['title']}...")
-    payload = {"article_id": article["id"]}
-    response = requests.post(f"{BASE_URL}/articles/metadata", json=payload)
+    response = requests.post(f"{BASE_URL}/articles/metadata", json=article)
+
     if response.status_code == 200:
         metadata = response.json()
         print(f"Metadata generated: {metadata}")
@@ -59,39 +59,56 @@ def generate_events(question_id):
     else:
         print(f"Failed to generate events for question {question_id}: {response.text}")
         return []
+    
+def create_article(article):
+    new_article = requests.post(f"{BASE_URL}/articles/create", json=article)
+    if new_article.status_code == 200:
+        print(f"Article created: {new_article.json()}")
+        print(new_article.json())
+    else:
+        print(f"Failed to create article: {new_article.text}")
+        return None
 
+def clean_article(article):
+    # go through content and if any items have "description" rename it to "image_caption", remove "type" field and change "content" to "text"
+    for content in article["content"]:
+        if "description" in content:
+            content["image_caption"] = content["description"]
+            del content["description"]
+        if "type" in content:
+            del content["type"]
+        if "content" in content:
+            content["text"] = content["content"]
+            del content["content"]
+    article["metadata"] = {}
+    article["questions"] = []
+            
+            
 def process_articles(articles):
     all_results = []
     for article in articles:
         print(f"Processing article: {article['title']}...")
         
         article['id'] = str(uuid.uuid4().int)
+        
+        clean_article(article)
 
-        # Generate Metadata
-        metadata = generate_metadata(article)
-
-        # Generate Questions
-        questions = generate_questions(article)
-
-        # Generate Clusters and Events for each Question
-        for question in questions:
-            question_id = question["id"]
-
-            # Generate Clusters
-            clusters = generate_clusters(question_id)
-
-            # Generate Events
-            events = generate_events(question_id)
-
-            question["clusters"] = clusters
-            question["events"] = events
-
-        article["metadata"] = metadata
-        article["questions"] = questions
-
-        all_results.append(article)
+        article = create_article(article)
 
     return all_results
+
+def process_questions():
+    # get all questions first
+    response = requests.get(f"{BASE_URL}/questions")
+    questions = response.json()
+    for question in questions:
+        question_id = question["id"]
+        # Generate Clusters
+        clusters = generate_clusters(question_id)
+
+        # Generate Events
+        events = generate_events(question_id)
+        
 
 if __name__ == "__main__":
     print("Starting ingestion...")

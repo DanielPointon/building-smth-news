@@ -1,3 +1,5 @@
+import traceback
+
 from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Union
@@ -9,6 +11,7 @@ import uuid
 from fastapi.responses import JSONResponse
 from typing import Optional
 import openai
+from functools import lru_cache
 
 app = FastAPI()
 router = APIRouter()
@@ -32,11 +35,16 @@ with open(DB_PATH, "r") as db_file:
     print(db_file)
     database = json.load(db_file)
 
+if "articles" not in database:
+    database["articles"] = {}
+if "questions" not in database:
+    database["questions"] = {}
 
 # print(database)
 
 def save_database():
     def pydantic_to_serializable(obj):
+        # if obj has attribute metadata
         """Helper function to handle Pydantic models."""
         if isinstance(obj, BaseModel):
             return obj.model_dump()  # Convert Pydantic models to dictionaries
@@ -82,21 +90,20 @@ class QuestionMetadata(BaseModel):
     
 class QuestionWithLink(BaseModel):
     question: str
+    question_id: Optional[str] = None
     metadata: QuestionMetadata
-    link_to_substring: str
     index_in_article: Optional[int] = None
     
 class GeneratedQuestions(BaseModel):
     questions: List[QuestionWithLink]
     
 class ArticleInput(BaseModel):
-    id: Union[int, None]
+    id: Union[str, None]
     title: str
     description: str
     author: str
     published_date: str  # ISO 8601 format (e.g., "2024-11-30")
     content: List[ArticleContent]
-    topic: str
     metadata: dict  # Includes fields like countries and other dynamic metadata
     questions: List[QuestionInput]
 
@@ -127,6 +134,16 @@ async def create_article(article: ArticleInput):
     print("Creating article...")
     article.id = uuid.uuid4().int
 
+    def pydantic_to_serializable(obj):
+        """Helper function to handle Pydantic models."""
+        if isinstance(obj, BaseModel):
+            return obj.model_dump()  # Convert Pydantic models to dictionaries
+        elif isinstance(obj, (list, tuple)):
+            return [pydantic_to_serializable(item) for item in obj]
+        elif isinstance(obj, dict):
+            return {key: pydantic_to_serializable(value) for key, value in obj.items()}
+        return obj  # Return the object as-is if not Pydantic
+    
     # Add the article to the database
     new_article = {
         "id": article.id,
@@ -135,37 +152,41 @@ async def create_article(article: ArticleInput):
         "author": article.author,
         "published_date": article.published_date,
         "content": [item.root for item in article.content],  # Flatten content
-        "topic": article.topic,
-        "metadata": article.metadata,
-        "question_ids": [],
+        "metadata": await get_article_metadata(article),
+        "questions": [],
     }
-    database["articles"][article.id] = new_article
+    
+    questions = await generate_questions_for_article(article)
+    article.questions = questions["questions"]
+    
 
     # Process each question in the input
     for question in article.questions:
         # Check if the question already exists
-        matching_question = next(
-            (q for q in database["questions"].values()
-             if q["text"] == question.text and q["metadata"] == question.metadata),
-            None
-        )
-
-        if matching_question:
+        if question.question_id in database["questions"]:
+            matching_question = database["questions"][question.question_id]
             # If the question exists, link the article to the existing question
             if article.id not in matching_question["article_ids"]:
                 matching_question["article_ids"].append(article.id)
-            new_article["question_ids"].append(matching_question["id"])
+            new_article["questions"].append({"id": matching_question["id"], "question": matching_question["question"], "index_in_article": question.index_in_article})
         else:
             # If the question doesn't exist, create a new one
             new_question = {
-                "id": question.id,
-                "text": question.text,
-                "metadata": question.metadata,
+                "id": str(uuid.uuid4().int),
+                "question": question.question,
+                "metadata": pydantic_to_serializable(question.metadata),
                 "article_ids": [article.id],
             }
-            database["questions"][question.id] = new_question
-            new_article["question_ids"].append(question.id)
+            database["questions"][new_question["id"]] = new_question
+            new_question_article = {
+                "id": new_question["id"],
+                "question": new_question["question"],
+                "index_in_article": question.index_in_article
+            }
+            new_article["questions"].append(new_question_article)
+            
 
+    database["articles"][article.id] = new_article
     # Save the database
     save_database()
 
@@ -188,26 +209,22 @@ async def get_article(article_id: str):
     
     return article
 
-@router.post("/articles/metadata")
-async def get_article_metadata(article_metadata: ArticleMetadataRequest):
+async def get_article_metadata(article: ArticleInput):
     """
     Generate metadata for an article using GPT-4o.
     Metadata includes a list of countries and other dynamic attributes.
     """
-    article_id = article_metadata.article_id
-    article = database["articles"].get(str(article_id))
     if not article:
         raise HTTPException(status_code=404, detail="Article not found.")
-
-    flattened_content = flatten_article_content(article["content"])
+    flattened_content = flatten_article_content(article.content)
 
     prompt_metadata = f"""
     Analyze the following article content:
     {flattened_content}
 
     Extract metadata including:
-    - "countries": A list of country codes relevant to the article (e.g., ["US", "FR"]). Leave this empty if no countries are mentioned.
-    - Other relevant metadata that could be useful for classification (i.e. fields like "tags", "topics", "concepts", "events" etc).
+    - "countries": A list of country codes relevant to the article (e.g., ["US", "FR"]). Leave this empty if no countries are relevant.
+    - Other relevant metadata that could be useful for classification (i.e. fields like "tags", "topics", "concepts" etc).
 
     Provide the result in JSON format:
     {{
@@ -215,6 +232,7 @@ async def get_article_metadata(article_metadata: ArticleMetadataRequest):
         "other_dynamic_field": "value"
     }}
     """
+    
     response_metadata = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt_metadata}],
@@ -224,10 +242,7 @@ async def get_article_metadata(article_metadata: ArticleMetadataRequest):
     )
     metadata = response_metadata.choices[0].message.content
 
-    article["metadata"] = json.loads(metadata)
-    save_database()
-
-    return {"article_id": article_id, "metadata": metadata}
+    return json.loads(metadata)
 
 
 @router.get("/questions/country/{country_code}", response_model=List[dict])
@@ -250,39 +265,53 @@ def flatten_article_content(content: List[Union[str, dict]]) -> str:
     """
     flattened_content = []
     for item in content:
-        if isinstance(item, str):
-            flattened_content.append(item)
-        elif isinstance(item, dict) and "image_caption" in item:
-            flattened_content.append(item["image_caption"])
+        if isinstance(item.root, TextContent):
+            flattened_content.append(item.root.text)
+        if isinstance(item.root, ImageContent):
+            flattened_content.append(item.root.image_caption)
     return "\n".join(flattened_content)
 
-@router.post("/articles/generate-questions", response_model=GeneratedQuestions)
+
 async def generate_questions_for_article(article: ArticleInput):
     """
     Generate prediction market-style questions for an article using GPT
-    and link them to relevant substrings.
+    and link them to relevant substrings, including relevant existing questions.
     """
     # Flatten article content
     flattened_content = flatten_article_content(article.content)
-    if database["articles"].get(article.id) and database["articles"][article.id].get("questions"):
-        return {"questions": database["articles"][article.id]["questions"]}
     try:
-        # Step 1: Generate questions
+        # Step 1: Generate new questions
+        
+        article_content_list = []
+        for i, item in enumerate(article.content):
+            if isinstance(item.root, TextContent):
+                article_content_list.append({"index": i, "text": item.root.text})
+            if isinstance(item.root, ImageContent):
+                article_content_list.append({"index": i, "image_caption": item.root.image_caption})
+                
+                
+        article_date = str(article.published_date)
+        print(f"Generating questions for article published on {article_date}...")
         prompt_generate = f"""
         The article content is as follows:
-        {flattened_content}
+        {article_content_list}
 
-        Generate 5 prediction market-style questions relevant to this article. Questions should be specific and tied to the article's content. Output the questions in JSON format:
+        The current date is: {article_date}
+        
+        Generate 2-4 high-quality prediction market-style questions relevant to this article. Questions must be answerable as a YES or NO. Questions should be specific (and NOT ambiguous) and tied to the article's content and about events that will have a result known in the future after the current date: {article_date}. Questions should be predictions and not about events prior to article date: {article_date}.
+        
+        Aim for a mixture of questions that will resolve in the near future as well as later on and a mixture of more general and more specific questions but with no ambiguity.
+        
+        Output the questions in JSON format:
         [
             {{
                 "question": "Will X event happen by Y date?",
                 "metadata": {{
                     "tags": ["tag1", "tag2"],
-                    "related_topics": ["topic1", "topic2"]
-                }}
+                }},
+                "index_in_article": 0 # index of the paragraph that most closely relates to the question. If the question is not tied to a specific paragraph, leave this field as null.
             }}
         ]
-        If there are no relevant questions, return an empty list.
         """
         question_generation_response = client.beta.chat.completions.parse(
             model="gpt-4o",
@@ -291,50 +320,58 @@ async def generate_questions_for_article(article: ArticleInput):
             ],
             tools=[openai.pydantic_function_tool(GeneratedQuestions)],
         )
-        print(question_generation_response.choices[0])
-        generated_questions = question_generation_response.choices[0].message.tool_calls[0].function.parsed_arguments["questions"]
+        
+        generated_questions = question_generation_response.choices[0].message.tool_calls[0].function.parsed_arguments.questions
+        for q in generated_questions:
+            q.question_id = str(uuid.uuid4().int)
+        
+        for question in generated_questions:
+            index = question.index_in_article
+            if index is not None and 0 <= index < len(article_content_list):
+                question.index_in_article = index
+            else:
+                question.index_in_article = None
 
-        # Step 2: Link questions to substrings in the article
-        prompt_link = f"""
-        The article content is as follows:
-        {flattened_content}
+        # Step 3: Check existing questions from the database for relevance
+        existing_questions = database.get("questions", [])
+        relevant_existing_questions = []
+        if existing_questions:
+            prompt_existing_questions = f"""
+            Here is a list of existing questions from the database:
+            {json.dumps(existing_questions, indent=2)}
 
-        Here is a list of generated questions:
-        {json.dumps([q.dict() for q in generated_questions])}
+            Based on the following article content:
+            {flattened_content}
 
-        For each question, identify the most relevant substring in the article. If no substring is relevant, return an empty string. The response format should be:
-        [
-            {{
-                "question": "Will X event happen by Y date?",
-                "metadata": {{
-                    "tags": ["tag1", "tag2"],
-                    "related_topics": ["topic1", "topic2"]
-                }},
-                "link_to_substring": "exact substring from the article or empty string"
-            }}
-        ]
-        """
-        linking_response = client.beta.chat.completions.parse(
-            model="gpt-4o",
-            messages=[
-                {"role": "user", "content": prompt_link},
-            ],
-            tools=[openai.pydantic_function_tool(GeneratedQuestions)],
-        )
-
-        linked_questions = linking_response.choices[0].message.tool_calls[0].function.parsed_arguments["questions"]
-
-        # Add index_in_article for linked substrings
-        for question in linked_questions:
-            substring = question.link_to_substring
-            question.index_in_article = (
-                flattened_content.find(substring) if substring else len(flattened_content)
+            Select between 0 and 3 questions that are relevant to this article. Return them in the same JSON format.
+            """
+            relevance_response = client.beta.chat.completions.parse(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": prompt_existing_questions},
+                ],
+                tools=[openai.pydantic_function_tool(GeneratedQuestions)],
             )
-        database["articles"][article.id]["questions"] = linked_questions
-        return {"questions": linked_questions}
+            relevant_existing_questions = relevance_response.choices[0].message.tool_calls[0].function.parsed_arguments.questions
+
+        # Append relevant existing questions to linked_questions
+        for question in relevant_existing_questions:
+            question.index_in_article = None  # Add with index_in_article set to None
+            generated_questions.append(question)
+
+        return {"questions": generated_questions}
 
     except Exception as e:
+        print(f"Error generating questions: {str(e)}")
+        traceback.print_exc()  # Prints the exact traceback of the error
         return {"questions": []}
+    
+@router.get("/questions")
+async def get_questions():
+    """
+    Get all questions stored in the database.
+    """
+    return database["questions"]
 
 @router.post("/questions/{question_id}/events", response_model=ExtractedEvents)
 async def get_events_for_question(question_id: str):
@@ -374,8 +411,6 @@ async def get_events_for_question(question_id: str):
         articles=article_contents
     )
     
-    if database["questions"][question_id].get("events"):
-        return ExtractedEvents(events=database["questions"][question_id]["events"], question_id=question_id)
     
     try:
         # Use structured data mode with OpenAI API
@@ -397,8 +432,6 @@ async def get_events_for_question(question_id: str):
 
         # Parse the structured response
         parsed_arguments = completion.choices[0].message.tool_calls[0].function.parsed_arguments
-        database["questions"][question_id]["events"] = parsed_arguments.events
-        save_database()
         return parsed_arguments
 
     except Exception as e:
@@ -406,6 +439,7 @@ async def get_events_for_question(question_id: str):
         print(f"Error generating events: {str(e)}")
         return ExtractedEvents(question_id=question_id, events=[])
 
+@lru_cache
 @router.post("/get_clusters_for_question", response_model=ClusteredSubtopics)
 async def get_clusters_for_question(cluster_request: ClusterRequest):
     """
@@ -436,9 +470,6 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
         question=question["text"],
         articles=related_articles
     )
-    
-    if database["questions"][question_id].get("clusters"):
-        return ClusteredSubtopics(clusters=database["questions"][question_id]["clusters"])
 
     try:
         # Use structured data mode with OpenAI API
@@ -460,7 +491,6 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
 
         # Parse the structured response
         parsed_arguments = completion.choices[0].message.tool_calls[0].function.parsed_arguments
-        database["questions"][question_id]["clusters"] = parsed_arguments.clusters
         return parsed_arguments
 
     except Exception as e:

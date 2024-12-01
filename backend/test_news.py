@@ -38,12 +38,33 @@ def test_create_article():
 
 def test_get_article_metadata():
     print("Testing /articles/metadata...")
-    payload = {"article_id": "39772345963899444759394251382399135389"}  # Form data must be sent as strings
+    payload = payload = {
+        "id": "1",
+        "title": "Test Article",
+        "description": "A test article for verification.",
+        "author": "John Doe",
+        "published_date": "2024-11-30",
+        "content": [
+            {"text": "This is a simple text content."},  # TextContent example
+            {
+                "image_url": "http://example.com/image.jpg",
+                "image_caption": "An illustrative image caption."
+            }  # ImageContent example
+        ],
+        "topic": "Technology",
+        "metadata": {"tags": ["AI", "Technology"], "countries": ["US"]},
+        "questions": [
+            {
+                "id": "101",
+                "text": "Will AI surpass human intelligence by 2030?",
+                "metadata": {"tags": ["AI", "Prediction"]}
+            }
+        ]
+    }
 
     response = requests.post(f"{BASE_URL}/articles/metadata", json=payload)
     assert response.status_code == 200, f"Unexpected status code: {response.status_code}"
     metadata = response.json()
-    assert "article_id" in metadata, "Response missing 'article_id'."
     assert "metadata" in metadata, "Response missing 'metadata'."
     print("Passed.")
 
