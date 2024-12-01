@@ -121,7 +121,6 @@ class Cluster(BaseModel):
     article_ids: List[int]
 
 class ClusteredSubtopics(BaseModel):
-    question_id: int
     clusters: List[Cluster]
 
 
@@ -509,5 +508,17 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating clusters: {str(e)}")
+
+@router.get("/articles-for-question/{question_id}")
+async def get_articles_for_question(question_id: str):
+    """
+    Get all articles related to a specific question based on the question ID.
+    """
+    question = database["questions"].get(question_id)
+    if not question:
+        raise HTTPException(status_code=404, detail="Question not found.")
+    article_ids = question.get("article_ids", [])
+    articles = [database["articles"].get(article_id) for article_id in article_ids]
+    return articles
 
 app.include_router(router)
