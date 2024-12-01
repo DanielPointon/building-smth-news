@@ -241,8 +241,11 @@ async def get_article_metadata(article: ArticleInput):
         temperature=0.7,
     )
     metadata = response_metadata.choices[0].message.content
-
-    return json.loads(metadata)
+    try:
+        metadata = json.loads(metadata)
+    except json.JSONDecodeError:
+        metadata = {}
+    return metadata
 
 
 @router.get("/questions/country/{country_code}", response_model=List[dict])
