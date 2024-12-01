@@ -134,7 +134,7 @@ export const ArticlePage: React.FC = () => {
           >
             <div className="relative">
               <div className="absolute -left-8 top-1/2 w-8 h-[2px] bg-gray-300"></div>
-              <QuestionCard {...question} question={question} />
+              <QuestionCard {...question} question={question} lowHeight={true} />
             </div>
           </div>
         ))}

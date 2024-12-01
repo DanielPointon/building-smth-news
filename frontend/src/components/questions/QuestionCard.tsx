@@ -26,19 +26,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   id,
   question,
   setQuestionData,
+  lowHeight,
 }) => {
-  console.log(question);
   const navigate = useNavigate();
   const [showAllNews, setShowAllNews] = useState<boolean>(false);
   const [backupData, setBackupData] = useState<DataPoint[]>([]);
-  const [backupProbability, setBackupProbability] = useState<number | null>(
-    null
-  );
+  const [backupProbability, setBackupProbability] = useState<number | null>(null);
 
   const currentProbability = question.probability ?? backupProbability ?? 50;
-  // const previousProbability = data[data.length - 2]?.probability;
-  // const trending = currentProbability > previousProbability;
-  // TODO:
   const trending = false;
 
   const events = question.articles
@@ -78,11 +73,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       hour12: false,
     }),
   }));
-
   let overallProbability = question.probability ?? backupProbability;
-
-  console.log(overallData);
-  console.log(overallProbability);
 
   const handleQuestionClick = () => {
     navigate(`/question/${id}`);
@@ -90,41 +81,43 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
   return (
     <div className="bg-[rgb(255,241,229)] p-6 mb-6 shadow-lg rounded-lg border border-gray-200">
-      <div
-        className="flex flex-row items-center justify-between pb-4 border-b border-gray-300 cursor-pointer hover:opacity-80 transition-opacity"
-        onClick={handleQuestionClick}
-      >
-        <div className="text-xl font-georgia text-[rgb(38,42,51)] flex items-center gap-2">
-          {question.question}
-          {trending && (
-            <Sparkles size={16} className="text-[rgb(13,118,128)]" />
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <span
-            className={`text-2xl font-bold font-georgia ${
-              trending ? "text-[rgb(13,118,128)]" : "text-red-600"
-            }`}
+      <div className="flex flex-col">
+        <div className="pb-4 border-b border-gray-300">
+          <div
+            className="flex flex-row items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={handleQuestionClick}
           >
-            {overallProbability}%
-          </span>
-          <TrendingUp
-            size={20}
-            className={`${
-              trending
-                ? "text-[rgb(13,118,128)] rotate-0"
-                : "text-red-600 rotate-180"
-            }`}
-          />
+            <div className="text-xl font-georgia text-[rgb(38,42,51)] flex items-center gap-2">
+              {question.question}
+              {trending && (
+                <Sparkles size={16} className="text-[rgb(13,118,128)]" />
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={`text-2xl font-bold font-georgia ${
+                  trending ? "text-[rgb(13,118,128)]" : "text-red-600"
+                }`}
+              >
+                {currentProbability}%
+              </span>
+              <TrendingUp
+                size={20}
+                className={`${
+                  trending
+                    ? "text-[rgb(13,118,128)] rotate-0"
+                    : "text-red-600 rotate-180"
+                }`}
+              />
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="py-6">
-        <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
-          <ProbabilityGraph data={overallData} events={events} />
-        </div>
+        <div className="py-6">
+          <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
+            {!lowHeight && (<ProbabilityGraph data={overallData} events={events} />)}
+          </div>
 
-        {(
           <TradingButtons
             question={{
               ...question,
@@ -134,13 +127,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             }}
             setQuestionData={setQuestionData}
           />
-        )}
-        {question.articles && (
-          <div className="mt-6 space-y-2">
-            <ArticleList articles={question.articles} showAll={showAllNews} />
-          </div>
-        )}
+        </div>
       </div>
+
+      {question.articles && (
+        <div className="mt-6 space-y-2">
+          <ArticleList articles={question.articles} showAll={showAllNews} />
+        </div>
+      )}
 
       {question.articles && question.articles.length > 2 && (
         <div className="pt-4 border-t border-gray-300">
@@ -161,3 +155,5 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     </div>
   );
 };
+
+export default QuestionCard;
