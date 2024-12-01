@@ -232,10 +232,10 @@ const QuestionPage: React.FC = () => {
             />
           </div>
 
-          <TradingButtons
+          {/* <TradingButtons
             question={currentQuestion}
             setQuestionData={setQuestionData}
-          />
+          /> */}
 
           <div className="mt-8 mb-8">
             <h3 className="text-xl font-georgia text-[rgb(38,42,51)] mb-4">
