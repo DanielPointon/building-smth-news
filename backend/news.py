@@ -570,7 +570,8 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
     try:
         # Use structured data mode with OpenAI API
         completion = client.beta.chat.completions.parse(
-            model="gpt-4o",
+            model="gpt-4o-mini",
+            max_tokens=500,
             messages=[
                 {
                     "role": "system",
