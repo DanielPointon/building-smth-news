@@ -7,6 +7,7 @@ import { ViewToggle } from "../components/navigation/ViewToggle";
 export const BrowsePage: React.FC = () => {
   const { questions, loading, error, setQuestionData } = useQuestions();
 
+  const truncatedQuestions = questions.slice(0,20);
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
