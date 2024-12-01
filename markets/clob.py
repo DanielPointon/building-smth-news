@@ -163,11 +163,10 @@ class Clob:
         if order.quantity == 0:
             return
 
-        match order.side:
-            case "bid":
-                self._add_order(order, self.bids)
-            case "ask":
-                self._add_order(order, self.asks)
+        if order.side == "bid":
+            self._add_order(order, self.bids)
+        else:
+            self._add_order(order, self.asks)
 
     def on_order_fill(self, order: Order, price: int, fill: int):
         # TODO:
@@ -186,13 +185,12 @@ class Clob:
         return None
 
     def _process_order(self, order: Order):
-        match order.side:
-            case "bid":
-                price_list = self.asks
-                price_mul = 1
-            case "ask":
-                price_list = self.bids
-                price_mul = -1
+        if order.side == "bid":
+            price_list = self.asks
+            price_mul = 1
+        else:
+            price_list = self.bids
+            price_mul = -1
 
         node = price_list.first
 
@@ -210,13 +208,12 @@ class Clob:
             order.quantity -= size
             counter.quantity -= size
 
-            match order.side:
-                case "bid":
-                    buy_user = order.user_id
-                    sell_user = counter.user_id
-                case "ask":
-                    buy_user = counter.user_id
-                    sell_user = order.user_id
+            if order.side == "bid":
+                buy_user = order.user_id
+                sell_user = counter.user_id
+            else:
+                buy_user = counter.user_id
+                sell_user = order.user_id
 
             self.trades.append(
                 Trade(buy_user, sell_user, datetime.now(), counter.price, size)
