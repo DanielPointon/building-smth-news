@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import logging
 import json
 import os
+import random
 
 
 class FTScraper:
@@ -20,13 +21,16 @@ class FTScraper:
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-    def get_articles(self, section=""):
+    def get_articles(self, section="", random_pages=True):
         """
         Scrape headlines from FT's homepage or specified section
         Returns a list of dictionaries containing article information
         """
         try:
+            if random_pages:
+                section = f"{section}?page={random.randint(1, 200)}"
             url = f"{self.base_url}/{section}"
+            print(url)
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
 
@@ -205,7 +209,7 @@ if __name__ == "__main__":
 
     sections_to_scrape = ["world", "world-uk", "companies", "technology", "markets", "climate-capital", "opinion", "lex"]
     # sections_to_scrape = ["world"]
-    articles = [article for section in sections_to_scrape for article in scraper.get_articles(section)]
+    articles = [article for section in sections_to_scrape for article in scraper.get_articles(section, random_pages=False)]
 
     # print(articles)
 
@@ -232,7 +236,7 @@ if __name__ == "__main__":
     # Create the directory if it doesn't exist
     os.makedirs(out_dir, exist_ok=True)
 
-    file_path = os.path.join(out_dir, "ft_articles.json")
+    file_path = os.path.join(out_dir, "older_articles.json")
 
     with open(file_path, "w") as f:
         json.dump(article_contents, f)
