@@ -263,8 +263,7 @@ async def get_questions_by_country(country_code: str):
     Get questions related to a specific country based on the metadata of associated articles.
     """
     related_articles = [article for article in database["articles"].values() if country_code in article["metadata"].get("countries", [])]
-
-    question_ids = {q_id for article in related_articles for q_id in article["question_ids"]}
+    question_ids = {q_id["id"] for article in related_articles for q_id in article["questions"]}
 
     questions = [question for question in database["questions"].values() if question["id"] in question_ids]
     return questions
