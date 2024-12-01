@@ -6,10 +6,10 @@ import { QuestionCard } from "../components/questions/QuestionCard";
 export const ArticlePage: React.FC = () => {
   const { id } = useParams();
   const [article, setArticle] = useState<Article | null>(null);
-  const [questions, setQuestions] = useState<any>();
+  const [questions, setQuestions] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(true);
-  const [paragraphOffset, setParagraphOffset] = useState(0);
+  const [paragraphOffsets, setParagraphOffsets] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -32,30 +32,29 @@ export const ArticlePage: React.FC = () => {
     fetchArticle();
   }, [id]);
 
-  const relatedQuestion = questions && questions[0];
-  console.log(relatedQuestion);
   useEffect(() => {
-    if (!article) return;
+    if (!article || questions.length === 0) return;
 
-    const calculateOffset = () => {
-      const paragraph = document.getElementById(
-        `paragraph-${relatedQuestion.index_in_article}`
-      );
-      if (!paragraph) return;
+    const calculateOffsets = () => {
+      const offsets = questions.map((question) => {
+        const paragraph = document.getElementById(
+          `paragraph-${question.index_in_article}`
+        );
+        if (!paragraph) return 0;
 
-      const offset = paragraph.offsetTop;
-      const adjustedOffset = offset + 414;
+        const offset = paragraph.offsetTop;
+        const adjustedOffset = offset + 414;
 
-      console.log("Original offset:", offset);
-      console.log("Adjusted offset:", adjustedOffset);
+        return adjustedOffset;
+      });
 
-      setParagraphOffset(adjustedOffset);
+      setParagraphOffsets(offsets);
     };
 
-    relatedQuestion && calculateOffset();
-    window.addEventListener("resize", calculateOffset);
-    return () => window.removeEventListener("resize", calculateOffset);
-  }, [relatedQuestion, article]);
+    calculateOffsets();
+    window.addEventListener("resize", calculateOffsets);
+    return () => window.removeEventListener("resize", calculateOffsets);
+  }, [questions, article]);
 
   if (loading) {
     return <div className="text-center py-8">Loading...</div>;
@@ -94,7 +93,7 @@ export const ArticlePage: React.FC = () => {
                   <p
                     id={`paragraph-${index}`}
                     className={`mb-4 transition-all duration-200 ${
-                      index === relatedQuestion.index_in_article
+                      questions.some((q) => q.index_in_article === index)
                         ? "bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500"
                         : ""
                     }`}
@@ -122,16 +121,23 @@ export const ArticlePage: React.FC = () => {
         </div>
       </div>
 
-      <div className="col-span-4">
-        <div
-          style={{
-            marginTop: paragraphOffset,
-          }}
-          className="relative"
-        >
-          <div className="absolute -left-8 top-1/2 w-8 h-[2px] bg-gray-300"></div>
-          <QuestionCard {...relatedQuestion} question={relatedQuestion} />
-        </div>
+      <div className="col-span-4 relative">
+        {questions.map((question, index) => (
+          <div
+            key={question.id}
+            style={{
+              position: "absolute",
+              top: paragraphOffsets[index],
+              left: 0,
+              right: 0,
+            }}
+          >
+            <div className="relative">
+              <div className="absolute -left-8 top-1/2 w-8 h-[2px] bg-gray-300"></div>
+              <QuestionCard {...question} question={question} />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
