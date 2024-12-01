@@ -129,11 +129,13 @@ class ExtractedEvents(BaseModel):
     question_id: int
     events: List[Event]
 
+
 class ClusterArticle(BaseModel):
     title: str
     author: str
     published_date: str
     description: str
+
 
 class Cluster(BaseModel):
     cluster_topic: str
@@ -313,7 +315,7 @@ def flatten_article_content(content: List[Union[str, dict]]) -> str:
     flattened_content = []
     for item in content:
         # Handle Pydantic models
-        if hasattr(item, 'root'):
+        if hasattr(item, "root"):
             if isinstance(item.root, TextContent):
                 flattened_content.append(item.root.text)
             if isinstance(item.root, ImageContent):
@@ -530,7 +532,10 @@ async def get_events_for_question(question_id: str):
         print(f"Error generating events: {str(e)}")
         return ExtractedEvents(question_id=question_id, events=[])
 
-@lru_cache
+
+CLUSTERS = {}
+
+
 @router.post("/get_fake_clusters_for_question", response_model=ClusteredSubtopics)
 async def get_clusters_for_question(cluster_request: ClusterRequest):
     """
@@ -538,12 +543,15 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
     Each cluster contains a sub-topic and a list of related articles.
     """
     question_id = cluster_request.question_id
+
+    if question_id in CLUSTERS:
+        return CLUSTERS[question_id]
+
     # Fetch the question by ID
     question = database["questions"].get(question_id)
     if not question:
         raise HTTPException(status_code=404, detail="Question not found.")
 
-    print(question)
     # Fetch related articles for the question
     related_articles = [
         {
@@ -589,13 +597,16 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
         parsed_arguments = (
             completion.choices[0].message.tool_calls[0].function.parsed_arguments
         )
+
+        CLUSTERS[question_id] = parsed_arguments
+
         return parsed_arguments
 
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Error generating clusters: {str(e)}"
         )
-        
+
 
 @lru_cache
 @router.post("/get_clusters_for_question", response_model=ClusteredSubtopics)
