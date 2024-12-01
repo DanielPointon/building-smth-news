@@ -117,7 +117,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 <Sparkles size={compact ? 14 : 16} className="text-[rgb(13,118,128)]" />
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-2">
               <span
                 className={`${compact ? 'text-xl' : 'text-2xl'} font-bold font-georgia ${
                   trending ? "text-[rgb(13,118,128)]" : "text-red-600"
@@ -125,14 +125,6 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               >
                 {currentProbability}%
               </span>
-              <TrendingUp
-                size={compact ? 18 : 20}
-                className={`${
-                  trending
-                    ? "text-[rgb(13,118,128)] rotate-0"
-                    : "text-red-600 rotate-180"
-                }`}
-              />
             </div>
           </div>
           {compact && <div className="mt-2">{tradingButtonsComponent}</div>}

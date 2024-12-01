@@ -46,7 +46,6 @@ export const ArticlePage: React.FC = () => {
           idx = article.content.length + question.index_in_article;
         }
 
-        console.log(question.index_in_article)
         const paragraph = document.getElementById(
           `paragraph-${idx}`
         );
@@ -85,7 +84,7 @@ export const ArticlePage: React.FC = () => {
     return <div className="text-center py-8">Article not found</div>;
   }
 
-  const QUESTION_CARD_WIDTH = 280;
+  const QUESTION_CARD_WIDTH = 380;
   const CARD_OFFSET = "4rem";
   
   const getLinePosition = (cardCenterY: number, paragraphCenterY: number) => {
@@ -113,9 +112,17 @@ export const ArticlePage: React.FC = () => {
           .connector-line {
             animation: dashedMove 0.5s linear infinite;
           }
+          .question-card {
+            min-height: 150px; /* Adjusted height */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Space out elements */
+            padding: 16px; /* Add padding for better spacing */
+            text-align: right; /* Align text properly */
+          }
         `}
       </style>
-      <div className="max-w-xl mx-auto relative">
+      <div className="max-w-3xl mx-auto relative">
         <div className="absolute inset-0 w-full">
           {questions.map((question, index) => {
             const isLeft = index % 2 === 1;
@@ -128,14 +135,16 @@ export const ArticlePage: React.FC = () => {
                 key={question.id}
                 style={{
                   position: "absolute",
-                  top: centerY,
+                  top: centerY - 70,
                   [isLeft ? "left" : "right"]: "100%",
                   width: `${QUESTION_CARD_WIDTH}px`,
                   marginLeft: isLeft ? CARD_OFFSET : 0,
                   marginRight: isLeft ? 0 : CARD_OFFSET,
                   transform: "translateY(-50%)",
+                  minHeight: "150px", // Increased height
+                  padding: "1rem", // Additional spacing
                 }}
-                className="flex items-center"
+                className="flex items-center rounded-lg"
               >
                 <div className="relative flex-1">
                   <div 
@@ -160,23 +169,32 @@ export const ArticlePage: React.FC = () => {
                         y1={linePosition.y1}
                         x2={isLeft ? "0" : "100%"}
                         y2={linePosition.y2}
-                        stroke="#BFDBFE"  // Changed to a lighter blue
-                        strokeWidth="4"    // Increased stroke width
-                        strokeDasharray="8 8"  // Increased dash size for thicker line
+                        stroke="#BFDBFE"
+                        strokeWidth="4"
+                        strokeDasharray="8 8"
                         className="connector-line"
                         transform={`rotate(${isLeft ? 15 : -15} ${isLeft ? "100" : "0"} 50)`}
                       />
                     </svg>
                   </div>
-                  <QuestionCard compact={true} {...question} question={question} />
+                  <QuestionCard 
+                    compact={true} 
+                    {...question} 
+                    question={question} 
+                    style={{
+                      textAlign: "right", // Align percentage or other content
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between", // Space out content
+                    }} 
+                  />
                 </div>
               </div>
             );
           })}
         </div>
 
-        <div className="bg-white p-8 shadow-lg rounded-lg">
-          {/* Rest of the article content remains the same */}
+        <div className="bg-[rgb(255,241,229)] p-8 shadow-lg rounded-lg">
           <h1 className="text-3xl font-bold mb-4">{article.title}</h1>
           <p className="text-gray-600 text-lg mb-4">{article.description}</p>
           <img
