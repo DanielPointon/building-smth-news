@@ -101,6 +101,7 @@ class ArticleInput(BaseModel):
     id: Union[str, None]
     title: str
     description: str
+    main_image_url: str
     author: str
     published_date: str  # ISO 8601 format (e.g., "2024-11-30")
     content: List[ArticleContent]
@@ -149,6 +150,7 @@ async def create_article(article: ArticleInput):
         "title": article.title,
         "description": article.description,
         "author": article.author,
+        "main_image_url": article.main_image_url,
         "published_date": article.published_date,
         "content": [item.root for item in article.content],  # Flatten content
         "metadata": await get_article_metadata(article),
