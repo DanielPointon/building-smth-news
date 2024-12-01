@@ -5,9 +5,10 @@ import { NavbarBalance } from './NavbarBalance';
 import { NavbarProps } from '../../types/navbar';
 import { Balance } from '../../types/balance';
 import { COLORS } from '../../constants/color';
+import PrismIcon from 'components/prism';
 
 const BALANCES: Balance[] = [
-  { currency: 'Prisms', amount: '1,234', icon: Coins },
+  { currency: 'Prisms', amount: '1,234', icon: PrismIcon },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({ onHistoryClick, onGlobalClick, onExplorerClick, className = '' }) => {

@@ -3,6 +3,7 @@ import { DollarSign } from 'lucide-react';
 import { TradingModalProps } from 'types/trades';
 import { MarketsClient } from 'utils/MarketsClient';
 import { ApiContentContext, UserContext } from 'App';
+import PrismIcon from 'components/prism';
 
 export const TradingModal: React.FC<TradingModalProps> = ({
   isOpen,
@@ -73,15 +74,17 @@ export const TradingModal: React.FC<TradingModalProps> = ({
             <div className="flex gap-3">
               <button
                 onClick={() => handleTrade('buy')}
-                className="flex-1 py-3 px-4 bg-[rgb(13,118,128)] hover:bg-[rgb(11,98,108)] text-white transition-colors font-georgia rounded-xl"
+                className="flex-1 py-3 px-4 bg-[rgb(13,118,128)] hover:bg-[rgb(11,98,108)] text-white transition-colors font-georgia rounded-xl flex items-center justify-center"
               >
-                Higher
+                <span className="mr-2">Higher</span>
+                <PrismIcon size={16} variant='filled-up'></PrismIcon>
               </button>
               <button
                 onClick={() => handleTrade('sell')}
-                className="flex-1 py-3 px-4 bg-[rgb(13,118,128)] hover:bg-[rgb(11,98,108)] text-white transition-colors font-georgia rounded-xl"
+                className="flex-1 py-3 px-4 bg-[rgb(13,118,128)] hover:bg-[rgb(11,98,108)] text-white transition-colors font-georgia rounded-xl flex items-center justify-center"
               >
-                Lower
+                <span className="mr-2">Lower</span>
+                <PrismIcon size={16} variant='filled-down'></PrismIcon>
               </button>
             </div>
           )}
