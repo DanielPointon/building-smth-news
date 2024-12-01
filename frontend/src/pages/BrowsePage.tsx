@@ -39,13 +39,13 @@ export const BrowsePage: React.FC = () => {
         </p>
       </div>
 
-      {questions.length === 0 ? (
+      {truncatedQuestions.length === 0 ? (
         <div className="text-center py-8 text-gray-600">
           No predictions available at the moment.
         </div>
       ) : (
         <div className="space-y-6">
-          {questions.map((q) => (
+          {truncatedQuestions.map((q) => (
             <QuestionCard
               key={q.id}
               id={q.id}
