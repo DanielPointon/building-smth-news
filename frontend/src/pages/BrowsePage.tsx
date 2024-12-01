@@ -3,12 +3,12 @@ import { useQuestions } from "../hooks/useQuestions";
 import { Alert, AlertDescription } from "components/ui/alert";
 import { QuestionCard } from "components/questions/QuestionCard";
 import { ViewToggle } from "../components/navigation/ViewToggle";
-import { FixedSizeList as List } from 'react-window';
+// import { FixedSizeList as List } from 'react-window';
 
 export const BrowsePage: React.FC = () => {
   const { questions, loading, error, setQuestionData } = useQuestions();
 
-  const truncatedQuestions = questions.slice(0,20);
+  const truncatedQuestions = questions.slice(0, 20);
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -36,7 +36,7 @@ export const BrowsePage: React.FC = () => {
           <ViewToggle />
         </div>
         <p className="text-[rgb(38,42,51)]">
-        Explore the questions shaping the future. 
+          Explore the questions shaping the future.
         </p>
       </div>
 
@@ -46,7 +46,15 @@ export const BrowsePage: React.FC = () => {
         </div>
       ) : (
         <div className="w-4/5 mx-auto space-y-6">
-              <List
+          {truncatedQuestions.map((q) => (
+            <QuestionCard
+              key={q.id}
+              id={q.id}
+              question={q}
+              setQuestionData={setQuestionData}
+            />
+          ))}
+          {/* <List
                 height={600} // height of the scrollable container (adjust as needed)
                 itemCount={questions.length} // total number of items
                 itemSize={500} // height of each item (adjust to match your QuestionCard height)
@@ -62,8 +70,7 @@ export const BrowsePage: React.FC = () => {
                     />
                   </div>
                 )}
-              </List>
-
+              </List> */}
         </div>
       )}
     </div>
