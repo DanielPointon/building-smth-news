@@ -1,4 +1,3 @@
-// types/question.ts
 export interface Article {
   id: string;
   title: string;
@@ -15,7 +14,6 @@ export interface Article {
   isKeyEvent?: boolean;
 }
 
-
 export interface DataPoint {
   date: string;
   probability: number;
@@ -29,7 +27,7 @@ export interface Event {
 export interface Question {
   id: string;
   question: string;
-  probability: number | null;
+  probability: number | null | undefined;
   data: DataPoint[];
   articles: Article[];
   totalPredictions?: number;
@@ -38,9 +36,11 @@ export interface Question {
   isUserQuestion?: boolean;
 }
 
+type PartialQuestion = Omit<Question, 'articles' | 'data'>;
+
 export interface QuestionCardProps {
   id: string;
-  question: Question;
+  question: PartialQuestion & { 'articles'?: Article[], data?: DataPoint[]};
   setQuestionData: (question: Question) => void;
 }
 

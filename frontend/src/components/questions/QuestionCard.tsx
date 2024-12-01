@@ -4,7 +4,7 @@ import { TrendingUp, Sparkles, ChevronRight } from 'lucide-react';
 import { ProbabilityGraph } from '../graph/ProbabilityGraph';
 import { TradingButtons } from '../trading/TradingButtons';
 import { ArticleList } from '../articles/ArticleList';
-import { QuestionCardProps, Article } from '../../types/question';
+import { QuestionCardProps, Article, Question } from '../../types/question';
 
 const isValidEvent = (article: Article): article is (Article & { date: string }) => {
   return !!article.isKeyEvent && article.isKeyEvent && typeof article.published_date === 'string';
@@ -23,12 +23,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   // TODO:
   const trending = false;
 
-  const events = question.articles
+  const events = question.articles ? question.articles
     .filter(isValidEvent)
     .map(article => ({
       date: article.date,
       title: article.title
-    }));
+    })) : [];
 
   const handleQuestionClick = () => {
     navigate(`/question/${id}`);
@@ -59,24 +59,24 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         </div>
       </div>
       
-      {/* Rest of the component remains the same */}
       <div className="py-6">
-      <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
+      {question.data && (<div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm">
         <ProbabilityGraph 
             data={question.data}
             events={events}
           />
-        </div>
-          <TradingButtons question={question} setQuestionData={setQuestionData} />
-        <div className="mt-6 space-y-2">
+      </div>)}
+
+          {question.probability && question.data && question.articles && (<TradingButtons question={question as Question} setQuestionData={setQuestionData} />)}
+        { question.articles && (<div className="mt-6 space-y-2">
           <ArticleList 
             articles={question.articles} 
             showAll={showAllNews}
           />
-        </div>
+        </div>)}
       </div>
 
-      {question.articles.length > 2 && (
+      {question.articles && question.articles.length > 2 && (
         <div className="pt-4 border-t border-gray-300">
           <button
             onClick={() => setShowAllNews(prev => !prev)}

@@ -95,11 +95,11 @@ interface QuestionInput {
     metadata: Record<string, unknown>;
 }
 
-interface Question {
+export interface Question {
     id: string;
     question: string;
     metadata: Record<string, unknown>;
-    index_in_article?: number | null;
+index_in_article?: number | null;
 }
 
 interface ExtractedEvents {
