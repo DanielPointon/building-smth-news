@@ -2,6 +2,7 @@ import json
 import math
 import random
 import requests
+import time
 
 f = json.load(open("database.json"))
 
@@ -31,6 +32,7 @@ def process_question(i, a, n):
 
     s = 50
     for _ in range(5):
+        time.sleep(0.001)
         r = random.random() + 0.5
         # r = math.log(r) + 0.05
         s = max(0, min(100, int(s * r)))
