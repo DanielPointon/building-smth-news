@@ -62,10 +62,6 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
         setBackupProbability(trades.trades[trades.trades.length - 1].price);
         setBackupData(processedResults);
-        console.log(trades);
-        console.log(backupProbability);
-        console.log(backupData);
-        console.log(processedResults);
       }
     };
 
@@ -82,6 +78,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       hour12: false,
     }),
   }));
+
   let overallProbability = question.probability ?? backupProbability;
 
   console.log(overallData);
@@ -109,7 +106,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               trending ? "text-[rgb(13,118,128)]" : "text-red-600"
             }`}
           >
-            {currentProbability}%
+            {overallProbability}%
           </span>
           <TrendingUp
             size={20}
