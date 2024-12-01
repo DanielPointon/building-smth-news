@@ -6,6 +6,7 @@ from typing import List, Union
 from pydantic import BaseModel, RootModel
 import json
 from pathlib import Path
+import random
 from openai import Client
 import uuid
 from fastapi.responses import JSONResponse
@@ -345,6 +346,7 @@ async def generate_questions_for_article(article: ArticleInput):
 
         # Step 3: Check existing questions from the database for relevance
         existing_questions = database.get("questions", [])
+        existing_questions = random.sample(list(existing_questions.values()), min(250, len(existing_questions)))
         relevant_existing_questions = []
         if existing_questions:
             prompt_existing_questions = f"""
@@ -356,6 +358,7 @@ async def generate_questions_for_article(article: ArticleInput):
 
             Select between 0 and 3 questions that are relevant to this article. Return them in the same JSON format.
             """
+
             relevance_response = client.beta.chat.completions.parse(
                 model="gpt-4o-mini",
                 messages=[
@@ -411,7 +414,7 @@ async def get_events_for_question(question_id: str):
     article_contents = [
         {
             "article_id": article["id"],
-            "content": flatten_article_content(article["content"]),
+            "content": article["content"],
         }
         for article in related_articles
     ]
@@ -422,7 +425,7 @@ async def get_events_for_question(question_id: str):
         articles: List[dict]
 
     event_extraction_request = EventExtractionRequest(
-        question=question["text"],
+        question=question["question"],
         articles=article_contents
     )
     

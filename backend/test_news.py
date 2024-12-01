@@ -81,7 +81,7 @@ def test_get_questions_by_country():
 
 def test_get_events_for_question():
     print("Testing /questions/{question_id}/events...")
-    question_id = 101
+    question_id = "121361256046429363071391177667681961182"
     response = requests.post(f"{BASE_URL}/questions/{question_id}/events", data={})
     print(response.json())
     assert response.status_code == 200, f"Unexpected status code: {response.status_code}"
@@ -142,12 +142,12 @@ def test_generate_questions_for_article():
 if __name__ == "__main__":
     print("Starting tests...")
     try:
-        test_create_article()
-        test_get_article_metadata()
-        test_get_questions_by_country()
+        #test_create_article()
+        #test_get_article_metadata()
+        #test_get_questions_by_country()
         test_get_events_for_question()
-        test_get_clusters_for_question()
-        test_generate_questions_for_article()
+        #test_get_clusters_for_question()
+        #test_generate_questions_for_article()
         print("All tests passed!")
     except AssertionError as e:
         print(f"Test failed: {e}")

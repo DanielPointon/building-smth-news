@@ -10,9 +10,9 @@ import json
 # Base URL of the FastAPI application
 BASE_URL = "http://127.0.0.1:8000"  # Update if your app runs on a different address
 
-news_articles = json.loads(open("../scraper/out/ft_articles.json").read())
+news_articles = json.loads(open("../scraper/out/older_articles_nodup.json").read())
 
-news_articles = news_articles[215:]  # Limit the number of articles for testing
+news_articles = news_articles[116:]  # Limit the number of articles for testing
 
 def generate_metadata(article):
     print(f"Generating metadata for article: {article['title']}...")
