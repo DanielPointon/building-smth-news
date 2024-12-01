@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 import uuid
 
-Uuid = str
+type Uuid = str
 
 
 class Model(BaseModel):
