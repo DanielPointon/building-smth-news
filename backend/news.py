@@ -436,7 +436,8 @@ async def get_questions():
     """
     Get all questions stored in the database.
     """
-    return list(database["questions"].values())[0:150]
+    random.seed(200)
+    return random.sample(list(database["questions"].values()), 200)
 
 
 @router.get("/questions/{question_id}")
@@ -565,7 +566,7 @@ async def get_clusters_for_question(cluster_request: ClusterRequest):
                 {
                     "role": "system",
                     "content": "You are an AI that clusters sub-topics from articles related to specific questions. "
-                    "Each cluster should include a topic title and the IDs of related articles. If there are not many or no other articles come up with plausible and realistic fake clusters and articles. Aim for at least 4 clusters and 2-3 articles per cluster.",
+                    "Each cluster should include a topic title and the IDs of related articles. If there are not many or no other articles come up with plausible and realistic fake clusters and articles. Aim for at least 4 clusters and a MINIMUM of 2-3 articles per cluster.",
                 },
                 {
                     "role": "user",
