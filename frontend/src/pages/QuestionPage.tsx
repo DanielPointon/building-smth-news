@@ -217,37 +217,32 @@ const QuestionPage: React.FC = () => {
     setSelectedCluster(cluster);
   };
 
+  // Get the articles for the selected cluster
+  const getSelectedClusterArticles = (): Article[] => {
+    if (!selectedCluster) return [];
+
+    const selectedClusterData = clusters.find(
+      (c) => c.cluster_topic === selectedCluster
+    );
+    if (!selectedClusterData) return [];
+
+    return selectedClusterData.article_list.map((article, index) => ({
+      id: index.toString(),
+      title: article.title,
+      description: article.description,
+      author: article.author,
+      published_date: article.published_date,
+      content: [], // Placeholder for now
+      main_image_url: "https://via.placeholder.com/300", // Placeholder image
+      isKeyEvent: false, // Default value
+    }));
+  };
+
   return (
     <div className="max-w-6xl mx-auto mb-12">
       <Card className="bg-[rgb(255,241,229)] border-none shadow-lg mb-8">
-        {/* <CardHeader className="border-b border-gray-200">
-          <CardTitle className="text-2xl font-georgia text-[rgb(38,42,51)]">
-            {currentQuestion.question}
-          </CardTitle>
-          <div className="flex items-center gap-4 mt-4">
-            <div className="bg-[rgb(242,223,206)] px-4 py-2 rounded-lg">
-              <span className="text-sm text-gray-600">Current Probability</span>
-              <p className="text-2xl font-bold text-[rgb(13,118,128)]">
-                {currentProbability}%
-              </p>
-            </div>
-            {currentQuestion.totalPredictions && (
-              <div className="bg-[rgb(242,223,206)] px-4 py-2 rounded-lg">
-                <span className="text-sm text-gray-600">Total Predictions</span>
-                <p className="text-2xl font-bold text-[rgb(38,42,51)]">
-                  {currentQuestion.totalPredictions.toLocaleString()}
-                </p>
-              </div>
-            )}
-          </div>
-        </CardHeader> */}
-
         <CardContent className="mt-6">
           <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm mb-6">
-            {/* <ProbabilityGraph 
-              data={currentQuestion.data}
-              events={[]}
-            /> */}
             <QuestionCard
               question={currentQuestion}
               id={currentQuestion.id}
@@ -255,30 +250,56 @@ const QuestionPage: React.FC = () => {
             />
           </div>
 
-          {/* <TradingButtons
-            question={currentQuestion}
-            setQuestionData={setQuestionData}
-          /> */}
-
           <div className="mt-8 mb-8">
             <h3 className="text-xl font-georgia text-[rgb(38,42,51)] mb-4">
-              Topic Network
+              Topic Clusters
             </h3>
-            <TopicGraph
-              articles={finalArticles}
-              clusters={finalClusters}
-              onClusterSelect={handleClusterSelect}
-            />
+
+            <div className="mb-8">
+              <TopicGraph
+                clusters={finalClusters}
+                articles={finalArticles}
+                onSelectCluster={handleClusterSelect}
+                selectedCluster={selectedCluster}
+              />
+            </div>
+
+            <div className="space-y-6">
+              {clusters.map((cluster, index) => (
+                <div
+                  key={index}
+                  className={`bg-[rgb(242,223,206)] rounded-lg p-6 cursor-pointer transition-all duration-200 ${
+                    selectedCluster === cluster.cluster_topic
+                      ? "ring-2 ring-[rgb(13,118,128)]"
+                      : "hover:ring-2 hover:ring-[rgb(13,118,128)]/50"
+                  }`}
+                  onClick={() => handleClusterSelect(cluster.cluster_topic)}
+                >
+                  <h4 className="text-lg font-semibold text-[rgb(13,118,128)] mb-4">
+                    {cluster.cluster_topic}
+                  </h4>
+                  {/* ... rest of cluster content ... */}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="mt-8">
             <h3 className="text-xl font-georgia text-[rgb(38,42,51)] mb-4">
-              Related Articles
+              {selectedCluster
+                ? `Articles: ${selectedCluster}`
+                : "Select a topic cluster to view its articles"}
             </h3>
             <div>
-              {finalArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} />
-              ))}
+              {selectedCluster ? (
+                getSelectedClusterArticles().map((article) => (
+                  <ArticleCard key={article.id} article={article} />
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  Click on a topic cluster above to view its related articles
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
