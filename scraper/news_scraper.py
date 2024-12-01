@@ -207,36 +207,34 @@ class FTScraper:
 if __name__ == "__main__":
     scraper = FTScraper()
 
-    sections_to_scrape = ["world", "world-uk", "companies", "technology", "markets", "climate-capital", "opinion", "lex"]
-    # sections_to_scrape = ["world"]
+    # sections_to_scrape = ["world", "world-uk", "companies", "technology", "markets", "climate-capital", "opinion", "lex"]
+    sections_to_scrape = ["us-presidential-election-2024?page=17"]
     articles = [article for section in sections_to_scrape for article in scraper.get_articles(section, random_pages=False)]
 
     # print(articles)
+    # articles = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out", "older_articles.json")))
+
+    article_contents = []
+    seen = set()
+    for article in articles:
+        if article and article["url"] not in seen:
+            seen.add(article["url"])
+            content = scraper.get_article_content_with_img(article["url"])
+            if content:
+                article_contents.append(content)
+        else:
+            print("duplicate")
 
     # article_contents = [
     #     scraper.get_article_content_with_img(article["url"]) for article in articles
     # ]
-
-    article_contents = []
-    for i, article in enumerate(articles):
-        content = scraper.get_article_content_with_img(article["url"])
-        if content:  # Only append if content was successfully retrieved
-            content["id"] = i
-            article_contents.append(content)
-            
-    article_contents = [
-        scraper.get_article_content_with_img(article["url"]) for article in articles
-    ]
     
-
-    # print(article_contents)
-
     out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out")
 
     # Create the directory if it doesn't exist
     os.makedirs(out_dir, exist_ok=True)
 
-    file_path = os.path.join(out_dir, "older_articles.json")
+    file_path = os.path.join(out_dir, "ft_election_1monthbefore.json")
 
     with open(file_path, "w") as f:
         json.dump(article_contents, f)
