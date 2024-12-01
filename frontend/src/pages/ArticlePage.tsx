@@ -130,7 +130,7 @@ export const ArticlePage: React.FC = () => {
           className="relative"
         >
           <div className="absolute -left-8 top-1/2 w-8 h-[2px] bg-gray-300"></div>
-          <QuestionCard question={relatedQuestion} />
+          <QuestionCard {...relatedQuestion} question={relatedQuestion} />
         </div>
       </div>
     </div>
