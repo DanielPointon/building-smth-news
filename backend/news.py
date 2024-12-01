@@ -129,10 +129,15 @@ class ExtractedEvents(BaseModel):
     question_id: int
     events: List[Event]
 
+class ClusterArticle(BaseModel):
+    title: str
+    author: str
+    published_date: str
+    description: str
 
 class Cluster(BaseModel):
     cluster_topic: str
-    article_ids: List[int]
+    article: ClusterArticle
 
 
 class ClusteredSubtopics(BaseModel):
@@ -431,7 +436,7 @@ async def get_questions():
     """
     Get all questions stored in the database.
     """
-    return list(database["questions"].values())[0:50]
+    return list(database["questions"].values())[0:150]
 
 
 @router.get("/questions/{question_id}")
@@ -516,6 +521,71 @@ async def get_events_for_question(question_id: str):
         print(f"Error generating events: {str(e)}")
         return ExtractedEvents(question_id=question_id, events=[])
 
+@lru_cache
+@router.post("/get_fake_clusters_for_question", response_model=ClusteredSubtopics)
+async def get_clusters_for_question(cluster_request: ClusterRequest):
+    """
+    Generate clusters of sub-topics for a given question based on related articles.
+    Each cluster contains a sub-topic and a list of related articles.
+    """
+    question_id = cluster_request.question_id
+    # Fetch the question by ID
+    question = database["questions"].get(question_id)
+    if not question:
+        raise HTTPException(status_code=404, detail="Question not found.")
+
+    # Fetch related articles for the question
+    related_articles = [
+        {
+            "article_id": article["id"],
+            "content": flatten_article_content(article["content"]),
+        }
+        for article in database["articles"].values()
+        if article["id"] in question.get("article_ids", [])
+    ]
+    if not related_articles:
+        raise HTTPException(
+            status_code=404, detail="No related articles found for the given question."
+        )
+
+    # Define the structured model for the OpenAI API
+    class ClusterRequest(BaseModel):
+        question: str
+        articles: List[dict]
+
+    cluster_request = ClusterRequest(
+        question=question["text"], articles=related_articles
+    )
+
+    try:
+        # Use structured data mode with OpenAI API
+        completion = client.beta.chat.completions.parse(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an AI that clusters sub-topics from articles related to specific questions. "
+                    "Each cluster should include a topic title and the IDs of related articles. If there are not many or no other articles come up with plausible and realistic fake clusters and articles. Aim for at least 4 clusters and 2-3 articles per cluster.",
+                },
+                {
+                    "role": "user",
+                    "content": cluster_request.json(),
+                },
+            ],
+            tools=[openai.pydantic_function_tool(ClusteredSubtopics)],
+        )
+
+        # Parse the structured response
+        parsed_arguments = (
+            completion.choices[0].message.tool_calls[0].function.parsed_arguments
+        )
+        return parsed_arguments
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error generating clusters: {str(e)}"
+        )
+        
 
 @lru_cache
 @router.post("/get_clusters_for_question", response_model=ClusteredSubtopics)
