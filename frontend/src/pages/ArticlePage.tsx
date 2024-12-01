@@ -37,8 +37,18 @@ export const ArticlePage: React.FC = () => {
 
     const calculateOffsets = () => {
       const offsets = questions.map((question) => {
+        let idx;
+        if (question.index_in_article == null) {
+          idx = 0;
+        } else if (question.index_in_article >= 0) {
+          idx = question.index_in_article;
+        } else {
+          idx = article.content.length + question.index_in_article;
+        }
+
+        console.log(question.index_in_article)
         const paragraph = document.getElementById(
-          `paragraph-${question.index_in_article}`
+          `paragraph-${idx}`
         );
         if (!paragraph) return { top: 0, height: 0 };
 
