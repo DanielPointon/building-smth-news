@@ -7,7 +7,7 @@ import { ArticleList } from "../components/articles/ArticleList";
 import { useQuestion, useQuestions } from "../hooks/useQuestions";
 import { Article, Question } from "../types/question";
 import { Card, CardContent, CardHeader, CardTitle } from "components/ui/card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TopicGraph from "components/TopicGraph";
 import {
   ChevronRight,
@@ -18,60 +18,21 @@ import {
 } from "lucide-react";
 import { QuestionCard } from "components/questions/QuestionCard";
 
-// Mock data for visualization
-const mockArticles: Article[] = [
-  {
-    id: "1",
-    title: "The Impact of Economic Disruptions on Local Communities",
-    description:
-      "An in-depth analysis of how economic changes affect community resilience",
-    author: "Sarah Johnson",
-    published_date: "2024-03-15",
-    content: [],
-    main_image_url:
-      "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/iKyAakezKfMI/v1/1200x801.webp",
-    isKeyEvent: true,
-  },
-  {
-    id: "2",
-    title: "Analyzing the Ripple Effects of a Changing Global Economy",
-    description:
-      "Exploring the interconnected nature of global economic systems",
-    author: "Michael Chen",
-    published_date: "2024-03-14",
-    content: [],
-    main_image_url:
-      "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/iZ7EgrLuQdYQ/v0/300x200.webp",
-    isKeyEvent: false,
-  },
-  {
-    id: "3",
-    title: "The Promise and Peril of Emerging Technologies",
-    description: "Examining the dual nature of technological advancement",
-    author: "Alex Rivera",
-    published_date: "2024-03-13",
-    content: [],
-    main_image_url:
-      "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ijI0shNG61S8/v2/459x306.webp",
-    isKeyEvent: true,
-  },
-];
+interface ClusterArticle {
+  title: string;
+  author: string;
+  published_date: string;
+  description: string;
+}
 
-// Mock clusters for topic visualization
-const mockClusters = [
-  {
-    cluster_topic: "Economic Impact",
-    article_ids: ["1", "2", "3"],
-  },
-  {
-    cluster_topic: "Technology Adoption",
-    article_ids: ["4", "5"],
-  },
-  {
-    cluster_topic: "Social Implications",
-    article_ids: ["6", "7", "8"],
-  },
-];
+interface Cluster {
+  cluster_topic: string;
+  article_list: ClusterArticle[];
+}
+
+interface ClusterResponse {
+  clusters: Cluster[];
+}
 
 interface RelatedQuestionProps {
   question: Question;
@@ -141,34 +102,96 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => (
             </div>
           </div>
         </div>
-        {article.main_image_url && (
+        {/* {article.main_image_url && (
           <img
             src={article.main_image_url}
             alt={article.title}
             className="w-32 h-32 object-cover rounded-lg"
           />
-        )}
+        )} */}
       </div>
-      <div className="flex justify-end mt-4">
-        <div className="flex items-center gap-1 text-[rgb(13,118,128)] text-sm group">
-          <span>Read more</span>
-          <ExternalLink
+      {/* <div className="flex justify-end mt-4"> */}
+      {/* <div className="flex items-center gap-1 text-[rgb(13,118,128)] text-sm group"> */}
+      {/* <span>Read more</span> */}
+      {/* <ExternalLink
             size={16}
             className="group-hover:translate-x-1 transition-transform"
-          />
-        </div>
-      </div>
+          /> */}
+      {/* </div> */}
+      {/* </div> */}
     </CardContent>
   </Card>
 );
 
 const QuestionPage: React.FC = () => {
   const { id } = useParams();
-
   const { loading, question, setQuestionData } = useQuestion(id);
+  const [clusters, setClusters] = useState<Cluster[]>([]);
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
 
+  // Add useEffect to fetch clusters
+  useEffect(() => {
+    const fetchClusters = async () => {
+      if (id) {
+        try {
+          const response = await fetch(
+            "http://localhost:8001/get_fake_clusters_for_question",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ question_id: id }),
+            }
+          );
+          const data: ClusterResponse = await response.json();
+          setClusters(data.clusters);
+          console.log(data);
+        } catch (error) {
+          console.error("Error fetching clusters:", error);
+        }
+      }
+    };
+
+    fetchClusters();
+  }, [id]);
+
   const currentQuestion = question;
+
+  const finalArticles: Article[] = [];
+  const finalClusters: { cluster_topic: string; article_ids: string[] }[] = [];
+
+  // Unique ID counter for articles
+  let articleId = 1;
+
+  // Transform the data
+  clusters.forEach((cluster) => {
+    const articleIds: string[] = [];
+
+    cluster.article_list.forEach((article) => {
+      const articleObj = {
+        id: articleId.toString(),
+        title: article.title,
+        description: article.description,
+        author: article.author,
+        published_date: article.published_date,
+        content: [], // Placeholder for now
+        main_image_url: "https://via.placeholder.com/300", // Placeholder image
+        isKeyEvent: false, // Default value
+      };
+      finalArticles.push(articleObj);
+      articleIds.push(articleObj.id);
+      articleId++;
+    });
+
+    finalClusters.push({
+      cluster_topic: cluster.cluster_topic,
+      article_ids: articleIds,
+    });
+  });
+
+  console.log("Articles:", finalArticles);
+  console.log("Clusters:", finalClusters);
 
   if (loading) {
     return (
@@ -186,8 +209,8 @@ const QuestionPage: React.FC = () => {
     );
   }
 
-  const currentProbability =
-    currentQuestion.data[currentQuestion.data.length - 1].probability;
+  // const currentProbability =
+  //   currentQuestion.data[currentQuestion.data.length - 1].probability;
 
   const handleClusterSelect = (cluster: string) => {
     console.log("Selected cluster:", cluster);
@@ -197,7 +220,7 @@ const QuestionPage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto mb-12">
       <Card className="bg-[rgb(255,241,229)] border-none shadow-lg mb-8">
-        <CardHeader className="border-b border-gray-200">
+        {/* <CardHeader className="border-b border-gray-200">
           <CardTitle className="text-2xl font-georgia text-[rgb(38,42,51)]">
             {currentQuestion.question}
           </CardTitle>
@@ -217,7 +240,7 @@ const QuestionPage: React.FC = () => {
               </div>
             )}
           </div>
-        </CardHeader>
+        </CardHeader> */}
 
         <CardContent className="mt-6">
           <div className="bg-[rgb(242,223,206)] rounded-lg shadow-sm mb-6">
@@ -242,8 +265,8 @@ const QuestionPage: React.FC = () => {
               Topic Network
             </h3>
             <TopicGraph
-              articles={mockArticles}
-              clusters={mockClusters}
+              articles={finalArticles}
+              clusters={finalClusters}
               onClusterSelect={handleClusterSelect}
             />
           </div>
@@ -253,7 +276,7 @@ const QuestionPage: React.FC = () => {
               Related Articles
             </h3>
             <div>
-              {mockArticles.map((article) => (
+              {finalArticles.map((article) => (
                 <ArticleCard key={article.id} article={article} />
               ))}
             </div>
