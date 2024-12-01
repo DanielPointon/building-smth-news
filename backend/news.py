@@ -355,7 +355,11 @@ async def generate_questions_for_article(article: ArticleInput):
                 ],
                 tools=[openai.pydantic_function_tool(GeneratedQuestions)],
             )
-            relevant_existing_questions = relevance_response.choices[0].message.tool_calls[0].function.parsed_arguments.questions
+            try:
+                relevant_existing_questions = relevance_response.choices[0].message.tool_calls[0].function.parsed_arguments.questions
+            except Exception as e:
+                print(f"Error parsing relevant existing questions: {str(e)}")
+                relevant_existing_questions = []
 
         # Append relevant existing questions to linked_questions
         for question in relevant_existing_questions:
