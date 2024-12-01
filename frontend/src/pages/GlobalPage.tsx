@@ -61,12 +61,12 @@ const GlobalPage: React.FC = () => {
           <div className="flex items-center gap-2 mb-4">
             <Globe className="w-8 h-8 text-[rgb(13,118,128)]" />
             <h1 className="text-2xl font-georgia text-[rgb(38,42,51)]">
-              Global Market Explorer
+              Questions that Matter
             </h1>
           </div>
           {!selectedCountry && (
             <p className="text-[rgb(38,42,51)]">
-              Select a country to explore its prediction markets and global economic indicators
+              Select a country to uncover the questions the world is asking about its future.
             </p>
           )}
         </div>

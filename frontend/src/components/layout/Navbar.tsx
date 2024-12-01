@@ -25,13 +25,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onHistoryClick, onGlobalClick, o
         </button>
         <button
           className="flex items-center space-x-3 hover:text-[rgb(13,118,128)] transition-colors"
-          onClick={onHistoryClick}
-        >
-          <History className="w-6 h-6" />
-          <span className="text-lg">History</span>
-        </button>
-        <button
-          className="flex items-center space-x-3 hover:text-[rgb(13,118,128)] transition-colors"
           onClick={() => navigate('/global')}
         >
           <Globe className="w-6 h-6" />
@@ -45,8 +38,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onHistoryClick, onGlobalClick, o
           <span className="text-lg">Explorer</span>
         </button>
       </div>
+      
       <div className="flex items-center space-x-6">
-        {BALANCES.map((balance, idx) => (
+      {BALANCES.map((balance, idx) => (
           <NavbarBalance
             key={idx}
             currency={balance.currency}
@@ -54,6 +48,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onHistoryClick, onGlobalClick, o
             icon={balance.icon}
           />
         ))}
+       <button
+          className="flex items-center space-x-3 hover:text-[rgb(13,118,128)] transition-colors"
+          onClick={onHistoryClick}
+        >
+          <History className="w-6 h-6" />
+          <span className="text-lg">History</span>
+        </button>
       </div>
     </nav>
   );

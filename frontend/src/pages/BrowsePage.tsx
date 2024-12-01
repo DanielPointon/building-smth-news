@@ -27,15 +27,15 @@ export const BrowsePage: React.FC = () => {
   return (
     <div>
       {/* <div className="bg-[rgb(242,223,206)] p-6 mb-8 rounded-lg"> */}
-      <div className="border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
+      <div className="w-4/5 mx-auto space-y-6 border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-georgia text-[rgb(38,42,51)]">
-            Market Predictions
+            Prediction Markets
           </h1>
           <ViewToggle />
         </div>
         <p className="text-[rgb(38,42,51)]">
-          Track and trade on future outcomes across global markets and events
+        Explore the questions shaping the future. 
         </p>
       </div>
 
@@ -44,7 +44,7 @@ export const BrowsePage: React.FC = () => {
           No predictions available at the moment.
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="w-4/5 mx-auto space-y-6">
           {truncatedQuestions.map((q) => (
             <QuestionCard
               key={q.id}
