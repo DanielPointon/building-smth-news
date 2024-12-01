@@ -1,28 +1,49 @@
 import json
+import math
+import random
 import requests
 
 f = json.load(open("database.json"))
 
-for a in f["questions"].values():
-    id = str(a["id"])
+
+def make_trade(id, p, q):
     m = requests.post(
-        "http://localhost:8000/markets",
-        json={"id": str(a["id"]), "name": a["question"], "description": ""},
+        f"http://localhost:8000/markets/{id}/order",
+        json={"user_id": "root", "side": "bid", "price": p, "quantity": q},
     )
 
     m = requests.post(
         f"http://localhost:8000/markets/{id}/order",
-        json={"user_id": "root", "side": "bid", "price": 51, "quantity": 1},
+        json={"user_id": "root", "side": "ask", "price": p - 1, "quantity": q},
     )
-    m = requests.post(
-        f"http://localhost:8000/markets/{id}/order",
-        json={"user_id": "root", "side": "ask", "price": 49, "quantity": 1},
+
+
+n = len(f["questions"])
+
+
+def process_question(i, a, n):
+    print(f"{i}/{n}\r", flush=True)
+    id = str(a["id"])
+    requests.post(
+        "http://localhost:8000/markets",
+        json={"id": str(a["id"]), "name": a["question"], "description": ""},
     )
-    m = requests.post(
-        f"http://localhost:8000/markets/{id}/order",
-        json={"user_id": "root", "side": "bid", "price": 49, "quantity": 1},
-    )
-    m = requests.post(
-        f"http://localhost:8000/markets/{id}/order",
-        json={"user_id": "root", "side": "ask", "price": 51, "quantity": 1},
-    )
+
+    s = 50
+    for _ in range(50):
+        r = random.random() + 0.5
+        r = math.log(r)
+        s = int(s * r)
+        make_trade(id, s, 1)
+
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+n = len(f["questions"])
+with ThreadPoolExecutor() as executor:
+    futures = [
+        executor.submit(process_question, i, a, n)
+        for i, a in enumerate(f["questions"].values())
+    ]
+    for future in as_completed(futures):
+        future.result()

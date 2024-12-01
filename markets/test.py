@@ -11,15 +11,18 @@ print(m.text)
 id = m.json()["id"]
 print(id)
 
-m = requests.post(
-    f"http://localhost:8000/markets/{id}/order",
-    json={"user_id": uid, "side": "bid", "price": 30, "quantity": 10},
-)
 
-m = requests.post(
-    f"http://localhost:8000/markets/{id}/order",
-    json={"user_id": uid, "side": "ask", "price": 39, "quantity": 10},
-)
+def make_trade(p, q):
+    m = requests.post(
+        f"http://localhost:8000/markets/{id}/order",
+        json={"user_id": uid, "side": "bid", "price": p, "quantity": q},
+    )
+
+    m = requests.post(
+        f"http://localhost:8000/markets/{id}/order",
+        json={"user_id": uid, "side": "ask", "price": p - 1, "quantity": q},
+    )
+
 
 clob = requests.get(
     f"http://localhost:8000/markets/{id}/clob",
