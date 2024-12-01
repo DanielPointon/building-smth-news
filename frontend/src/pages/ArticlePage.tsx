@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 import { useState, useEffect, Fragment } from "react";
 import { useParams } from "react-router-dom";
 import { QuestionCard } from "../components/questions/QuestionCard";
@@ -94,7 +94,7 @@ export const ArticlePage: React.FC = () => {
                   <p
                     id={`paragraph-${index}`}
                     className={`mb-4 transition-all duration-200 ${
-                      index === relatedQuestion.paragraphIndex
+                      index === relatedQuestion.index_in_article
                         ? "bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500"
                         : ""
                     }`}
@@ -130,7 +130,7 @@ export const ArticlePage: React.FC = () => {
           className="relative"
         >
           <div className="absolute -left-8 top-1/2 w-8 h-[2px] bg-gray-300"></div>
-          <QuestionCard {...relatedQuestion} />
+          <QuestionCard question={relatedQuestion} />
         </div>
       </div>
     </div>

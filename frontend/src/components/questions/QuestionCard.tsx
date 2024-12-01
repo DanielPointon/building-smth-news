@@ -16,6 +16,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   setQuestionData,
 }) => {
+  console.log(question);
   const navigate = useNavigate();
   const [showAllNews, setShowAllNews] = useState<boolean>(false);
   const [backupData, setBackupData] = useState<DataPoint[]>([]);

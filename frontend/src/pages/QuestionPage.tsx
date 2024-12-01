@@ -163,7 +163,7 @@ const QuestionPage: React.FC = () => {
   if (!currentQuestion) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-lg text-gray-500">Question not found</p>
+        <p className="text-lg text-gray-500">Loading</p>
       </div>
     );
   }
