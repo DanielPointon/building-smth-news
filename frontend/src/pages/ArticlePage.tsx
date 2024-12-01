@@ -6,6 +6,8 @@ import { QuestionCard } from "../components/questions/QuestionCard";
 export const ArticlePage: React.FC = () => {
   const { id } = useParams();
   const [article, setArticle] = useState<Article | null>(null);
+  const [questions, setQuestions] = useState<any>();
+
   const [loading, setLoading] = useState(true);
   const [paragraphOffset, setParagraphOffset] = useState(0);
 
@@ -18,7 +20,7 @@ export const ArticlePage: React.FC = () => {
           throw new Error("Article not found");
         }
         const data = await response.json();
-        console.log(data);
+        setQuestions(data.questions);
         setArticle(data);
       } catch (error) {
         console.error("Error fetching article:", error);
@@ -30,24 +32,14 @@ export const ArticlePage: React.FC = () => {
     fetchArticle();
   }, [id]);
 
-  const relatedQuestion = {
-    id: "1",
-    question: {question: "Will Russia win the war in Ukraine by 2025?"},
-    paragraphIndex: 2,
-    data: [
-      { date: "2024-01-01", probability: 25 },
-      { date: "2024-02-01", probability: 30 },
-      { date: "2024-03-01", probability: 28 },
-    ],
-    articles: [],
-  };
+  const relatedQuestion = questions && questions[0];
 
   useEffect(() => {
     if (!article) return;
 
     const calculateOffset = () => {
       const paragraph = document.getElementById(
-        `paragraph-${relatedQuestion.paragraphIndex}`
+        `paragraph-${relatedQuestion.index_in_article}`
       );
       if (!paragraph) return;
 
@@ -60,10 +52,10 @@ export const ArticlePage: React.FC = () => {
       setParagraphOffset(adjustedOffset);
     };
 
-    calculateOffset();
+    relatedQuestion && calculateOffset();
     window.addEventListener("resize", calculateOffset);
     return () => window.removeEventListener("resize", calculateOffset);
-  }, [relatedQuestion.paragraphIndex, article]);
+  }, [relatedQuestion, article]);
 
   if (loading) {
     return <div className="text-center py-8">Loading...</div>;

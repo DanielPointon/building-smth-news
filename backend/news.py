@@ -434,6 +434,20 @@ async def get_questions():
     return list(database["questions"].values())[0:50]
 
 
+@router.get("/questions/{question_id}")
+async def get_questions(question_id:str):
+    """
+    Get all questions stored in the database.
+    """
+
+    for question in database["questions"]:
+        if question == question_id:
+            return database["questions"][question]
+
+
+    raise HTTPException(
+        status_code=404, detail="No question found."
+    )
 @router.post("/questions/{question_id}/events", response_model=ExtractedEvents)
 async def get_events_for_question(question_id: str):
     """

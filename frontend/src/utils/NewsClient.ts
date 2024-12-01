@@ -2,8 +2,8 @@ export class NewsClient {
     private baseURL: string;
 
     constructor() {
-      // FIXME: env
-      this.baseURL = "http://localhost:8001";
+        // FIXME: env
+        this.baseURL = "http://localhost:8001";
     }
 
     private async request<T>(
@@ -62,6 +62,11 @@ export class NewsClient {
     async getClustersForQuestion(request: ClusterRequest): Promise<ClusteredSubtopics> {
         return this.request('/get_clusters_for_question', 'POST', request);
     }
+
+    // get question
+    async getQuestion(id: string): Promise<any> {
+        return this.request(`/questions/${id}`, 'GET');
+    }
 }
 
 // models to match the python server types
@@ -99,7 +104,7 @@ export interface Question {
     id: string;
     question: string;
     metadata: Record<string, unknown>;
-index_in_article?: number | null;
+    index_in_article?: number | null;
 }
 
 interface ExtractedEvents {

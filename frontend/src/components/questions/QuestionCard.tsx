@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Sparkles, ChevronRight } from 'lucide-react';
 import { ProbabilityGraph } from '../graph/ProbabilityGraph';
 import { TradingButtons } from '../trading/TradingButtons';
 import { ArticleList } from '../articles/ArticleList';
-import { QuestionCardProps, Article, Question } from '../../types/question';
+import { QuestionCardProps, Article, Question, DataPoint } from '../../types/question';
+import { MarketsClient, MarketTrade, MarketTrades } from 'utils/MarketsClient';
 
 const isValidEvent = (article: Article): article is (Article & { date: string }) => {
   return !!article.isKeyEvent && article.isKeyEvent && typeof article.published_date === 'string';
@@ -17,6 +18,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const [showAllNews, setShowAllNews] = useState<boolean>(false);
+  const [backupData, setBackupData] = useState<DataPoint[]>([]);
+  const [backupProbability, setBackupProbability] = useState<number|null>(null);
+
   const currentProbability = question.probability ?? 0.5;
   // const previousProbability = data[data.length - 2]?.probability;
   // const trending = currentProbability > previousProbability;
@@ -29,6 +33,34 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       date: article.date,
       title: article.title
     })) : [];
+
+    useEffect(
+      () => {
+        const getBackupData = async () => {
+          if(!question.data){
+            const marketsClient = new MarketsClient();
+            const trades = await marketsClient.getTrades(id);
+            setBackupProbability(trades.trades[trades.trades.length - 1].price);
+            setBackupData(trades.trades.map(
+              (event: MarketTrade) => {
+                return {
+                date: event.time,
+                probability: event.price,
+                }
+              }
+            ));
+            console.log(backupProbability);
+            console.log(backupData);
+          }
+        };
+
+        getBackupData();
+      }, []
+    )
+
+  let overallData = question.data ?? backupData;
+  let overallProbability = question.probability ?? backupProbability;
+    
 
   const handleQuestionClick = () => {
     navigate(`/question/${id}`);
@@ -67,7 +99,13 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           />
       </div>
 
-          {question.probability && question.data && question.articles && (<TradingButtons question={question as Question} setQuestionData={setQuestionData} />)}
+          {overallProbability && overallData && question.articles && (<TradingButtons question={
+            {
+              ...question,
+              probability: overallProbability,
+              data: overallData,
+              articles: question.articles || []
+          }} setQuestionData={setQuestionData} />)}
         { question.articles && (<div className="mt-6 space-y-2">
           <ArticleList 
             articles={question.articles} 

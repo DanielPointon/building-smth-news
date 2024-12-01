@@ -13,6 +13,9 @@ const GlobalPage: React.FC = () => {
   // Create newsClient once using useMemo
   const newsClient = useMemo(() => new NewsClient(), []);
 
+  console.log("News Client");
+  console.log(newsClient);
+
   useEffect(() => {
     let isSubscribed = true;
 

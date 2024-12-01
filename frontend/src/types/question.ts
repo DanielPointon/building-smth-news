@@ -1,3 +1,5 @@
+import { MarketsClient } from "utils/MarketsClient";
+
 export interface Article {
   id: string;
   title: string;
