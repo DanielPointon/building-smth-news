@@ -165,7 +165,7 @@ const QuestionPage: React.FC = () => {
   let articleId = 1;
 
   // Transform the data
-  clusters.forEach((cluster) => {
+  (clusters || []).forEach((cluster) => {
     const articleIds: string[] = [];
 
     cluster.article_list.forEach((article) => {

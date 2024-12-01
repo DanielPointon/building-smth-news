@@ -50,6 +50,7 @@ export const ArticlePage: React.FC = () => {
         const paragraph = document.getElementById(
           `paragraph-${idx}`
         );
+
         if (!paragraph) return { top: 0, height: 0 };
 
         const paragraphRect = paragraph.getBoundingClientRect();
