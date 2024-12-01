@@ -28,6 +28,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   setQuestionData,
   lowHeight,
+  compact = false,
 }) => {
   const navigate = useNavigate();
   const [showAllNews, setShowAllNews] = useState<boolean>(false);
@@ -39,7 +40,6 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   const trending = false;
 
   useEffect(() => {
-    // Trigger the fade-in animation after component mount
     setIsVisible(true);
   }, []);
 
@@ -86,34 +86,46 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     navigate(`/question/${id}`);
   };
 
+  const tradingButtonsComponent = (
+    <TradingButtons
+      question={{
+        ...question,
+        probability: currentProbability,
+        data: overallData ?? [],
+        articles: question.articles || [],
+      }}
+      setQuestionData={setQuestionData}
+    />
+  );
+
   return (
     <div 
-      className={`bg-[rgb(255,241,229)] p-6 mb-6 shadow-lg rounded-lg border border-gray-200 transition-opacity duration-1000 ease-in-out ${
+      className={`bg-[rgb(255,241,229)] ${compact ? 'p-4' : 'p-6'} mb-6 shadow-lg rounded-lg border border-gray-200 transition-opacity duration-1000 ease-in-out ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
       <div className="flex flex-col">
-        <div className="pb-4 border-b border-gray-300">
+        <div className={`${compact ? 'pb-2' : 'pb-4'} border-b border-gray-300`}>
           <div
             className="flex flex-row items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
             onClick={handleQuestionClick}
           >
-            <div className="text-xl font-georgia text-[rgb(38,42,51)] flex items-center gap-2">
+            <div className={`${compact ? 'text-base' : 'text-xl'} font-georgia text-[rgb(38,42,51)] flex items-center gap-2`}>
               {question.question}
               {trending && (
-                <Sparkles size={16} className="text-[rgb(13,118,128)]" />
+                <Sparkles size={compact ? 14 : 16} className="text-[rgb(13,118,128)]" />
               )}
             </div>
             <div className="flex items-center gap-2">
               <span
-                className={`text-2xl font-bold font-georgia ${
+                className={`${compact ? 'text-xl' : 'text-2xl'} font-bold font-georgia ${
                   trending ? "text-[rgb(13,118,128)]" : "text-red-600"
                 }`}
               >
                 {currentProbability}%
               </span>
               <TrendingUp
-                size={20}
+                size={compact ? 18 : 20}
                 className={`${
                   trending
                     ? "text-[rgb(13,118,128)] rotate-0"
@@ -122,50 +134,43 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               />
             </div>
           </div>
+          {compact && <div className="mt-2">{tradingButtonsComponent}</div>}
         </div>
 
-        <div className="py-6">
+        <div className={`${compact ? 'py-3' : 'py-6'}`}>
           <div className={`bg-[rgb(242,223,206)] rounded-lg shadow-sm transition-transform duration-1000 ease-in-out ${
             isVisible ? 'translate-y-0' : 'translate-y-4'
-          }`}>
+          } ${compact ? 'h-40' : 'h-64'}`}>
             {!lowHeight && (
               <ProbabilityGraph 
                 data={overallData} 
                 events={events}
                 className={`transition-opacity duration-2000 delay-500 ${
                   isVisible ? 'opacity-100' : 'opacity-0'
-                }`}
+                } h-full`}
               />
             )}
           </div>
 
-          <TradingButtons
-            question={{
-              ...question,
-              probability: currentProbability,
-              data: overallData ?? [],
-              articles: question.articles || [],
-            }}
-            setQuestionData={setQuestionData}
-          />
+          {!compact && <div className="mt-4">{tradingButtonsComponent}</div>}
         </div>
       </div>
 
       {question.articles && (
-        <div className="mt-6 space-y-2">
+        <div className={`${compact ? 'mt-3' : 'mt-6'} space-y-2`}>
           <ArticleList articles={question.articles} showAll={showAllNews} />
         </div>
       )}
 
       {question.articles && question.articles.length > 2 && (
-        <div className="pt-4 border-t border-gray-300">
+        <div className={`${compact ? 'pt-2' : 'pt-4'} border-t border-gray-300`}>
           <button
             onClick={() => setShowAllNews((prev) => !prev)}
-            className="flex items-center gap-2 text-sm text-[rgb(13,118,128)] hover:text-[rgb(11,98,108)] transition-colors group"
+            className={`flex items-center gap-2 ${compact ? 'text-xs' : 'text-sm'} text-[rgb(13,118,128)] hover:text-[rgb(11,98,108)] transition-colors group`}
           >
             {showAllNews ? "Show less" : "Explore more"}
             <ChevronRight
-              size={16}
+              size={compact ? 14 : 16}
               className={`transition-transform duration-300 group-hover:translate-x-1 ${
                 showAllNews ? "rotate-90" : ""
               }`}

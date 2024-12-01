@@ -74,7 +74,7 @@ export const ArticlePage: React.FC = () => {
     return <div className="text-center py-8">Article not found</div>;
   }
 
-  const QUESTION_CARD_WIDTH = 280; // Reduced from 320
+  const QUESTION_CARD_WIDTH = 280;
   const CARD_OFFSET = "4rem";
   
   const getLinePosition = (cardCenterY: number, paragraphCenterY: number) => {
@@ -104,7 +104,7 @@ export const ArticlePage: React.FC = () => {
           }
         `}
       </style>
-      <div className="max-w-xl mx-auto relative"> {/* Changed from max-w-2xl to max-w-xl */}
+      <div className="max-w-xl mx-auto relative">
         <div className="absolute inset-0 w-full">
           {questions.map((question, index) => {
             const isLeft = index % 2 === 1;
@@ -149,15 +149,15 @@ export const ArticlePage: React.FC = () => {
                         y1={linePosition.y1}
                         x2={isLeft ? "0" : "100%"}
                         y2={linePosition.y2}
-                        stroke="#93C5FD"
-                        strokeWidth="2"
-                        strokeDasharray="4 4"
+                        stroke="#BFDBFE"  // Changed to a lighter blue
+                        strokeWidth="4"    // Increased stroke width
+                        strokeDasharray="8 8"  // Increased dash size for thicker line
                         className="connector-line"
                         transform={`rotate(${isLeft ? 15 : -15} ${isLeft ? "100" : "0"} 50)`}
                       />
                     </svg>
                   </div>
-                  <QuestionCard {...question} question={question} lowHeight={true} />
+                  <QuestionCard compact={true} {...question} question={question} />
                 </div>
               </div>
             );
@@ -165,6 +165,7 @@ export const ArticlePage: React.FC = () => {
         </div>
 
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          {/* Rest of the article content remains the same */}
           <h1 className="text-3xl font-bold mb-4">{article.title}</h1>
           <p className="text-gray-600 text-lg mb-4">{article.description}</p>
           <img

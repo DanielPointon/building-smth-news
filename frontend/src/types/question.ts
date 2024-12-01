@@ -45,6 +45,7 @@ export interface QuestionCardProps {
   question: PartialQuestion & { 'articles'?: Article[], data?: DataPoint[]};
   setQuestionData: (question: Question) => void;
   lowHeight?: boolean;
+  compact?: boolean;
 }
 
 export interface Cluster {
