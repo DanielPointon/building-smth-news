@@ -72,7 +72,16 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     getBackupData();
   }, []);
 
-  let overallData = question.data ?? backupData;
+  let overallData = (question.data ?? backupData).map((point) => ({
+    ...point,
+    date: new Date(point.date).toLocaleString("en-US", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }),
+  }));
   let overallProbability = question.probability ?? backupProbability;
 
   console.log(overallData);
