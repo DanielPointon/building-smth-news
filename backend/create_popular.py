@@ -53,10 +53,11 @@ def process_questions(questions: Dict[str, dict]) -> Dict[str, dict]:
     )
 
     # Parse the response
-    response_content = completion["choices"][0]["message"]["content"]
-    response_data = PopularQuestions.parse_raw(response_content)
+    parsed_arguments = (
+            completion.choices[0].message.tool_calls[0].function.parsed_arguments
+        )
+    return parsed_arguments
 
-    return response_data.dict()
 
 
 # Example usage
