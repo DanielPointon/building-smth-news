@@ -52,6 +52,10 @@ export const useQuestions = (): UseQuestions => {
                     const data: DataPoint[] = info.trades.map(t => ({ date: t.time, probability: t.price }))
                     const articles = await newsClient.getArticlesForQuestion(q.id.toString())
 
+                    if (!articles) {
+                        continue
+                    }
+
                     newQuestions.push({
                         id: q.id,
                         question: q.question,
