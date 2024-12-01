@@ -7,7 +7,7 @@ import { Balance } from '../../types/balance';
 import PrismIcon from 'components/prism';
 
 const BALANCES: Balance[] = [
-  { currency: 'Prisms', amount: '1,234', icon: PrismIcon },
+  { currency: 'Prisms', amount: '1,337', icon: PrismIcon },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({ onHistoryClick, onGlobalClick, onExplorerClick, className = '' }) => {
