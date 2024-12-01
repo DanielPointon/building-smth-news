@@ -520,7 +520,11 @@ async def get_articles_for_question(question_id: str):
     if not question:
         raise HTTPException(status_code=404, detail="Question not found.")
     article_ids = question.get("article_ids", [])
-    articles = [database["articles"].get(article_id) for article_id in article_ids]
+    articles = []
+    for article_id in article_ids:
+        article = database["articles"].get(article_id)
+        if article:
+            articles.append(article)
     return articles
 
 app.include_router(router)
